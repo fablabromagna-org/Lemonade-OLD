@@ -14,7 +14,7 @@
   $cognome = $mysqli -> real_escape_string(isset($_POST['cognome']) ? trim($_POST['cognome']) : '');
   $pwd = $mysqli -> real_escape_string(isset($_POST['pwd']) ? trim($_POST['pwd']) : '');
   $email = $mysqli -> real_escape_string(isset($_POST['email']) ? strtolower(trim($_POST['email'])) : '');
-  $ip = $mysqli -> real_escape_string($_SERVER['REMOTE_ADDR']);
+  $ip = $mysqli -> real_escape_string($_SERVER['X-Forwarded-For']);
 
   function stampaErrore($errore = 'Errore sconosciuto!') {
     echo '{"errore":true,"msg":"'.$errore.'"}';

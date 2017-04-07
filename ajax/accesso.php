@@ -52,7 +52,7 @@
 
           $hashSessione = md5(time());
           $scadenza = time()+30*24*60*60;
-          $ip = $_SERVER['REMOTE_ADDR'];
+          $ip = $_SERVER['X-Forwarded-For'];
 
           // Inserisco la sessione nel db ed elimino tutte quelle scadute
           $sql = "INSERT INTO sessioni (ipInizio, hashSessione, idUtente, userAgent, scadenza) VALUES ('$ip', '$hashSessione', '".$dati['id']."', '$userAgent', '$scadenza'); ";

@@ -87,7 +87,7 @@
         $nomeCognome = str_replace('Utente: ', '', $nomeCognome -> nodeValue);
 
         // Preparo le query
-        $sql = "INSERT INTO confermeScuolaWeb (codiceUtente, idUtente, ip, nomeAccount, data) VALUES ('$utente', '".$autenticazione -> id."', '".$_SERVER['REMOTE_ADDR']."', '$nomeCognome', '".time()."'); ";
+        $sql = "INSERT INTO confermeScuolaWeb (codiceUtente, idUtente, ip, nomeAccount, data) VALUES ('$utente', '".$autenticazione -> id."', '".$_SERVER['X-Forwarded-For']."', '$nomeCognome', '".time()."'); ";
         $sql .= "UPDATE utenti SET scuolaweb = '1' WHERE id = '".$autenticazione -> id."'";
 
         // Eseguo la query
