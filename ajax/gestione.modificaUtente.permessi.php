@@ -102,7 +102,7 @@
           // Controllo che la categoria esista
           $vecchiaRow = $row;
 
-          $sql = "SELECT * FROM categorieUtenti WHERE id = '{$id}'";
+          $sql = "SELECT * FROM categorieUtenti WHERE id = '{$categoria}'";
 
           if(!$query = $mysqli -> query($sql))
             stampaErrore('Impossibile inviare la richiesta al database!');
