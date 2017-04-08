@@ -1,25 +1,28 @@
 <?php
+
+  @include_once('devConfig.inc.php');
+
   // E-Mail
-  define('MAILGUN_API_KEY', '');
-  define('MITTENTE_EMAIL', '');
-  define('INDIRIZZO_MITTENTE', '');
-  define('DOMINIO_EMAIL_MAILGUN', '');
+  define('MAILGUN_API_KEY', getenv('MAILGUN_API_KEY'));
+  define('MITTENTE_EMAIL', getenv('MAILGUN_FROM_NAME'));
+  define('INDIRIZZO_MITTENTE', getenv('MAILGUN_FROM'));
+  define('DOMINIO_EMAIL_MAILGUN', getenv('MAILGUN_DOMAIN'));
 
   // Login
   define('COOKIE_NAME', 'flrAuth');
 
   // MySQL
-  define('MYSQL_USERNAME', 'root');
-  define('MYSQL_PASSWORD', 'root');
-  define('MYSQL_DATABASE', 'agora');
-  define('MYSQL_HOST', 'localhost');
+  define('MYSQL_USERNAME', getenv('MYSQL_USERNAME'));
+  define('MYSQL_PASSWORD', getenv('MYSQL_PWD'));
+  define('MYSQL_DATABASE', getenv('MYSQL_DB'));
+  define('MYSQL_HOST', getenv('MYSQL_HOST'));
 
   // Il programma deve mostrare gli errori di PHP?
-  define('PHP_MOSTRA_ERRORI', false);
+  define('PHP_MOSTRA_ERRORI', (bool)getenv('PHP_ERRORS'));
 
   // Nome del sito e url
-  define('NOME_SITO', 'FabLab Romagna');
-  define('URL_SITO', 'http://localhost:2121');
+  define('NOME_SITO', getenv('SITE_NAME'));
+  define('URL_SITO', getenv('SITE_URL'));
 
   // Tema
   define('TEMA_BG_PRINCIPALE', '#cecece'); // Colore sfondo home e footer e topbar
