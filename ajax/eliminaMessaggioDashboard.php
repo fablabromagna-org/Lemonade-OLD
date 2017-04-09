@@ -38,10 +38,11 @@
       // Estraggo i dati relativi all'utente
       $sql = "DELETE FROM dashboard WHERE id = '{$id}'";
 
-      if($query = $mysqli -> query($sql))
+      if($query = $mysqli -> query($sql)) {
+        $console -> log("Rimosso messaggio sulla dashboard.", $autenticazione -> id);
         echo '{}';
 
-      else
+      } else
         stampaErrore('Impossibile inviare la richiesta al database! '.$mysqli -> error);
     }
   }

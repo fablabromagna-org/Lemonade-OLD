@@ -52,10 +52,10 @@
       // Estraggo i dati relativi all'utente
       $sql = "INSERT INTO dashboard (titolo, descrizione, tipo, linkBottone, titoloLink) VALUES ('{$titolo}', '{$descrizione}', '{$tipo}', '{$link}', '{$testo}')";
 
-      if($query = $mysqli -> query($sql))
+      if($query = $mysqli -> query($sql)) {
+        $console -> log("Aggiunto messaggio sulla dashboard ({$titolo}).", $autenticazione -> id);
         echo '{}';
-
-      else
+      } else
         stampaErrore('Impossibile inviare la richiesta al database! '.$mysqli -> error);
     }
   }
