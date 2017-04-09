@@ -1,5 +1,5 @@
 <?php
-  require_once('class/gestioneAuth.class.php');
+  require_once('class/caricaClassi.inc.php');
   require_once('inc/mysqli.inc.php');
 
   $autenticazione = new Autenticazione($mysqli);
