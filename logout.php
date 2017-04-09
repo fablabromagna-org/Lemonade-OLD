@@ -1,6 +1,5 @@
 <?php
-  require_once('class/caricaClassi.inc.php');
-  require_once('inc/mysqli.inc.php');
+  require_once('inc/carica.inc.php');
 
   $autenticazione = new Autenticazione($mysqli);
   if(!$autenticazione -> isLogged())

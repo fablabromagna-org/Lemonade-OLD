@@ -1,6 +1,5 @@
 <?php
-  require_once('../class/caricaClassi.inc.php');
-  require_once('../inc/mysqli.inc.php');
+  require_once('../inc/carica.inc.php');
   require_once('../vendor/autoload.php');
 
   $autenticazione = new Autenticazione($mysqli);
@@ -56,7 +55,7 @@
         else
           stampaErrore('Impossibile inviare la richiesta al database!');
       }
-      
+
     } else if($richiesta == 'rinomina') {
 
       // Controllo l'ID sia diverso da vuoto

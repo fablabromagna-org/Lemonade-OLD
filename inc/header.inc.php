@@ -1,5 +1,5 @@
 <?php
-  require_once(__DIR__.'/../class/caricaClassi.inc.php');
+  require_once('carica.inc.php');
   $autenticazione = new Autenticazione($mysqli);
 ?>
 <title><?php echo NOME_SITO; ?></title>

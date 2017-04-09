@@ -1,5 +1,5 @@
 <?php
-  require_once('inc/mysqli.inc.php');
+  require_once('inc/carica.inc.php');
 ?>
 <!DOCTYPE html>
 <html lang="it">
