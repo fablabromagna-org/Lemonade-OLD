@@ -52,7 +52,7 @@
           </div>
           <div class="descrizione">
             <p>Pannello per la gesestione dei corsi.</p>
-            <a class="button disabled">Vai a Corsi</a>
+            <a href="/gestione/corsi" class="button">Vai a Corsi</a>
           </div>
         </div>
       </div>
