@@ -70,7 +70,7 @@
             $sql = "INSERT INTO utenti (nome, cognome, email, password, codiceAttivazione, ipRegistrazione) VALUES ('".$nome."', '".$cognome."', '".$email."', '".md5($pwd)."', '".$codiceConferma."',  '".$ip."')";
 
           else
-            $sql = "UPDATE utenti SET nome = '".$nome."', cognome = '".$cognome."', password = '".md5($pwd)."', codiceAttivazione = '".$codiceConferma."',  ipRegistrazione = '".$ip."' WHERE email = '".$email."'";
+            $sql = "UPDATE utenti SET nome = '".$nome."', cognome = '".$cognome."', password = '".md5($pwd)."', codiceAttivazione = '".$codiceConferma."',  ipRegistrazione = '".$ip."', sospeso = '0', categoria = '1', gestionePortale = '2', gestioneRete = '2' WHERE email = '".$email."'";
 
           if($query = $mysqli -> query($sql)) {
 
