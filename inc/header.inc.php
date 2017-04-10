@@ -11,7 +11,6 @@
 <script type="text/javascript" src="https://use.fontawesome.com/cf689c1a7e.js"></script>
 
 <script type="text/javascript" src="/js/cookie.js"></script>
-<script type="text/javascript" src="/js/accessibilita.js"></script>
 
 <style type="text/css">
   body { color: <?php echo TEMA_COL_TESTO_PRINCIPALE; ?> !important; }
