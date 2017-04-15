@@ -20,9 +20,7 @@
       $msg = $this -> mysqli -> real_escape_string($msg);
       $id = $this -> mysqli -> real_escape_string($id);
 
-      $debug = $this -> mysqli -> real_escape_string(print_r(debug_backtrace(), true));
-
-      @$this -> mysqli -> query("INSERT INTO log (livello, idUtente, messaggio, debug) VALUES ('WARN', '{$id}', '{$msg}', '{$debug}')");
+      @$this -> mysqli -> query("INSERT INTO log (livello, idUtente, messaggio) VALUES ('WARN', '{$id}', '{$msg}')");
     }
 
     public function alert($msg, $id) {
