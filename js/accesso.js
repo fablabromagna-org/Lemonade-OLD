@@ -1,6 +1,6 @@
 /**
  * @author Edoardo Savini <sedoardo98@gmail.com>
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 ;(function() {
@@ -51,7 +51,7 @@
 
       // Cambio il testo del bottone
       invioForm.value = 'Accesso in corso'
-
+      
       email.value = email.value.trim()
 
       // Controllo i valori
