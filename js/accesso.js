@@ -52,6 +52,8 @@
       // Cambio il testo del bottone
       invioForm.value = 'Accesso in corso'
 
+      email.value = email.value.trim()
+
       // Controllo i valori
       if(email.value === '')
         errore('Devi inserire il tuo indirizzo email')
