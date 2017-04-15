@@ -10,9 +10,7 @@
       $msg = $this -> mysqli -> real_escape_string($msg);
       $id = $this -> mysqli -> real_escape_string($id);
 
-      $debug = $this -> mysqli -> real_escape_string(print_r(debug_backtrace(), true));
-
-      if($this -> mysqli -> query("INSERT INTO log (idUtente, messaggio, debug) VALUES ('{$id}', '{$msg}', '{$debug}')")) {
+      if($this -> mysqli -> query("INSERT INTO log (idUtente, messaggio) VALUES ('{$id}', '{$msg}')")) {
         return true;
       } else
         return $this -> mysqli -> error;
