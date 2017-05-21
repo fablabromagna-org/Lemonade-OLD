@@ -55,6 +55,15 @@
             <a href="/gestione/corsi" class="button">Vai a Corsi</a>
           </div>
         </div>
+        <div class="box">
+          <div class="titolo">
+            <p>Log</p>
+          </div>
+          <div class="descrizione">
+            <p>Elenco dei log del portale.</p>
+            <a href="/gestione/logs.php" class="button">Vai a Log</a>
+          </div>
+        </div>
       </div>
     </div>
     <?php
