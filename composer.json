@@ -6,7 +6,8 @@
         "php": ">=5.4.0 <7.0.0",
         "php-http/guzzle6-adapter": "^1.1",
         "davidpiesse/facebook_messenger_php": "^0.0.1",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "eluceo/ical": "^0.11.3"
     },
     "minimum-stability": "dev",
     "authors": [
