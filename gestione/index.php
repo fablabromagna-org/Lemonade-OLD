@@ -25,7 +25,7 @@
           </div>
           <div class="descrizione">
             <p>Pannello di gestione degli utenti.</p>
-            <a href="/gestione/gestioneUtenti.php" class="button">Apri Gestione Utenti</a>
+            <a href="/gestione/utenti/" class="button">Apri Gestione Utenti</a>
           </div>
         </div>
         <div class="box">
