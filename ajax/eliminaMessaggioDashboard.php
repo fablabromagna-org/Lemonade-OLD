@@ -39,7 +39,7 @@
       $sql = "DELETE FROM dashboard WHERE id = '{$id}'";
 
       if($query = $mysqli -> query($sql)) {
-        $console -> log("Rimosso messaggio sulla dashboard.", $autenticazione -> id);
+        $console -> warn("Rimosso messaggio sulla dashboard.", $autenticazione -> id);
         echo '{}';
 
       } else
