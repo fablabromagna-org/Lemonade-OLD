@@ -56,6 +56,24 @@
           } else
             echo '<p style="margin-top: 20px">Impossibile caricare la dashboard (errore durante la comunicazione col database).</p>';
         ?>
+        <!-- <div class="box">
+          <div class="titolo">
+            <p>Macchinari</p>
+          </div>
+          <div class="descrizione">
+            <p>Non hai nessuna prenotazione aperta.</p>
+            <a href="/macchinari/" class="button">Vai ai Macchinari</a>
+          </div>
+        </div>-->
+        <div class="box">
+          <div class="titolo">
+            <p>Attività svolte</p>
+          </div>
+          <div class="descrizione">
+            <p>Puoi vedere tutte le attività che hai svolto presso FabLab Romagna e che ti sono state riconosciute alla pagina "Attività".</p>
+            <a href="/account/attivita.php" class="button">Vai ad Attività</a>
+          </div>
+        </div>
       </div>
     </div>
     <?php
