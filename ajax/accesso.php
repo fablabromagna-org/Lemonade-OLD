@@ -33,7 +33,7 @@
     $pwd = md5($pwd);
 
     // Creo la query
-    $sql = "SELECT id, sospeso FROM utenti WHERE codiceAttivazione = '0' AND email = '".$email."' AND password = '".$pwd."'";
+    $sql = "SELECT id, sospeso, nome, cognome FROM utenti WHERE codiceAttivazione = '0' AND email = '".$email."' AND password = '".$pwd."'";
 
     // Eseguo la query
     if($query = $mysqli -> query($sql)) {
@@ -51,7 +51,7 @@
         else {
 
           $hashSessione = md5(time());
-          $scadenza = time()+30*24*60*60;
+          $scadenza = time() + 30 * 24 * 60 * 60;
           $ip = getIpAddress();
 
           // Inserisco la sessione nel db ed elimino tutte quelle scadute
