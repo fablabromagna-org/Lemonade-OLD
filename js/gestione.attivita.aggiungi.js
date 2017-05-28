@@ -51,6 +51,8 @@ function salva(e) {
     submit.disabled = false
 
     alert(msg)
+
+    salvataggioInCorso = false
   }
 
   // Blocco tutti gli input

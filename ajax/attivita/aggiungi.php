@@ -88,8 +88,8 @@
       $descrizione = strip_tags($descrizione, '<strong><em><p><br><u><span><h1><h2><h3><ol><ul><li><a>');
 
       // Se i FabCoin sono più di 0 creo una transazione
-      if($fabcoin != 0) {
-        $sql = "INSERT INTO transazioniFabCoin (idUtente, dataInserimento, annullabile, modificabile) VALUES ('{$id}', '".time()."', 'FALSE', 'FALSE')";
+      if($fabcoin != '0') {
+        $sql = "INSERT INTO transazioniFabCoin (idUtente, dataInserimento, annullabile, modificabile, valore) VALUES ('{$id}', '".time()."', 'FALSE', 'FALSE', '{$fabcoin}')";
 
         if($mysqli -> query($sql)) {
           $idTransazione = $mysqli -> insert_id;
@@ -106,7 +106,7 @@
       $fine = strtotime("{$annoEnd}-{$meseEnd}-{$giornoEnd} {$oraEnd}:{$minutoEnd}");
 
       // Aggiungo l'attività
-      $sql = "INSERT INTO attivita (idUtente, descrizione, aggiuntoDa, aggiuntoIl, inizio, fine, idTransazioneFabCoin, fabcoin) VALUES ('{$id}', '{$descrizione}', '".$autenticazione -> id."', '".time()."', '{$inizio}', '{$fine}', '{$idTransazione}', '{$fabcoin}')";
+      $sql = "INSERT INTO attivita (idUtente, descrizione, aggiuntoDa, aggiuntoIl, inizio, fine, idTransazioneFabCoin, fabcoin) VALUES ('{$id}', '{$descrizione}', '".$autenticazione -> id."', '".time()."', '{$inizio}', '{$fine}', {$idTransazione}, {$fabcoin})";
 
       // Tutto ok, aggiorno la transazione se necessario
       if($mysqli -> query($sql)) {
