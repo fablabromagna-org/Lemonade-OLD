@@ -147,7 +147,7 @@
             Case sensitive
           </div>
         </div>
-        <a href="/gestione/ricercaUtenti.php" class="button">Reset</a>
+        <a href="/gestione/utenti/ricerca.php" class="button">Reset</a>
         <input type="submit" value="Cerca" />
         <a id="filtroColonneBottone">Filtro colonne</a>
         <div id="filtroColonneContainer">
