@@ -49,7 +49,7 @@
 
                 echo "<tr>";
                 echo "<td><a href=\"log.php?id={$row['id']}\" style=\"padding: 3px 5px;\" class=\"button\">{$row['id']}</a></td>";
-                echo "<td><a href=\"utente.php?id={$row['idUtente']}\" style=\"padding: 3px 5px;\" class=\"button\">{$row['idUtente']}</a></td>";
+                echo "<td><a href=\"/gestione/utenti/utente.php?id={$row['idUtente']}\" style=\"padding: 3px 5px;\" class=\"button\">{$row['idUtente']}</a></td>";
                 echo "<td>{$row['livello']}</td>";
                 echo "<td>{$row['messaggio']}</td>";
                 echo "<td>{$row['data']}</td>";

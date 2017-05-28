@@ -61,7 +61,7 @@
 
           $log['messaggio'] = nl2br($log['messaggio']);
         ?>
-        <p style="margin-top: 10px;"><b>ID utente:</b> <a href="utente.php?id=<?php echo $log['idUtente'] ?>" style="padding: 3px 5px;" class="button"><?php echo $log['idUtente'] ?></a></p>
+        <p style="margin-top: 10px;"><b>ID utente:</b> <a href="/gestione/utenti/utente.php?id=<?php echo $log['idUtente'] ?>" style="padding: 3px 5px;" class="button"><?php echo $log['idUtente'] ?></a></p>
         <pstyle="margin-top: 10px;"><b>Livello:</b> <?php echo $log['livello'] ?></p>
         <div style="margin-top: 4px; border: 1px solid #888; border-radius: 3px;">
           <div style="width: calc(100% - 10px); background: #888; padding: 5px;"><p style="color: #fff"><b>Messaggio</b></p></div>
