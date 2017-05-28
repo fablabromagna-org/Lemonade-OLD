@@ -34,4 +34,7 @@
   define('TEMA_BG_BTN_NOHOVER', 'rgb(0, 98, 217)'); // Sfondo no hover bottoni
   define('TEMA_BG_BTN_HOVER', '#fff'); // Sfondo hover bottoni
   define('TEMA_COL_BTN_BORDER_DISABLED', '#cecece'); // Bordo bottoni disabilitati
+
+  // Fuso orario
+  date_default_timezone_set('Europe/Rome');
 ?>

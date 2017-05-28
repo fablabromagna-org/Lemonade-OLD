@@ -291,7 +291,7 @@
                 echo "<td class=\"nome\">{$row['nome']}</td>";
                 echo "<td class=\"cognome\">{$row['cognome']}</td>";
                 echo "<td class=\"email\">{$row['email']}</td>";
-                echo "<td class=\"dataIscrizione\">".date("d/m/Y", strtotime($row['dataRegistrazione'].' GMT+1'))."</td>";
+                echo "<td class=\"dataIscrizione\">".date("d/m/Y", $row['dataRegistrazione'])."</td>";
                 echo "<td class=\"categoria\">{$row['nomeCategoria']}</td>";
                 echo "<td class=\"confEmail\">{$row['codiceAttivazione']}</td>";
                 echo "</tr>";

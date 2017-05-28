@@ -51,7 +51,7 @@
       <div id="contenuto">
         <h1>Visualizzazione log</h1>
         <p><b>ID log:</b> <?php echo $id; ?></p>
-        <p style="margin-top: 10px;"><b>Data:</b> <?php echo $log['data']; ?></p>
+        <p style="margin-top: 10px;"><b>Data:</b> <?php echo date("d/m/Y H:i:s", $log['data']); ?></p>
         <?php
           if($log['livello'] == 'WARN')
             $log['livello'] = '<span style="padding: 3px 5px; border-radius: 3px; color: #fff; margin-top: 3px; display: inline-block; background: #ff9800; font-weight: 700;">WARN</span>';

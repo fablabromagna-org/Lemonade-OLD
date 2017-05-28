@@ -52,7 +52,7 @@
                 echo "<td><a href=\"/gestione/utenti/utente.php?id={$row['idUtente']}\" style=\"padding: 3px 5px;\" class=\"button\">{$row['idUtente']}</a></td>";
                 echo "<td>{$row['livello']}</td>";
                 echo "<td>{$row['messaggio']}</td>";
-                echo "<td>{$row['data']}</td>";
+                echo "<td>".date("d/m/Y H:i:s", $row['data'])."</td>";
                 echo "</tr>";
               }
             ?>
