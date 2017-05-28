@@ -66,6 +66,7 @@
     ?>
     <div id="contenuto">
       <h1>Profilo di <?php echo $profilo['nome'].' '.$profilo['cognome']; ?></h1>
+      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/attivita/?id=<?php echo $id; ?>">Visualizza le attività svolte</a></p>
       <div class="box">
         <div>Profilo</div>
         <div>
@@ -144,7 +145,6 @@
           <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">Puoi inviare una nuova password all'utente cliccando il bottone sopra. L'invio di una nuova password comporta la revoca della precedente.</p>
         </div>
       </div>
-
       <?php
           }
         }
