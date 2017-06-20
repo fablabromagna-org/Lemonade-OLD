@@ -37,6 +37,15 @@
             <a href="categorie.php" class="button">Vai a Categorie utenti</a>
           </div>
         </div>
+        <div class="box">
+          <div class="titolo">
+            <p>Ricerca badge</p>
+          </div>
+          <div class="descrizione">
+            <p>Pannello per la ricerca nel database dei badge.</p>
+            <a href="/gestione/badge/" class="button">Vai a Ricerca Badge</a>
+          </div>
+        </div>
       </div>
     </div>
     <?php
