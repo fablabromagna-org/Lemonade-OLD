@@ -139,7 +139,7 @@
                     'h:Reply-To' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
                     'html' => file_get_contents('../mail/modificaMailNuovoIndirizzo/mail.html'),
                     'subject' => 'Conferma E-Mail',
-                    'recipient-variables' => "{ \"{$email}\": { \"nomeUtente\": \"{$nome}\", \"nomeSito\": \"".NOME_SITO."\", \"urlSito\": \"".URL_SITO."\", \"indirizzoMittente\": \"".INDIRIZZO_MITTENTE."\", \"link\": \"".$link."\" } }"
+                    'recipient-variables' => "{ \"{$email}\": { \"nomeUtente\": \"{$nome}\", \"nomeSito\": \"".NOME_SITO."\", \"urlSito\": \"".URL_SITO."\", \"indirizzoMittente\": \"".INDIRIZZO_MITTENTE."\", \"link\": \"{$link}\" } }"
                   ));
 
                   echo '{}';
