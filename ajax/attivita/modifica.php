@@ -1,11 +1,5 @@
 <?php
   require_once('../../inc/carica.inc.php');
-  require_once('../../vendor/autoload.php');
-
-  // Configuro Mailgun
-  use Mailgun\Mailgun;
-  $dominio = DOMINIO_EMAIL_MAILGUN;
-  $mailgun = new Mailgun(MAILGUN_API_KEY);
 
   $autenticazione = new Autenticazione($mysqli);
 
