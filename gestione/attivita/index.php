@@ -10,7 +10,6 @@
     <?php
       require_once('../../inc/header.inc.php');
     ?>
-    <script type="text/javascript" src="/js/gestione.utente.js"></script>
     <style type="text/css">
       .box { display: table; border: 1px solid <?php echo TEMA_BG_PRINCIPALE ?>; width: 100%; border-radius: 3px; margin-bottom: 15px; }
       .box > div { display: table-cell; vertical-align: top; padding: 10px; }
@@ -26,6 +25,34 @@
       form input, form select { margin-bottom: 10px; }
       form input:last-child, select { margin-bottom: 0; }
     </style>
+    <script type="text/javascript">
+      function elimina(id) {
+        var xhr = new XMLHttpRequest()
+        xhr.open('POST', '/ajax/attivita/elimina.php', true)
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+
+        xhr.send('id='+encodeURIComponent(id))
+
+        xhr.onreadystatechange = function() {
+
+         if(xhr.readyState === 4 && xhr.status === 200) {
+
+           var res = JSON.parse(xhr.response)
+
+           if(res.errore === true)
+            alert(res.msg)
+
+           else {
+             alert('Attività eliminata con successo!')
+             location.href = location.href
+           }
+
+
+         } else if(xhr.readyState === 4)
+          alert('Impossibile completare la richiesta!\nRiprova tra qualche minuto.')
+        }
+      }
+    </script>
   </head>
   <body>
     <?php
@@ -50,7 +77,7 @@
       $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
 
       // Estraggo il profilo dell'utente
-      $sql = "SELECT * FROM attivita WHERE idUtente = '{$id}'";
+      $sql = "SELECT * FROM attivita WHERE idUtente = '{$id}' ORDER BY id DESC";
 
       if(!$query = $mysqli -> query($sql))
         echo '<div id="contenuto"><h1>Errore!</h1></div>';
@@ -71,6 +98,7 @@
               <th>Data inizio</th>
               <th>Data fine</th>
               <th>Descrizione</th>
+              <th>Azioni</th>
             </tr>
           </thead>
           <tbody>
@@ -90,6 +118,7 @@
                   echo "<td>".date("d/m/Y H:i", $row['inizio'])."</td>";
                   echo "<td>".date("d/m/Y H:i", $row['fine'])."</td>";
                   echo "<td>{$row['descrizione']}</td>";
+                  echo "<td><a href=\"modifica.php?id={$row['id']}\">Modifica</a> </br/><a onclick=\"elimina({$row['id']})\">Elimina</a></td>";
                   echo "</tr>";
                 }
               }
