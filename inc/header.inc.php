@@ -34,6 +34,3 @@
   .button.disabled, input[type='submit'][disabled] { border: 2px dashed <?php echo TEMA_COL_BTN_BORDER_DISABLED; ?> !important; background: #fff; background: <?php echo TEMA_BG_BTN_HOVER; ?> !important; color: <?php echo TEMA_COL_BTN_HOVER; ?> !important; }
   input[type='text']:focus, input[type='text']:hover, input[type='email']:focus, input[type='email']:hover, input[type='password']:focus, input[type='password']:hover, select:hover, select:focus { border-color: <?php echo TEMA_BG_BTN_NOHOVER; ?> !important; }
 </style>
-
-<!-- File JS bloccati (cookie) -->
-<script type="text/plain" class="_iub_cs_activate" data-suppressedsrc="/js/sdkConCookie.js"></script>
