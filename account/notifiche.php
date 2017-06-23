@@ -52,7 +52,7 @@
                     echo "<a href=\"{$row['link']}\">Apri</a>";
 
                   if($row['letto'] == false)
-                    echo "<a onclick=\"letto(this, {$row['id']})\">Letto</a>";
+                    echo " <a onclick=\"letto(this, {$row['id']})\">Letto</a>";
 
                   echo " <a onclick=\"elimina(this, {$row['id']})\">Elimina</a>";
 
