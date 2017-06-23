@@ -7,6 +7,7 @@
     setCookie(COOKIE_NAME, '', -1);
     header('Location: /');
     exit();
-
   }
+
+  $notifiche = new Notifiche($mysqli, $autenticazione -> id)
 ?>
