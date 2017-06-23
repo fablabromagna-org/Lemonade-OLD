@@ -172,6 +172,9 @@
         $console -> log('Aggiornata attività (ID: '.$datiOriginali['id'].').', $autenticazione -> id);
         echo '{}';
 
+        $notificheUtente = new Notifiche($mysqli, $datiOriginali['idUtente']);
+        $notificheUtente -> link('Ti è stata aggiornata un\'attività (ID: '.$datiOriginali['id'].').', '/account/visualizzaAttivita.php?id='.$datiOriginali['id']);
+
       } else {
         $console -> alert('Impossibile aggiornare l\'attività! '.$mysqli -> error, $autenticazione -> id);
         stampaErrore('Impossibile aggiornare l\'attività!'.$mysqli -> error);

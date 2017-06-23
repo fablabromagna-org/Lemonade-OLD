@@ -74,6 +74,9 @@
 
       echo '{}';
       $console -> warn('Eliminata attività ID: '.$attivita['id'].' all\'utente '.$attivita['idUtente'], $autenticazione -> id);
+
+      $notificheUtente = new Notifiche($mysqli, $attivita['idUtente']);
+      $notificheUtente -> noLink('Ti è stata eliminata un\'attività (ID: '.$attivita['id'].').');
     }
   }
 ?>

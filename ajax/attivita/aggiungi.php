@@ -105,7 +105,11 @@
       // Tutto ok, aggiorno la transazione se necessario
       if($mysqli -> query($sql)) {
 
-        $console -> log("Aggiunta/aggiornata attività a {$id} (ID: ".$mysqli -> insert_id.")", $autenticazione -> id);
+        $idAttivita = $mysqli -> insert_id;
+        $console -> log("Aggiunta attività a {$id} (ID: {$idAttivita})", $autenticazione -> id);
+
+        $notificheUtente = new Notifiche($mysqli, $id);
+        $notificheUtente -> link('Ti è stata aggiunta un\'attività (ID: '.$idAttivita.').', '/account/visualizzaAttivita.php?id='.$idAttivita);
 
         if($idTransazione == 'NULL') {
           echo '{}';
