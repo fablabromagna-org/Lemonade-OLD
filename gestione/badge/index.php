@@ -32,7 +32,7 @@
       $rfid = $mysqli -> real_escape_string(isset($_GET['rfid']) ? trim($_GET['rfid']) : '');
     ?>
     <div id="contenuto">
-      <h1>Ricerca utenti</h1>
+      <h1>Ricerca badge</h1>
       <form method="get">
         <div>
           <input type="text" name="rfid" placeholder="RFID" value="<?php echo $rfid; ?>" style="width: 46px; min-width: 160px;" maxlength="10" />
