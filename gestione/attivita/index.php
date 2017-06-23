@@ -77,7 +77,7 @@
       $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
 
       // Estraggo il profilo dell'utente
-      $sql = "SELECT * FROM attivita WHERE idUtente = '{$id}' ORDER BY id DESC";
+      $sql = "SELECT * FROM attivita WHERE idUtente = '{$id}' ORDER BY fine DESC, id DESC";
 
       if(!$query = $mysqli -> query($sql))
         echo '<div id="contenuto"><h1>Errore!</h1></div>';
@@ -108,6 +108,8 @@
 
                   if(strlen($row['descrizione']) > 30)
                     $row['descrizione'] = substr($row['descrizione'], 0, 27).'...';
+
+                  $row['descrizione'] = strip_tags($row['descrizione']);
 
                   if($row['fabcoin'] === null)
                     $row['fabcoin'] = '--';
