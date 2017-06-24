@@ -86,6 +86,7 @@
               <li>ID utente: <b><?php echo $profilo['id'] ?> </b></li>
               <li>Data di iscrizione: <b><?php echo date("d/m/Y H:i:s", $profilo['dataRegistrazione']); ?></b></li>
               <li>IP al momento della registrazione: <b><?php echo $profilo['ipRegistrazione']; ?></b></li>
+              <li>UUID: <b><?php echo $profilo['adUUID']; ?></b></li>
             </ul>
           </div>
           <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
@@ -96,7 +97,6 @@
                   <option value="0" <?php if($profilo['gestionePortale'] == 0) echo 'selected' ?>>Non abilitata</option>
                   <option value="1" <?php if($profilo['gestionePortale'] == 1) echo 'selected' ?>>Abilitata</option>
                   <option value="2" <?php if($profilo['gestionePortale'] == 2) echo 'selected' ?>>Default dalla categoria</option>
-
                 </select>
               </div>
               <div>
@@ -129,7 +129,6 @@
                       $selected = ($profilo['categoria'] == $key) ? 'selected': '';
                       echo "<option value=\"{$key}\" {$selected}>{$value}</option>";
                     }
-
                   ?>
                 </select>
               </div>
