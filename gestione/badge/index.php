@@ -25,6 +25,11 @@
       $idUtente = $mysqli -> real_escape_string(isset($_GET['idUtente']) ? trim($_GET['idUtente']) : '');
       $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
       $rfid = $mysqli -> real_escape_string(isset($_GET['rfid']) ? trim($_GET['rfid']) : '');
+
+      $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
+
+      if(!preg_match("/^[0-9]+$/", $pagina))
+        $pagina = 1;
     ?>
     <div id="contenuto">
       <h1>Ricerca badge</h1>
@@ -58,16 +63,18 @@
         if(mb_substr($sql, -strlen(" WHERE ")) == " WHERE ")
           $sql = mb_substr($sql, 0, strlen($sql)-strlen(" WHERE "));
 
-        // echo $sql;
+        $sql .= " ORDER BY id DESC";
+
+        $query = new Paginator($mysqli, $sql, $pagina, 10);
 
         // Eseguo la query
-        if($query = $mysqli -> query($sql)) {
+        if($query -> result) {
 
           // Sono presenti degli utenti con i criteri selezionati
-          if($query -> num_rows > 0) {
+          if($query -> result -> num_rows > 0) {
 
-          ?>
-          <p style="margin-top: 20px;">Trovato/i <?php echo$query -> num_rows ?> badge/.</p>
+        ?>
+          <p style="margin-top: 20px;">Trovato/i <?php echo $query -> result -> num_rows ?> badge/.</p>
           <div style="overflow-x: auto;">
             <table>
               <thead>
@@ -84,7 +91,7 @@
               <tbody>
                 <?php
                   // Stampo i badge
-                  while($row = $query -> fetch_assoc()) {
+                  while($row = $query -> result -> fetch_assoc()) {
 
                     echo "<tr>";
                     echo "<td>{$row['id']}</td>";
@@ -100,13 +107,14 @@
               </tbody>
             </table>
           </div>
+          <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
           <?php
           } else
             echo "<p style=\"margin-top: 20px;\">Nessun badge è presente nel database con i criteri impostati.</p>";
 
         } else {
-          echo "Impossibile contattare il database.";
-          $console -> alert('Impossibile contattare il database '.$mysqli -> error, $autenticazione -> id);
+          echo "Impossibile completare la richiesta.";
+          $console -> alert('Impossibile contattare il database '.$query -> mysqli -> error, $autenticazione -> id);
         }
       ?>
     </div>

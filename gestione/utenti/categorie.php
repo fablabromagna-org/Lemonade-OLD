@@ -29,55 +29,67 @@
         <?php
           $sql = "SELECT * FROM categorieUtenti";
 
-          if($query = $mysqli -> query($sql)) {
+          $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
+
+          if(!preg_match("/^[0-9]+$/", $pagina))
+            $pagina = 1;
+
+          $query = new Paginator($mysqli, $sql, $pagina, 10);
+
+          if($query -> result) {
         ?>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome</th>
-              <th>Gestione portale</th>
-              <th>Gestione rete</th>
-              <th>Azioni</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-              // Stampo gli utenti
-              while($row = $query -> fetch_assoc()) {
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Gestione portale</th>
+                <th>Gestione rete</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+                // Stampo gli utenti
+                while($row = $query -> result -> fetch_assoc()) {
 
-                if($row['gestioneRete'] == false)
-                  $row['gestioneRete'] = 'Non abilitato';
+                  if($row['gestioneRete'] == false)
+                    $row['gestioneRete'] = 'Non abilitato';
 
-                else
-                  $row['gestioneRete'] = 'Abilitato';
+                  else
+                    $row['gestioneRete'] = 'Abilitato';
 
-                if($row['gestionePortale'] == false)
-                  $row['gestionePortale'] = 'Non abilitato';
+                  if($row['gestionePortale'] == false)
+                    $row['gestionePortale'] = 'Non abilitato';
 
-                else
-                  $row['gestionePortale'] = 'Abilitato';
+                  else
+                    $row['gestionePortale'] = 'Abilitato';
 
-                echo "<tr>";
-                echo "<td>{$row['id']}</td>";
-                echo "<td>{$row['nome']}</td>";
-                echo "<td class=\"descrizione\">{$row['gestionePortale']}</td>";
-                echo "<td>{$row['gestioneRete']}</td>";
+                  echo "<tr>";
+                  echo "<td>{$row['id']}</td>";
+                  echo "<td>{$row['nome']}</td>";
+                  echo "<td class=\"descrizione\">{$row['gestionePortale']}</td>";
+                  echo "<td>{$row['gestioneRete']}</td>";
 
-                if($row['id'] != 1)
-                  echo "<td><a onclick=\"elimina({$row['id']})\">Elimina</a><br /><a onclick=\"modifica({$row['id']})\">Modifica nome</a><br /><a onclick=\"spostaIn({$row['id']})\">Sposta utenti</a></td>";
+                  if($row['id'] != 1)
+                    echo "<td><a onclick=\"elimina({$row['id']})\">Elimina</a><br /><a onclick=\"modifica({$row['id']})\">Modifica nome</a><br /><a onclick=\"spostaIn({$row['id']})\">Sposta utenti</a></td>";
 
-                else
-                  echo "<td><a onclick=\"modifica({$row['id']})\">Modifica nome</a><br /><a onclick=\"spostaIn({$row['id']})\">Sposta utenti</a></td>";
+                  else
+                    echo "<td><a onclick=\"modifica({$row['id']})\">Modifica nome</a><br /><a onclick=\"spostaIn({$row['id']})\">Sposta utenti</a></td>";
 
-                echo "</tr>";
-              }
-            ?>
-          </tbody>
-        </table>
+                  echo "</tr>";
+                }
+              ?>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
         <?php
-          } else
-            echo "<p>Impossibile comunicare con il database!</p>";
+          } else {
+            echo "<p>Impossibile completare la richiesta!</p>";
+            $console -> alert('Impossibile completare la richiesta! '.$query -> mysqli -> error, $autenticazione -> id);
+          }
         ?>
       </div>
     </div>

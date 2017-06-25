@@ -242,13 +242,18 @@
         if(mb_substr($sql, -strlen(" WHERE ")) == " WHERE ")
           $sql = mb_substr($sql, 0, strlen($sql)-strlen(" WHERE "));
 
-        // echo $sql;
+        $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
+
+        if(!preg_match("/^[0-9]+$/", $pagina))
+          $pagina = 1;
+
+        $query = new Paginator($mysqli, $sql, $pagina, 10);
 
         // Eseguo la query
-        if($query = $mysqli -> query($sql)) {
+        if($query -> result) {
 
           // Sono presenti degli utenti con i criteri selezionati
-          if($query -> num_rows > 0) {
+          if($query -> result -> num_rows > 0) {
 
           ?>
           <style type="text/css">
@@ -260,7 +265,7 @@
             .categoria {  display: <?php if(array_search('categoria', $filtroColonne) !== false) echo 'auto'; else echo 'none'; ?>; }
             .confEmail {  display: <?php if(array_search('confEmail', $filtroColonne) !== false) echo 'auto'; else echo 'none'; ?>; }
           </style>
-          <p style="margin-top: 20px;">Trovato/i <?php echo$query -> num_rows ?> utente/i.</p>
+          <p style="margin-top: 20px;">Trovato/i <?php echo $query -> result -> num_rows ?> utente/i.</p>
           <div style="overflow-x: auto;">
             <table>
               <thead>
@@ -277,7 +282,7 @@
               <tbody>
             <?php
               // Stampo gli utenti
-              while($row = $query -> fetch_assoc()) {
+              while($row = $query -> result -> fetch_assoc()) {
 
                 if($row['codiceAttivazione'] != 0)
                   $row['codiceAttivazione'] = 'NO';
@@ -300,6 +305,7 @@
               </tbody>
             </table>
           </div>
+          <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
           <?php
           } else
             echo "<p style=\"margin-top: 20px;\">Nessun utente è presente nel database con i criteri impostati.</p>";

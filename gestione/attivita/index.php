@@ -58,33 +58,21 @@
     <?php
       include_once('../../inc/nav.inc.php');
 
-      // Estraggo tutte le categorie degli utenti
-      $sql = "SELECT id, nome FROM categorieUtenti";
-
-      $categorieUtenti = array();
-
-      if($query = $mysqli -> query($sql)) {
-
-        while($key = $query -> fetch_array(MYSQLI_ASSOC))
-          $categorieUtenti[$key['id']] = $key['nome'];
-
-
-      } else {
-        echo 'Impossibile estrarre le categorie degli utenti.';
-        exit();
-      }
-
       $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
+      $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
 
-      // Estraggo il profilo dell'utente
+      if(!preg_match("/^[0-9]+$/", $pagina))
+        $pagina = 1;
+
       $sql = "SELECT * FROM attivita WHERE idUtente = '{$id}' ORDER BY fine DESC, id DESC";
 
-      if(!$query = $mysqli -> query($sql))
+      $query = new Paginator($mysqli, $sql, $pagina, 10);
+
+      if(!$query -> result) {
         echo '<div id="contenuto"><h1>Errore!</h1></div>';
+        $console -> alert('Impossibile completare la richiesta! '.$result -> mysqli -> error, $autenticazione -> id);
 
-      else {
-
-
+      } else {
     ?>
     <div id="contenuto">
       <h1>Riepilogo attività</h1>
@@ -104,7 +92,7 @@
           <tbody>
             <?php
                 // Stampo le attività
-                while($row = $query -> fetch_assoc()) {
+                while($row = $query -> result -> fetch_assoc()) {
 
                   if(strlen($row['descrizione']) > 30)
                     $row['descrizione'] = substr($row['descrizione'], 0, 27).'...';
@@ -128,6 +116,7 @@
           </tbody>
         </table>
       </div>
+      <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
     </div>
     <?php
       include_once('../../inc/footer.inc.html');

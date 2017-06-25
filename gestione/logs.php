@@ -20,9 +20,15 @@
       <h2>Log del portale</h1>
       <div style="overflow-x: auto;">
         <?php
-          $sql = "SELECT id, idUtente, messaggio, data, livello FROM log ORDER BY id DESC";
+          $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
 
-          if($query = $mysqli -> query($sql)) {
+          if(!preg_match("/^[0-9]+$/", $pagina))
+            $pagina = 1;
+
+          $sql = "SELECT id, idUtente, messaggio, data, livello FROM log ORDER BY id DESC";
+          $query = new Paginator($mysqli, $sql, $pagina, 10);
+
+          if($query -> result) {
         ?>
         <table>
           <thead>
@@ -37,7 +43,7 @@
           <tbody>
             <?php
               // Stampo gli utenti
-              while($row = $query -> fetch_assoc()) {
+              while($row = $query -> result -> fetch_assoc()) {
 
                 if($row['livello'] == 'WARN')
                   $row['livello'] = '<span style="padding: 3px 5px; border-radius: 3px; color: #fff; margin-top: 3px; display: inline-block; background: #ff9800; font-weight: 700;">WARN</span>';
@@ -63,6 +69,7 @@
             echo "<p>Impossibile comunicare con il database!</p>";
         ?>
       </div>
+      <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
     </div>
     <?php
       include_once('../inc/footer.inc.html');

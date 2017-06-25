@@ -43,15 +43,23 @@
           </thead>
           <tbody>
             <?php
-            $sql = "SELECT * FROM attivita WHERE idUtente = '{$autenticazione -> id}' ORDER BY fine DESC, id DESC";
+              $sql = "SELECT * FROM attivita WHERE idUtente = '{$autenticazione -> id}' ORDER BY fine DESC, id DESC";
 
-              if(!$query = $mysqli -> query($sql))
-                echo '<p>Impossibile estrarre le attività dal database.</p>';
+              $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
 
-              else {
+              if(!preg_match("/^[0-9]+$/", $pagina))
+                $pagina = 1;
+
+              $query = new Paginator($mysqli, $sql, $pagina, 10);
+
+              if(!$query -> result) {
+                echo '<p>Impossibile completare la richiesta.</p>';
+                $console -> alert('Impossibile estrarre le attività dal database! '.$query -> mysqli -> error, $autenticazione -> id);
+
+              } else {
 
                 // Stampo le attività
-                while($row = $query -> fetch_assoc()) {
+                while($row = $query -> result -> fetch_assoc()) {
 
                   if(strlen($row['descrizione']) > 30)
                     $row['descrizione'] = substr($row['descrizione'], 0, 27).'...';
@@ -74,6 +82,7 @@
           </tbody>
         </table>
       </div>
+      <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
     </div>
     <?php
       include_once('../inc/footer.inc.html');

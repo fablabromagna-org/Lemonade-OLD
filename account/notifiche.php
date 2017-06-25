@@ -29,14 +29,21 @@
             <?php
               $sql = "SELECT * FROM notifiche WHERE idUtente = '{$autenticazione -> id}' ORDER BY id DESC";
 
-              if(!$query = $mysqli -> query($sql)) {
-                $console -> alert('Impossibile estrarre le notifiche '.$mysqli -> error, $autenticazione -> id);
-                echo '<p>Impossibile estrarre le notifiche dal database.</p>';
+              $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
+
+              if(!preg_match("/^[0-9]+$/", $pagina))
+                $pagina = 1;
+
+              $query = new Paginator($mysqli, $sql, $pagina, 10);
+
+              if(!$query -> result) {
+                $console -> alert('Impossibile estrarre le notifiche '.$query -> mysqli -> error, $autenticazione -> id);
+                echo '<p>Impossibile completare la richiesta.</p>';
 
               } else {
 
                 // Stampo le notifiche
-                while($row = $query -> fetch_assoc()) {
+                while($row = $query -> result -> fetch_assoc()) {
 
                   $nonLettoCSS = "";
 
@@ -64,6 +71,7 @@
           </tbody>
         </table>
       </div>
+      <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
     </div>
     <?php
       include_once('../inc/footer.inc.html');
