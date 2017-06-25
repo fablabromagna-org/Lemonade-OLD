@@ -122,16 +122,5 @@
         }
       }
     }
-
-    public function getPicUrl() {
-
-      // Se l'indirizzo email è vuoto non ritorno nulla
-      if($this -> email == '')
-        return;
-
-      $fallback = URL_SITO.'/images/utente.png';
-      return "https://www.gravatar.com/avatar/".md5($this -> email)."?d=".urlencode($fallback)."&s=100";
-
-    }
   }
 ?>

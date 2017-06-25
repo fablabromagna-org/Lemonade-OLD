@@ -4,11 +4,10 @@
 ?>
 <title><?php echo NOME_SITO; ?></title>
 <link type="text/css" rel="stylesheet" media="screen" href="/css/generale.css" />
+<link type="text/css" rel="stylesheet" media="screen" href="/fonts/font-awesome/css/font-awesome.min.css" />
 <meta charset="utf-8">
 <meta name="theme-color" content="<?php echo TEMA_BG_PRINCIPALE ?>">
 <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.5">
-
-<script type="text/javascript" src="https://use.fontawesome.com/cf689c1a7e.js"></script>
 
 <script type="text/javascript" src="/js/cookie.js"></script>
 

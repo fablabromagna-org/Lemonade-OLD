@@ -10,7 +10,7 @@
         <p><a href="/account/impostazioni.php" style="color: #151515">Impostazioni</a> - <a href="/account/notifiche.php" style="color: #151515">Notifiche<?php if($notifiche -> numNotificheNonLette != false) echo " ({$notifiche -> numNotificheNonLette})"; ?></a></p>
       </div>
       <div>
-        <img src="<?php echo $autenticazione -> getPicUrl(); ?>" alt="Immagine del profilo" />
+        <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size: 50px; color: #2b2b2b; margin-left: 15px;"></i>
       </div>
     </div>
   </div>
