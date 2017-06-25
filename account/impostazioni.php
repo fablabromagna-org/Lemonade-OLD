@@ -33,13 +33,12 @@
       <div class="box">
         <div>Profilo</div>
         <div>
-          <img src="<?php echo $autenticazione -> getPicUrl(); ?>" id="imgUtente" alt />
+          <i class="fa fa-user-circle-o" aria-hidden="true" style="font-size: 80px; color: #2b2b2b; margin: 0 0 20px 0;"></i>
           <ul>
             <li><b><?php echo $autenticazione -> nome; ?> <?php echo $autenticazione -> cognome; ?></b></li>
             <li><?php echo $autenticazione -> email; ?></li>
           </ul>
           <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
-            <p style="margin-bottom: 7px;">Puoi modificare la tua immagine del profilo su <a href="https://it.gravatar.com/">Gravatar</a>.</p>
             <p>Se hai necessità di modificare i tuoi dati personali o l'indirizzo email devi contattare il supporto.</p>
           </div>
           <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
