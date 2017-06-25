@@ -14,11 +14,6 @@
       form { margin-top: 20px; }
       form div { margin-bottom: 10px; }
       form div input { margin-right: 5px; margin-bottom: 10px; }
-
-      #contenitoreAvanzate { display: none; }
-
-      #filtroColonneContainer { display: none; background: rgba(0, 0, 0, 0.6); position: absolute; height: 100vh; z-index: 998; left: 0; right: 0; top: 0; bottom: 0; }
-      #filtroColonne { left: calc(calc(100% - 320px) / 2); width: 320px; height: 180px; text-align: center; background: #fff; position: absolute; z-index: 999; top: 12vh; border-radius: 3px; }
     </style>
     <script type="text/javascript" src="/js/badge/revoca.js"></script>
   </head>
@@ -38,7 +33,6 @@
           <input type="text" name="rfid" placeholder="RFID" value="<?php echo $rfid; ?>" style="width: 46px; min-width: 160px;" maxlength="10" />
           <input type="text" name="id" placeholder="ID Badge" style="width: 46px; min-width: 65px;" value="<?php echo $id; ?>" />
           <input type="text" name="idUtente" placeholder="ID Utente" style="width: 54px; min-width: 70px;" value="<?php echo $idUtente; ?>" />
-          <a id="avanzate">Visualizza avanzate</a>
         </div>
         <a href="/gestione/badge/" class="button">Reset</a>
         <input type="submit" value="Cerca" />
