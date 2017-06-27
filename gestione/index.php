@@ -34,25 +34,16 @@
           </div>
           <div class="descrizione">
             <p>Pannello di gestione della dashboard e di altre funzioni.</p>
-            <a href="/gestione/gestioneGenerale.php" class="button">Apri Gestione Dashboard</a>
+            <a href="/gestione/gestioneGenerale.php" class="button">Apri Gestione Generale</a>
           </div>
         </div>
         <div class="box">
           <div class="titolo">
-            <p>Newsletter</p>
+            <p>Maker Space</p>
           </div>
           <div class="descrizione">
-            <p>Pannello di gestione della newsletter.</p>
-            <a href="/gestione/gestioneNewsletter.php" class="button disabled">Apri Gestione Newsletter</a>
-          </div>
-        </div>
-        <div class="box">
-          <div class="titolo">
-            <p>Corsi</p>
-          </div>
-          <div class="descrizione">
-            <p>Pannello per la gesestione dei corsi.</p>
-            <a href="/gestione/corsi" class="button">Vai a Corsi</a>
+            <p>Pannello di gestione dei Maker Space.</p>
+            <a href="/gestione/makerspace/" class="button">Apri Gestione Maker Space</a>
           </div>
         </div>
         <div class="box">
