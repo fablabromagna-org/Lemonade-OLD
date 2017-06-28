@@ -117,7 +117,7 @@
             else if($query -> num_rows == 1) {
 
               $codiceAttivazione = '0';
-              if($row['codiceAttivazione'] != $confermaMail)
+              if($row['codiceAttivazione'] == '0' && $confermaMail == '0')
                 $codiceAttivazione = uniqid();
 
               $sql = "UPDATE utenti SET categoria = '{$categoria}', gestionePortale = '{$gestionePortale}', gestioneRete = '{$gestioneRete}', sospeso = '{$sospensione}', codiceAttivazione = '{$codiceAttivazione}' WHERE id = '{$id}'";
