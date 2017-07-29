@@ -42,8 +42,10 @@
         $console -> warn("Rimosso messaggio sulla dashboard.", $autenticazione -> id);
         echo '{}';
 
-      } else
-        stampaErrore('Impossibile inviare la richiesta al database! '.$mysqli -> error);
+      } else {
+        $console -> warn("Impossibile inviare la richiesta al database! ".$mysqli -> error, $autenticazione -> id);
+        stampaErrore('Impossibile completare la richiesta!');
+      }
     }
   }
 ?>
