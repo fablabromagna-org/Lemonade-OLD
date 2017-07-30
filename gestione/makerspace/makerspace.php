@@ -58,7 +58,6 @@
             <input type="hidden" id="idMakerSpace" value="<?php echo $makerspace['id']; ?>" />
             <input type="submit" value="Salva" id="salvaMakerSpace" />
           </form>
-          <p style="margin-top: 20px;">RADIUS Token: <b><?php echo $makerspace['radiusToken']; ?></b></p>
         </div>
       </div>
       <div class="box">

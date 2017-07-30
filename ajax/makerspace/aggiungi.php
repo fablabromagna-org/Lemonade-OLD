@@ -44,7 +44,7 @@
       stampaErrore('Il Maker Space esiste già!');
 
     // Creo il Maker Space
-    $sql = "INSERT INTO makerspace (nome, radiusToken) VALUES ('{$nome}', UUID())";
+    $sql = "INSERT INTO makerspace (nome) VALUES ('{$nome}')";
     $query = $mysqli -> query($sql);
 
     if(!$query) {

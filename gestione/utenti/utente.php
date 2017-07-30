@@ -86,7 +86,6 @@
               <li>ID utente: <b><?php echo $profilo['id'] ?> </b></li>
               <li>Data di iscrizione: <b><?php echo date("d/m/Y H:i:s", $profilo['dataRegistrazione']); ?></b></li>
               <li>IP al momento della registrazione: <b><?php echo $profilo['ipRegistrazione']; ?></b></li>
-              <li>UUID: <b><?php echo $profilo['adUUID']; ?></b></li>
             </ul>
           </div>
           <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
