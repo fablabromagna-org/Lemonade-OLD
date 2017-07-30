@@ -1,19 +1,15 @@
 {
-    "name": "edoardosavini/listapasquale",
+    "name": "edoardosavini/flr-auth",
     "type": "project",
     "require": {
-        "mailgun/mailgun-php": "^2.1",
-        "php": ">=5.4.0 <7.0.0",
-        "php-http/guzzle6-adapter": "^1.1",
-        "davidpiesse/facebook_messenger_php": "^0.0.1",
-        "ext-mbstring": "*",
-        "eluceo/ical": "^0.11.3"
+        "aws/aws-sdk-php": "2.*",
+        "ext-mbstring": "*"
     },
     "minimum-stability": "dev",
     "authors": [
         {
             "name": "Edoardo Savini",
-            "email": "sedoardo98@gmail.com"
+            "email": "edoardo.savini@fablabromagna.org"
         }
     ]
 }
