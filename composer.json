@@ -3,7 +3,8 @@
     "type": "project",
     "require": {
         "aws/aws-sdk-php": "2.*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "dompdf/dompdf": "^0.8.0"
     },
     "minimum-stability": "dev",
     "authors": [
