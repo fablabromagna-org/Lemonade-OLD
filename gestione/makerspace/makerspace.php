@@ -34,7 +34,7 @@
       $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
 
       // Estraggo il profilo dell'utente
-      $sql = "SELECT * FROM makerspace WHERE id = '{$id}'";
+      $sql = "SELECT * FROM makerspace WHERE id = '{$id}' AND eliminato = FALSE";
 
       if(!$query = $mysqli -> query($sql))
         echo '<div id="contenuto"><h1>Errore!</h1></div>';

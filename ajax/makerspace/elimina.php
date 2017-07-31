@@ -46,7 +46,7 @@
     $mksp = $query -> fetch_array();
 
     // Creo il Maker Space
-    $sql = "DELETE FROM makerspace WHERE id = '{$id}'";
+    $sql = "UPDATE makerspace SET eliminato = TRUE WHERE id = '{$id}'";
     $query = $mysqli -> query($sql);
 
     if(!$query) {

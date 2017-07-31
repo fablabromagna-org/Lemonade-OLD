@@ -24,7 +24,7 @@
       </form>
       <div style="overflow-x: auto;">
         <?php
-          $sql = "SELECT * FROM makerspace ORDER BY id ASC";
+          $sql = "SELECT * FROM makerspace WHERE eliminato = FALSE ORDER BY id ASC";
 
           $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
 
