@@ -32,7 +32,7 @@
       stampaErrore('Il Maker Space può contenere solo lettere, numeri, punti e spazi (min. 3  caratteri, max. 50 caratteri)!');
 
     // Controllo che il Maker Space non esista già
-    $sql = "SELECT * FROM makerspace WHERE nome COLLATE utf8_general_ci = '{$nome}'";
+    $sql = "SELECT * FROM makerspace WHERE nome COLLATE utf8_general_ci = '{$nome}' AND eliminato = FALSE";
     $query = $mysqli -> query($sql);
 
     if(!$query) {
