@@ -74,6 +74,32 @@
             <a href="/account/attivita.php" class="button">Vai ad Attività</a>
           </div>
         </div>
+        <div class="box">
+          <div class="titolo">
+            <p>FabCoin</p>
+          </div>
+          <div class="descrizione">
+            <?php
+              $sql = "SELECT SUM(valore) AS somma FROM transazioniFabCoin WHERE idUtente = '{$autenticazione -> id}' AND annullata  = FALSE";
+              $query = $mysqli -> query($sql);
+
+              if($query) {
+                $row = $query -> fetch_assoc();
+
+                if($row['somma'] != '')
+                  echo '<p style="margin-top: 20px;">Il tuo saldo FabCoin è di <b>'.$row['somma'].'</b>.</p>';
+
+                else
+                  echo '<p style="margin-top: 20px;">Non hai nessun FabCoin</b>.</p>';
+
+              } else {
+                echo '<p>Impossibile completare la richiesta.</p>';
+                $console -> alert("Impossibile estrarre saldo fabcoin sulla dashboard. ".$mysqli -> error, $autenticazione -> id);
+              }
+            ?>
+            <a href="/account/transazioni/fabcoin.php" class="button">Vai alle transazioni</a>
+          </div>
+        </div>
       </div>
     </div>
     <?php

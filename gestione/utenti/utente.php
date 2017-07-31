@@ -67,6 +67,8 @@
     <div id="contenuto">
       <h1>Profilo di <?php echo $profilo['nome'].' '.$profilo['cognome']; ?></h1>
       <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/attivita/?id=<?php echo $id; ?>">Visualizza le attività svolte</a></p>
+      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/badge/utente.php?id=<?php echo $profilo['id']; ?>">Gestione badge</a></p>
+      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/transazioni/utenteFabCoin.php?id=<?php echo $profilo['id']; ?>">Transazioni FabCoin</a></p>
       <div class="box">
         <div>Profilo</div>
         <div>
@@ -141,12 +143,6 @@
         <div>
           <a id="cambiaPwd" class="button" data-email="<?php echo $profilo['email']; ?>">Invia password</a>
           <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">Puoi inviare una nuova password all'utente cliccando il bottone sopra. L'invio di una nuova password comporta la revoca della precedente.</p>
-        </div>
-      </div>
-      <div class="box">
-        <div>Badge</div>
-        <div>
-          <a href="/gestione/badge/utente.php?id=<?php echo $profilo['id']; ?>">Gestione badge</a>
         </div>
       </div>
       <?php
