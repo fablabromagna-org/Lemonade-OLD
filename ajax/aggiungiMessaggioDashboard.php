@@ -1,6 +1,5 @@
 <?php
   require_once('../inc/carica.inc.php');
-  require_once('../vendor/autoload.php');
 
   $autenticazione = new Autenticazione($mysqli);
 
