@@ -61,22 +61,6 @@
         </div>
       </div>
       <div class="box">
-        <div>Gestione presenze</div>
-        <div>
-          <form id="modificaLimiti">
-            <div>
-              <label for="limiteGiornaliero">Limite giornaliero beggiate (0 = senza limiti)</label>
-              <input type="text" value="<?php echo $makerspace['limiteBeggiateGiornaliere'] ?>" id="limiteGiornaliero" placeholder="Limite giornaliero" style="display: block; margin-top: 5px;" />
-            </div>
-            <div style="margin: 10px 0;">
-              <label for="distanzaBeggiate">Distanza beggiate (in ore, 0 = distanza non richiesta)</label>
-              <input type="text" value="<?php echo $makerspace['distanzaBeggiate'] ?>" id="distanzaBeggiate" placeholder="Distanza beggiate" style="display: block; margin-top: 5px;" />
-            </div>
-            <input type="submit" value="Salva" id="salvaLimiti" />
-          </form>
-        </div>
-      </div>
-      <div class="box">
         <div>Gestione totem</div>
         <div>
           <form id="aggiungiTotemForm">

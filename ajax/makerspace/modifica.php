@@ -48,7 +48,7 @@
       stampaErrore('Il Maker Space non esiste!');
 
     // Controllo che il nome non sia già stato utilizzato
-    $sql = "SELECT * FROM makerspace WHERE nome COLLATE utf8_general_ci = '{$nome}' AND id <> '{$id}'  AND eliminato = FALSE";
+    $sql = "SELECT * FROM makerspace WHERE nome COLLATE utf8mb4_general_ci = '{$nome}' AND id <> '{$id}'  AND eliminato = FALSE";
     $query = $mysqli -> query($sql);
 
     if(!$query) {
