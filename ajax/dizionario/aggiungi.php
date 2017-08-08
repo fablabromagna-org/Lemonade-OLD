@@ -29,7 +29,7 @@
   else {
 
     // Controllo che la chiave e il valore siano corretti
-    if(!preg_match("/^[a-z\._0-9]{3,50}+$/iu", $chiave) || !preg_match("/^[a-z\._0-9]{0,50}+$/iu", $valore))
+    if(!preg_match("/^[a-z\._0-9]{3,50}+$/iu", $chiave) || strlen($valore) > 50)
       stampaErrore('La chiave ed il valore possono contenere solo lettere, numeri, punti, underscore e spazi (min. 3  caratteri, max. 50 caratteri)!');
 
     // Controllo che la chiave non esista già

@@ -33,7 +33,7 @@
       stampaErrore('ID non valido!');
 
     // Controllo che il valore sia corretti
-    if(!preg_match("/^[a-z\._0-9]{0,50}+$/iu", $valore))
+    if(strlen($valore) > 50)
       stampaErrore('Il valore può contenere solo lettere, numeri, punti, underscore e spazi (min. 3  caratteri, max. 50 caratteri)!');
 
     // Controllo che la chiave non esista già
