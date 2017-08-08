@@ -1,5 +1,5 @@
 <?php
-  require_once('../inc/autenticazione.inc.php');
+  require_once('../../inc/autenticazione.inc.php');
 
   if($autenticazione -> gestionePortale != 1)
     header('Location: /');
@@ -8,14 +8,14 @@
 <html lang="it">
   <head>
     <?php
-      require_once('../inc/header.inc.php');
+      require_once('../../inc/header.inc.php');
     ?>
     <link type="text/css" rel="stylesheet" media="screen" href="/css/dashboard.css" />
     <script type="text/javascript" src="/js/gestione.dashboard.js"></script>
   </head>
   <body>
     <?php
-      include_once('../inc/nav.inc.php');
+      include_once('../../inc/nav.inc.php');
     ?>
     <div id="contenuto">
       <h2>Aggiungi un messaggio</h1>
@@ -65,7 +65,7 @@
       </div>
     </div>
     <?php
-      include_once('../inc/footer.inc.html');
+      include_once('../../inc/footer.inc.html');
     ?>
   </body>
 </html>

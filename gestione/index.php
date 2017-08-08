@@ -34,7 +34,7 @@
           </div>
           <div class="descrizione">
             <p>Pannello di gestione della dashboard e di altre funzioni.</p>
-            <a href="/gestione/gestioneGenerale.php" class="button">Apri Gestione Generale</a>
+            <a href="/gestione/generale/" class="button">Apri Gestione Generale</a>
           </div>
         </div>
         <div class="box">
