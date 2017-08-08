@@ -177,17 +177,17 @@
                  utenti.dataRegistrazione FROM utenti INNER JOIN categorieUtenti ON categorieUtenti.id = utenti.categoria WHERE ";
 
         // Case sensitive o insensitive
-        $ci = ($ci == 1) ? '' : ' COLLATE utf8_general_ci';
+        $ci = ($ci == 1) ? '' : ' COLLATE utf8mb4_general_ci';
 
         // Aggiungo i campi di ricerca
         if($nome != "")
-          $sql .= "utenti.nome LIKE _utf8 '%".$nome."%'".$ci." AND ";
+          $sql .= "utenti.nome LIKE _utf8mb4 '%".$nome."%'".$ci." AND ";
 
         if($cognome != "")
-          $sql .= "cognome LIKE _utf8 '%".$cognome."%'".$ci." AND ";
+          $sql .= "cognome LIKE _utf8mb4 '%".$cognome."%'".$ci." AND ";
 
         if($email != "")
-          $sql .= "email LIKE _utf8 '%".$email."%'".$ci." AND ";
+          $sql .= "email LIKE _utf8mb4 '%".$email."%'".$ci." AND ";
 
         if($id != "")
           $sql .= "utenti.id = '".$id."' AND ";
@@ -231,7 +231,7 @@
 
         switch($sospeso) {
           case 1:
-            $sql .= "sospeso = '1' AND ";
+            $sql .= "sospeso = TRUE AND ";
             break;
         }
 
@@ -310,8 +310,11 @@
           } else
             echo "<p style=\"margin-top: 20px;\">Nessun utente è presente nel database con i criteri impostati.</p>";
 
-        } else
-          echo "Impossibile contattare il database.";
+        } else {
+          echo "Impossibile completare la richiesta.";
+          $console -> alert('Impossibile contattare il database! '.$mysqli -> error, $autenticazione -> id);
+        }
+
 
       ?>
     </div>
