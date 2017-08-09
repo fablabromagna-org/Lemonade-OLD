@@ -5,7 +5,7 @@
 
   header('Content-Type: application/json');
 
-  $sorgente = $mysqli -> real_escape_string(isset($_POST['sorgente']) ? trim($_POST['sorgente']) : '');
+  $sorgente = isset($_POST['sorgente']) ? trim($_POST['sorgente']) : '';
   $id = $mysqli -> real_escape_string(isset($_POST['id']) ? trim($_POST['id']) : '');
 
   function stampaErrore($errore = 'Errore sconosciuto!') {
@@ -29,7 +29,7 @@
   if(!preg_match("/^[0-9]+$/i", $id))
     stampaErrore('ID non valido!');
 
-  $sorgente = $mysqli -> real_escape_string(strip_tags($sorgente, '<strong><em><p><br><u><span><h1><h2><h3><ol><ul><li><a>'));
+  $sorgente = $mysqli -> real_escape_string(base64_encode(strip_tags($sorgente, '<strong><em><p><br><u><span><h1><h2><h3><ol><ul><li><a>')));
 
   $sql = "UPDATE templates SET sorgente = '{$sorgente}' WHERE id = {$id}";
   $query = $mysqli -> query($sql);

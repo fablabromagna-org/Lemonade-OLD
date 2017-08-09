@@ -21,7 +21,7 @@
         return null;
 
       $template = $query -> fetch_assoc();
-      $template = $template['sorgente'];
+      $template = base64_decode($template['sorgente']);
 
       foreach($variables as $key => $value)
         $template = str_replace("%%{$key}%%", $value, $template);
