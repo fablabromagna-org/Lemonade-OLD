@@ -13,6 +13,10 @@
     exit();
   }
 
+  // Controllo che gli accessi non siano stati bloccati
+  if($dizionario -> getValue('bloccoAccessi') === 'true')
+    stampaErrore('Gli accessi sono stati bloccati!');
+
   // Controllo i dati
   if($email === "")
     stampaErrore('L\'indirizzo email è obbligatorio!');

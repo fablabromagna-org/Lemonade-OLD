@@ -24,6 +24,10 @@
     exit();
   }
 
+  // Controllo che le iscrizioni non siano state bloccate
+  if($dizionario -> getValue('bloccoIscrizioni') === 'true')
+    stampaErrore('Le iscrizioni sono state bloccate!');
+
   // Controllo i dati
   if($nome === "")
     stampaErrore('Il nome è obbligatorio!');

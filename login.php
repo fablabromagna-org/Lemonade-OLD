@@ -24,12 +24,22 @@
     </div>
     <div id="accesso">
       <h2>Accesso</h2>
+      <?php
+        if($dizionario -> getValue('bloccoAccessi') !== 'true') {
+      ?>
       <form id="formAccesso">
         <input type="text" id="email" autocomplete="off" placeholder="E-Mail" />
         <input type="password" id="pwd" autocomplete="off" placeholder="Password" />
         <a style="display: block;" href="/account/recupero.php">Ho dimenticato la password</a>
         <input type="submit" value="Accedi" id="invioForm" />
       </form>
+      <?php
+        } else {
+      ?>
+      <h3 style="margin-top: 20px;">Gli accessi sono temporaneamente bloccati.</h3>
+      <?php
+        }
+      ?>
     </div>
     <?php
       include_once('inc/footer.inc.html');

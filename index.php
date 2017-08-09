@@ -24,6 +24,9 @@
     </div>
     <div id="registrazione">
       <h2>Registrazione</h2>
+      <?php
+        if($dizionario -> getValue('bloccoIscrizioni') !== 'true') {
+      ?>
       <form id="formRegistrazione">
         <input type="text" id="nome" autocomplete="off" placeholder="Nome" />
         <input type="text" id="cognome" autocomplete="off" placeholder="Cognome" />
@@ -33,6 +36,13 @@
         <input type="submit" id="invioForm" value="Registrati" />
         <p style="color: #aaa; margin-top: 15px;">Registrandoti accetti la Privacy Policy ed i Termini di utilizzo.</p>
       </form>
+      <?php
+        } else {
+      ?>
+      <h3 style="margin-top: 20px;">Le registrazioni sono temporaneamente bloccate.</h3>
+      <?php
+        }
+      ?>
       <div id="fbLogin">
 
       </div>
