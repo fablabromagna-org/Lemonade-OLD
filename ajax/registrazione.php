@@ -2,10 +2,13 @@
   require_once('../inc/carica.inc.php');
   require_once('../vendor/autoload.php');
 
-  // Configuro Mailgun
-  use Mailgun\Mailgun;
-  $dominio = DOMINIO_EMAIL_MAILGUN;
-  $mailgun = new Mailgun(MAILGUN_API_KEY);
+  // Configuro AWS SES
+  use Aws\Ses\SesClient;
+  $client = SesClient::factory(array(
+      'key' => $dizionario -> getValue('AWS_KEY'),
+      'secret' => $dizionario -> getValue('AWS_SECRET'),
+      'region'  => $dizionario -> getValue('AWS_REGION')
+  ));
 
   header('Content-Type: application/json');
 
@@ -74,21 +77,42 @@
 
           if($query = $mysqli -> query($sql)) {
 
-            $link = URL_SITO.'/confermaMail.php?token='.$codiceConferma;
+            $link = $dizionario -> getValue('urlSito').'/confermaMail.php?token='.$codiceConferma;
 
             try {
-              $mailgun -> sendMessage($dominio, array(
-                'to' => $email,
-                'from' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                'h:Reply-To' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                'html' => file_get_contents('../mail/registrazione/mail.html'),
-                'subject' => 'Conferma indirizzo email',
-                'recipient-variables' => "{ \"{$email}\": { \"nomeUtente\": \"{$nome}\", \"nomeSito\": \"".NOME_SITO."\", \"link\": \"{$link}\", \"urlSito\": \"".URL_SITO."\", \"indirizzoMittente\": \"".INDIRIZZO_MITTENTE."\" } }"
+
+              $replyTo = ($dizionario -> getValue('EMAIL_REPLY_TO') == false || $dizionario -> getValue('EMAIL_REPLY_TO') == null) ? $dizionario -> getValue('EMAIL_SOURCE') : $dizionario -> getValue('EMAIL_REPLY_TO');
+              $html = $templateManager -> getTemplate('registrazione', array(
+                'nome' => $nome,
+                'cognome' => $cognome,
+                'linkConferma' => $link,
+                'nomeSito' => $dizionario -> getValue('nomeSito')
+              ));
+
+              $client -> sendEmail(array(
+                'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
+                'ReplyToAddresses' => array($replyTo),
+                'Destination' => array(
+                  'ToAddresses' => array($email)
+                ),
+                'Message' => array(
+                  'Subject' => array(
+                    'Data' => 'Verifica indirizzo email',
+                    'Charset' => 'UTF-8'
+                  ),
+                  'Body' => array(
+                    'Html' => array(
+                      'Data' => $html,
+                      'Charset' => 'UTF-8'
+                    )
+                  )
+                )
               ));
 
               echo '{}';
 
             } catch(Exception $e) {
+              $console -> alert('Impossibile inviare l\'email! '.$e, 0);
               stampaErrore('Impossibile inviare l\'email!');
             }
 

@@ -2,10 +2,13 @@
   require_once('../inc/carica.inc.php');
   require_once('../vendor/autoload.php');
 
-  // Configuro Mailgun
-  use Mailgun\Mailgun;
-  $dominio = DOMINIO_EMAIL_MAILGUN;
-  $mailgun = new Mailgun(MAILGUN_API_KEY);
+  // Configuro AWS SES
+  use Aws\Ses\SesClient;
+  $client = SesClient::factory(array(
+    'key' => $dizionario -> getValue('AWS_KEY'),
+    'secret' => $dizionario -> getValue('AWS_SECRET'),
+    'region'  => $dizionario -> getValue('AWS_REGION')
+  ));
 
   $autenticazione = new Autenticazione($mysqli);
 
@@ -128,16 +131,35 @@
                 // Rinvio la mail
                 if($row['codiceAttivazione'] != $confermaMail) {
 
-                  $linkVerifica = URL_SITO.'/confermaMail.php?token='.$codiceAttivazione;
+                  $linkVerifica = $dizioanario -> getValue('urlSito').'/confermaMail.php?token='.$codiceAttivazione;
 
                   try {
-                    $mailgun -> sendMessage($dominio, array(
-                      'to' => $vecchiaRow['email'],
-                      'from' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                      'h:Reply-To' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                      'html' => file_get_contents('../mail/confermaMailGestione/mail.html'),
-                      'subject' => 'Conferma indirizzo email',
-                      'recipient-variables' => "{ \"{$vecchiaRow['email']}\": { \"nomeUtente\": \"{$vecchiaRow['nome']}\", \"nomeSito\": \"".NOME_SITO."\", \"link\": \"{$linkVerifica}\", \"urlSito\": \"".URL_SITO."\", \"indirizzoMittente\": \"".INDIRIZZO_MITTENTE."\" } }"
+                    $replyTo = ($dizionario -> getValue('EMAIL_REPLY_TO') == false || $dizionario -> getValue('EMAIL_REPLY_TO') == null) ? $dizionario -> getValue('EMAIL_SOURCE') : $dizionario -> getValue('EMAIL_REPLY_TO');
+                    $html = $templateManager -> getTemplate('confermaMailGestione', array(
+                      'nome' => $nome,
+                      'cognome' => $cognome,
+                      'linkConferma' => $linkVerifica,
+                      'nomeSito' => $dizionario -> getValue('nomeSito')
+                    ));
+
+                    $client -> sendEmail(array(
+                      'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
+                      'ReplyToAddresses' => array($replyTo),
+                      'Destination' => array(
+                        'ToAddresses' => array($email)
+                      ),
+                      'Message' => array(
+                        'Subject' => array(
+                          'Data' => 'Verifica indirizzo email',
+                          'Charset' => 'UTF-8'
+                        ),
+                        'Body' => array(
+                          'Html' => array(
+                            'Data' => $html,
+                            'Charset' => 'UTF-8'
+                          )
+                        )
+                      )
                     ));
 
                     echo '{}';
@@ -145,6 +167,7 @@
                   } catch(Exception $e) {
                     stampaErrore('Impossibile inviare l\'email!');
                   }
+
                 } else
                   echo '{}';
 

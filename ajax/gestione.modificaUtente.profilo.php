@@ -2,10 +2,13 @@
   require_once('../inc/carica.inc.php');
   require_once('../vendor/autoload.php');
 
-  // Configuro Mailgun
-  use Mailgun\Mailgun;
-  $dominio = DOMINIO_EMAIL_MAILGUN;
-  $mailgun = new Mailgun(MAILGUN_API_KEY);
+  // Configuro AWS SES
+  use Aws\Ses\SesClient;
+  $client = SesClient::factory(array(
+    'key' => $dizionario -> getValue('AWS_KEY'),
+    'secret' => $dizionario -> getValue('AWS_SECRET'),
+    'region'  => $dizionario -> getValue('AWS_REGION')
+  ));
 
   $autenticazione = new Autenticazione($mysqli);
 
@@ -95,12 +98,12 @@
           else {
 
             // Creo una funzione che verrà richiamata per modificare i dati dell'utente
-            function modifica($nome, $cognome, $email, $id, $emailOriginale, $mysqli, $mailgun, $codiceConfermaMail) {
+            function modifica($nome, $cognome, $email, $id, $emailOriginale, $mysqli, $client, $codiceConfermaMail, $dizionario, $templateManager) {
 
               // Genero un codice di attivazione se l'indirizzo è diverso da quello nel db
               if($emailOriginale != $email) {
                 $codiceAttivazione = uniqid();
-                $link = URL_SITO.'/confermaMail.php?token='.$codiceAttivazione;
+                $link = $dizionario -> getValue('urlSito').'/confermaMail.php?token='.$codiceAttivazione;
 
               } else
                 $codiceAttivazione = $codiceConfermaMail;
@@ -124,22 +127,59 @@
                 // La modifica è avvenuta con successo
                 // Invio una mail all'indirizzo originale e a quello nuovo
                 try {
-                  $mailgun -> sendMessage(DOMINIO_EMAIL_MAILGUN, array(
-                    'to' => $emailOriginale,
-                    'from' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                    'h:Reply-To' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                    'html' => file_get_contents('../mail/modificaMailVecchioIndirizzo/mail.html'),
-                    'subject' => 'Modifica dell\'indirizzo email',
-                    'recipient-variables' => "{ \"{$emailOriginale}\": { \"nomeUtente\": \"{$nome}\", \"nomeSito\": \"".NOME_SITO."\", \"urlSito\": \"".URL_SITO."\", \"indirizzoMittente\": \"".INDIRIZZO_MITTENTE."\" } }"
+                  $replyTo = ($dizionario -> getValue('EMAIL_REPLY_TO') == false || $dizionario -> getValue('EMAIL_REPLY_TO') == null) ? $dizionario -> getValue('EMAIL_SOURCE') : $dizionario -> getValue('EMAIL_REPLY_TO');
+                  $html = $templateManager -> getTemplate('confermaEmailVecchioIndirizzo', array(
+                    'nome' => $nome,
+                    'cognome' => $cognome,
+                    'nuovoIndirizzo' => $email,
+                    'nomeSito' => $dizionario -> getValue('nomeSito')
                   ));
 
-                  $mailgun -> sendMessage(DOMINIO_EMAIL_MAILGUN, array(
-                    'to' => $email,
-                    'from' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                    'h:Reply-To' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-                    'html' => file_get_contents('../mail/modificaMailNuovoIndirizzo/mail.html'),
-                    'subject' => 'Conferma E-Mail',
-                    'recipient-variables' => "{ \"{$email}\": { \"nomeUtente\": \"{$nome}\", \"nomeSito\": \"".NOME_SITO."\", \"urlSito\": \"".URL_SITO."\", \"indirizzoMittente\": \"".INDIRIZZO_MITTENTE."\", \"link\": \"{$link}\" } }"
+                  $client -> sendEmail(array(
+                    'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
+                    'ReplyToAddresses' => array($replyTo),
+                    'Destination' => array(
+                      'ToAddresses' => array($emailOriginale)
+                    ),
+                    'Message' => array(
+                      'Subject' => array(
+                        'Data' => 'Cambio indirizzo email',
+                        'Charset' => 'UTF-8'
+                      ),
+                      'Body' => array(
+                        'Html' => array(
+                          'Data' => $html,
+                          'Charset' => 'UTF-8'
+                        )
+                      )
+                    )
+                  ));
+
+                  $html = $templateManager -> getTemplate('confermaEmailNuovoIndirizzo', array(
+                    'nome' => $nome,
+                    'cognome' => $cognome,
+                    'linkConferma' => $link,
+                    'nomeSito' => $dizionario -> getValue('nomeSito')
+                  ));
+
+                  $client -> sendEmail(array(
+                    'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
+                    'ReplyToAddresses' => array($replyTo),
+                    'Destination' => array(
+                      'ToAddresses' => array($email)
+                    ),
+                    'Message' => array(
+                      'Subject' => array(
+                        'Data' => 'Conferma indirizzo email',
+                        'Charset' => 'UTF-8'
+                      ),
+                      'Body' => array(
+                        'Html' => array(
+                          'Data' => $html,
+                          'Charset' => 'UTF-8'
+                        )
+                      )
+                    )
                   ));
 
                   echo '{}';
@@ -161,15 +201,14 @@
               $row = $query -> fetch_assoc();
 
               if($row['id'] == $id)
-                modifica($nome, $cognome, $email, $id, $vecchiaRow['email'], $mysqli, $mailgun, $vecchiaRow['codiceAttivazione']);
+                modifica($nome, $cognome, $email, $id, $vecchiaRow['email'], $mysqli, $client, $vecchiaRow['codiceAttivazione'], $dizionario, $templateManager);
 
               else
                 stampaErrore('E-Mail già utilizzata!');
 
             // Se non restituisce nulla modifico direttamente
             } else
-              modifica($nome, $cognome, $email, $id, $vecchiaRow['email'], $mysqli, $mailgun, $vecchiaRow['codiceAttivazione']);
-
+              modifica($nome, $cognome, $email, $id, $vecchiaRow['email'], $mysqli, $client, $vecchiaRow['codiceAttivazione'], $dizionario, $templateManager);
           }
         }
       } else

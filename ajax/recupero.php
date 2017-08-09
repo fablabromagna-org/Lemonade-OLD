@@ -2,10 +2,13 @@
   require_once('../inc/carica.inc.php');
   require_once('../vendor/autoload.php');
 
-  // Configuro Mailgun
-  use Mailgun\Mailgun;
-  $dominio = DOMINIO_EMAIL_MAILGUN;
-  $mailgun = new Mailgun(MAILGUN_API_KEY);
+  // Configuro AWS SES
+  use Aws\Ses\SesClient;
+  $client = SesClient::factory(array(
+      'key' => $dizionario -> getValue('AWS_KEY'),
+      'secret' => $dizionario -> getValue('AWS_SECRET'),
+      'region'  => $dizionario -> getValue('AWS_REGION')
+  ));
 
   header('Content-Type: application/json');
 
@@ -49,6 +52,7 @@
         $password = randomString();
         $hashPassword = md5($password);
         $nome = $dati['nome'];
+        $cognome = $dati['cognome'];
 
         $sql = "UPDATE utenti SET password = '$hashPassword' WHERE id = '".$dati['id']."'";
 
@@ -56,15 +60,33 @@
 
           // Invio la mail
           try {
-            $mailgun -> sendMessage($dominio, array(
-              'to' => $email,
-              'from' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-              'h:Reply-To' => MITTENTE_EMAIL." <".INDIRIZZO_MITTENTE.">",
-              'html' => file_get_contents('../mail/password/mail.html'),
-              'subject' => 'Recupero password',
-              'recipient-variables' => "{ \"{$email}\": { \"nomeUtente\": \"{$nome}\", \"nomeSito\": \"".NOME_SITO."\", \"password\": \"{$password}\", \"urlSito\": \"".URL_SITO."\", \"indirizzoMittente\": \"".INDIRIZZO_MITTENTE."\" } }"
+            $replyTo = ($dizionario -> getValue('EMAIL_REPLY_TO') == false || $dizionario -> getValue('EMAIL_REPLY_TO') == null) ? $dizionario -> getValue('EMAIL_SOURCE') : $dizionario -> getValue('EMAIL_REPLY_TO');
+            $html = $templateManager -> getTemplate('recuperoPassword', array(
+              'nome' => $nome,
+              'cognome' => $cognome,
+              'password' => $password,
+              'nomeSito' => $dizionario -> getValue('nomeSito')
             ));
 
+            $client -> sendEmail(array(
+              'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
+              'ReplyToAddresses' => array($replyTo),
+              'Destination' => array(
+                'ToAddresses' => array($email)
+              ),
+              'Message' => array(
+                'Subject' => array(
+                  'Data' => 'Nuova password',
+                  'Charset' => 'UTF-8'
+                ),
+                'Body' => array(
+                  'Html' => array(
+                    'Data' => $html,
+                    'Charset' => 'UTF-8'
+                  )
+                )
+              )
+            ));
 
             echo '{}';
 
