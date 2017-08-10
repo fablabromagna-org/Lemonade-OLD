@@ -43,9 +43,6 @@
       <?php
         }
       ?>
-      <div id="fbLogin">
-
-      </div>
     </div>
     <?php
       require_once('inc/footer.inc.html');
