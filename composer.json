@@ -4,7 +4,8 @@
     "require": {
         "aws/aws-sdk-php": "2.*",
         "ext-mbstring": "*",
-        "dompdf/dompdf": "^0.8.0"
+        "dompdf/dompdf": "^0.8.0",
+        "longman/telegram-bot": "^0.47.1"
     },
     "minimum-stability": "dev",
     "authors": [
