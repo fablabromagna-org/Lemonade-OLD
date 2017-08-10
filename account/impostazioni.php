@@ -30,6 +30,7 @@
     ?>
     <div id="contenuto">
       <h1>Impostazioni</h1>
+      <p style="text-align: right; margin-bottom: 5px;"><a href="/account/social.php">Social Networks</a></p>
       <div class="box">
         <div>Profilo</div>
         <div>

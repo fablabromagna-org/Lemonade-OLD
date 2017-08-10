@@ -69,6 +69,7 @@
       <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/attivita/?id=<?php echo $id; ?>">Visualizza le attività svolte</a></p>
       <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/badge/utente.php?id=<?php echo $profilo['id']; ?>">Gestione badge</a></p>
       <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/transazioni/utenteFabCoin.php?id=<?php echo $profilo['id']; ?>">Transazioni FabCoin</a></p>
+      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/utenti/social.php?id=<?php echo $profilo['id']; ?>">Social Networks</a></p>
       <div class="box">
         <div>Profilo</div>
         <div>
