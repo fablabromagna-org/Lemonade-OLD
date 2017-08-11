@@ -27,5 +27,8 @@
     stampaErrore('Impossibile completare la richiesta!');
   }
 
+  $notificheUtente = new Notifiche($mysqli, $autenticazione -> id);
+  $notificheUtente -> link('Disconnessione da Telegram riuscita!', '/account/social.php');
+
   echo '{}';
 ?>
