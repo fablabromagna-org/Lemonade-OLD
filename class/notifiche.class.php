@@ -43,7 +43,7 @@
     }
 
     private function social($msg, $link = null) {
-      if($dizionario -> getValue('telegramBotName') !== false && $dizionario -> getValue('telegramBotName') !== null) {
+      if($GLOBALS['dizionario'] -> getValue('telegramBotName') !== false && $GLOBALS['dizionario'] -> getValue('telegramBotName') !== null) {
 
         $sql = "SELECT * FROM socialNetworks WHERE idUtente = {$this -> idUtente} AND tipo = 'telegram' AND authCode IS NULL LIMIT 0, 1";
         $query = $this -> mysqli -> query($sql);
