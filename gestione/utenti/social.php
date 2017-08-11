@@ -80,7 +80,7 @@
                   $row = $query -> fetch_assoc();
 
                   echo '<p>Collegamento effettuato.</p>';
-                  echo '<p>ID Telegram: <b>'.$row['idSocial'].'</b></p>';
+                  echo '<p>ID Facebook: <b>'.$row['idSocial'].'</b></p>';
                 }
               } else {
 
