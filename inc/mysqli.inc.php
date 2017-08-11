@@ -27,4 +27,28 @@
     } else
       return $_SERVER['REMOTE_ADDR'];
   }
+
+  // Metodo per la conversione dei giorni
+  function sec2str($secs) {
+    $r = '';
+    if ($secs >= 86400) {
+      $days = floor($secs/86400);
+      $secs = $secs%86400;
+      $r .= $days . 'd';
+      if ($secs > 0) $r .= ' ';
+    }
+    if ($secs >= 3600) {
+      $hours = floor($secs/3600);
+      $secs = $secs%3600;
+      $r .= $hours . 'h';
+      if ($secs > 0) $r .= ' ';
+    }
+    if ($secs>=60) {
+      $minutes = floor($secs/60);
+      $secs = $secs%60;
+      $r .= $minutes . 'm';
+      if ($secs > 0) $r .= ' ';
+    }
+    return $r . $secs . 's';
+  }
 ?>
