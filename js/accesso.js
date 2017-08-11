@@ -1,8 +1,3 @@
-/**
- * @author Edoardo Savini <sedoardo98@gmail.com>
- * @version 0.0.2
- */
-
 ;(function() {
   function $(id) { return document.getElementById(id) }
 
@@ -51,7 +46,7 @@
 
       // Cambio il testo del bottone
       invioForm.value = 'Accesso in corso'
-      
+
       email.value = email.value.trim()
 
       // Controllo i valori
@@ -95,5 +90,63 @@
         } // Fine onreadystatechange
       } // Fine else controllo dati
     }) // Fine evento submit
+
+    $('fbLogin').addEventListener('click', fbLogin)
   }) // Fine evento DOMContentLoaded
+
+  var accessoFbInCorso = false
+
+  // Accesso con Facebook
+  function fbLogin(e) {
+
+    e.preventDefault()
+
+    if(accessoFbInCorso)
+      return
+
+    _this = this
+
+    FB.login(function(res){
+
+      // L'utente ha autorizzato l'applicazione
+      if(res.authResponse) {
+
+        // Ricavo il token di autenticazione
+        var token = FB.getAuthResponse()['accessToken']
+
+        // Disabilito la richiesta
+        accessoFbInCorso = true
+        _this.innerHTML = 'Accesso in corso...'
+
+        // Invio il token al server
+        var xhr = new XMLHttpRequest()
+        xhr.open('POST', '/ajax/social/facebook/login.php', true)
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+        xhr.send('token=' + encodeURIComponent(token))
+
+        function errore(msg) {
+          alert(msg)
+          accessoFbInCorso = false
+          _this.innerHTML = '<i class="fa fa-facebook-official" aria-hidden="true"></i>Accedi con Facebook'
+        }
+
+        xhr.onreadystatechange = function() {
+
+          if(xhr.readyState === 4 && xhr.status === 200) {
+
+            var res = JSON.parse(xhr.response)
+
+            if(res.errore === true)
+              errore(res.msg)
+
+            else
+              location.href = '/dashboard.php'
+
+
+          } else if(xhr.readyState === 4)
+            errore('Impossibile completare la richiesta!\nRiprova tra qualche minuto.')
+        }
+      }
+    }, {}); // FB.login
+  }
 })()

@@ -15,6 +15,21 @@
     <script type="text/javascript" src="js/accesso.js"></script>
   </head>
   <body>
+    <?php
+      if($dizionario -> getValue('facebookAppId') !== false && $dizionario -> getValue('facebookAppId') !== null) {
+    ?>
+    <!-- Facebook -->
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/it_IT/sdk.js#xfbml=1&version=v2.10&appId=<?php echo $dizionario -> getValue('facebookAppId') ?>";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+    <?php
+      }
+    ?>
     <div id="header">
       <a href="/" class="button" id="bottoneFlottante">Registrazione</a>
       <div>
@@ -34,6 +49,13 @@
         <input type="submit" value="Accedi" id="invioForm" />
       </form>
       <?php
+          if($dizionario -> getValue('facebookAppId') !== false && $dizionario -> getValue('facebookAppId') !== null) {
+      ?>
+        <!-- Facebook -->
+        <a id="fbLogin" class="noselect"><i class="fa fa-facebook-official" aria-hidden="true"></i>Accedi con Facebook</a>
+      <?php
+          }
+
         } else {
       ?>
       <h3 style="margin-top: 20px;">Gli accessi sono temporaneamente bloccati.</h3>

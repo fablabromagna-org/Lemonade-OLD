@@ -41,18 +41,6 @@ input[type='submit'][disabled] { background: #fff; padding: 4px 13px; color: #aa
 #footer div { display: inline-block; vertical-align: middle; max-width: 25vh; margin: 10px; text-align: justify; }
 #footer div ul li { margin-top: 3px; }
 
-/* Accessibilità */
-#accessibilita { background: #403c3c; padding: 10px 40px 10px 10px; border-radius: 3px; max-width: initial !important; }
-#accessibilita p { color: #fff !important; }
-#accessibilita > p { font-size: 1.2em; font-weight: 700; color: #fff !important; }
-#accessibilita > p i { margin-right: 6px; font-size: 1.5em; vertical-align: middle; }
-#accessibilita div { margin: 10px 0 0 30px; display: block; }
-#accessibilita div.zoom a { margin-top: 5px; display: inline-block; padding: 5px; border-radius: 3px; color: #fff !important; }
-#accessibilita div.zoom a i { font-size: 1.25em; }
-#accessibilita div.zoom a:hover, #accessibilita div.inversione a:hover { background: #1d1b1b; text-decoration: none; }
-#accessibilita div a i { margin-right: 6px; font-size: 1.2em; vertical-align: middle; }
-#accessibilita div.inversione a { display: inline-block; padding: 5px; border-radius: 3px; margin-left: -3px; color: #fff !important; }
-
 /* Header, Barra superiore, Barra di navigazione, Contenuto */
 #headerInt { background: #ece153; position: ; top: 0; right: 0; left: 0;}
 
@@ -91,3 +79,10 @@ td.id a { display: inline-block; padding: 3px 5px; background: #00fffd; border-
 thead { background: #f4f4f4; font-weight: 700; border-bottom: 1px solid #e2e2e2;  }
 tbody tr { border-bottom: 1px solid #e2e2e2; transition: .1s background; background: #fff; }
 tbody tr:hover { transition: .1s background; background: #f4f4f4; }
+
+.noselect { -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+
+/* Social Networks */
+#fbLogin { border: 1px solid #3b5998; transition: .2s color, background; margin-top: 10px; min-width: 210px; background: #3b5998; color: #fff; display: inline-block; font-size: 17px; font-weight: 700; padding: 5px 10px; border-radius: 3px; }
+#fbLogin:active { border: 1px solid #3b5998; transition: .2s color background; background: #fff; color: #3b5998; }
+#fbLogin i { float: left; }
