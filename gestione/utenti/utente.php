@@ -25,6 +25,8 @@
 
       form input, form select { margin-bottom: 10px; }
       form input:last-child, select { margin-bottom: 0; }
+
+      .link { text-align: right; margin-bottom: 5px; }
     </style>
   </head>
   <body>
@@ -66,10 +68,11 @@
     ?>
     <div id="contenuto">
       <h1>Profilo di <?php echo $profilo['nome'].' '.$profilo['cognome']; ?></h1>
-      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/attivita/?id=<?php echo $id; ?>">Visualizza le attività svolte</a></p>
-      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/badge/utente.php?id=<?php echo $profilo['id']; ?>">Gestione badge</a></p>
-      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/transazioni/utenteFabCoin.php?id=<?php echo $profilo['id']; ?>">Transazioni FabCoin</a></p>
-      <p style="text-align: right; margin-bottom: 5px;"><a href="/gestione/utenti/social.php?id=<?php echo $profilo['id']; ?>">Social Networks</a></p>
+      <p class="link"><a href="/gestione/attivita/?id=<?php echo $id; ?>">Visualizza le attività svolte</a></p>
+      <p class="link"><a href="/gestione/badge/utente.php?id=<?php echo $profilo['id']; ?>">Gestione badge</a></p>
+      <p class="link"><a href="/gestione/transazioni/utenteFabCoin.php?id=<?php echo $profilo['id']; ?>">Transazioni FabCoin</a></p>
+      <p class="link"><a href="/gestione/utenti/social.php?id=<?php echo $profilo['id']; ?>">Social Networks</a></p>
+      <p class="link"><a href="/gestione/presenze/presenze.php?id=<?php echo $profilo['id']; ?>">Presenze</a></p>
       <div class="box">
         <div>Profilo</div>
         <div>

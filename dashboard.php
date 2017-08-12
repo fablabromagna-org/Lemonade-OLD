@@ -56,22 +56,13 @@
           } else
             echo '<p style="margin-top: 20px">Impossibile caricare la dashboard (errore durante la comunicazione col database).</p>';
         ?>
-        <!-- <div class="box">
-          <div class="titolo">
-            <p>Macchinari</p>
-          </div>
-          <div class="descrizione">
-            <p>Non hai nessuna prenotazione aperta.</p>
-            <a href="/macchinari/" class="button">Vai ai Macchinari</a>
-          </div>
-        </div>-->
         <div class="box">
           <div class="titolo">
             <p>Attività svolte</p>
           </div>
           <div class="descrizione">
             <p>Puoi vedere tutte le attività che hai svolto presso FabLab Romagna e che ti sono state riconosciute alla pagina "Attività".</p>
-            <a href="/account/attivita.php" class="button">Vai ad Attività</a>
+            <a href="/account/attivita.php" class="button">Vai ad attività</a>
           </div>
         </div>
         <div class="box">
@@ -98,6 +89,32 @@
               }
             ?>
             <a href="/account/transazioni/fabcoin.php" class="button">Vai alle transazioni</a>
+          </div>
+        </div> <!-- Fine box -->
+        <div class="box">
+          <div class="titolo">
+            <p>Presenze</p>
+          </div>
+          <div class="descrizione">
+            <?php
+              $sql = "SELECT SUM(presenze.fine - presenze.inizio) AS somma FROM presenze WHERE annullata IS NOT TRUE AND idUtente = {$autenticazione -> id} AND fine >= ".strtotime(date('Y-01-01'));
+              $query = $mysqli -> query($sql);
+
+              if($query) {
+                $row = $query -> fetch_assoc();
+
+                if((int)$row['somma'] === 0)
+                  echo '<p>Non sei mai stato presente.</p>';
+
+                else
+                  echo '<p>Sei stato presente '.sec2str((int)$row['somma']).'.</p>';
+
+              } else {
+                $console -> alert('Impossibile caricare le presenze sulla dashboard. '.$mysqli -> error, $autenticazione -> id);
+                echo '<p>Impossibile completare la richiesta.</p>';
+              }
+            ?>
+            <a href="/account/presenze.php" class="button">Vai alle presenze</a>
           </div>
         </div>
       </div>
