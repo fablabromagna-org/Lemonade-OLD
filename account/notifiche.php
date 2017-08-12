@@ -16,6 +16,8 @@
     ?>
     <div id="contenuto">
       <h1>Notifiche</h1>
+      <p><a onclick="leggiTutto()">Leggi tutte le notifiche</a></p>
+      <p><a onclick="eliminaTutto()">Elimina tutte le notifiche</a></p>
       <div style="overflow-x: auto;">
         <table>
           <thead>
