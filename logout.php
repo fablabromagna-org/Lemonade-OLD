@@ -35,7 +35,7 @@
       <p style="margin-top: 20px;"><a href="/login.php">Clicca qui</a> per tornare alla pagina di accesso.</p>
     </div>
     <?php
-      require_once('inc/footer.inc.html');
+      require_once('inc/footer.inc.php');
     ?>
   </body>
 </html>

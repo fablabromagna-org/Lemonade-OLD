@@ -76,7 +76,7 @@
       <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
     </div>
     <?php
-      include_once('../inc/footer.inc.html');
+      include_once('../inc/footer.inc.php');
     ?>
   </body>
 </html>

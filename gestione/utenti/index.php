@@ -49,7 +49,7 @@
       </div>
     </div>
     <?php
-      include_once('../../inc/footer.inc.html');
+      include_once('../../inc/footer.inc.php');
     ?>
   </body>
 </html>
