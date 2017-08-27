@@ -2,12 +2,6 @@
 
   @include_once('devConfig.inc.php');
 
-  // E-Mail
-  define('MAILGUN_API_KEY', getenv('MAILGUN_API_KEY'));
-  define('MITTENTE_EMAIL', getenv('MAILGUN_FROM_NAME'));
-  define('INDIRIZZO_MITTENTE', getenv('MAILGUN_FROM'));
-  define('DOMINIO_EMAIL_MAILGUN', getenv('MAILGUN_DOMAIN'));
-
   // Login
   define('COOKIE_NAME', 'flrAuth');
 

@@ -22,9 +22,7 @@
     ?>
       <div style="margin: 10px auto 30px auto; max-width: 520px; padding: 0 20px;">
         <h1 style="text-align: center;">L'iscrizione è quasi terminata</h1>
-        <p style="margin-top: 10px;">A breve riceverai un'email di conferma da <?php echo MITTENTE_EMAIL; ?> (<a href="mailto:<?php echo INDIRIZZO_MITTENTE; ?>"><?php echo INDIRIZZO_MITTENTE; ?></a>) con il link di conferma del tuo account.</p>
-        <p style="margin-top: 10px;">Se non hai ricevuto l'email di conferma <b>controlla anche nella casella di SPAM</b>, se non non la trovi ancora registrati nuovamente con lo stesso indirizzo email.</p>
-        <p style="margin-top: 10px;">Se il problema persiste, contatta <?php echo MITTENTE_EMAIL; ?> a questo indirizzo <a href="mailto:<?php echo INDIRIZZO_MITTENTE; ?>"><?php echo INDIRIZZO_MITTENTE; ?></a>.</p>
+        <p>Devi confermare l'account seguendo le istruzioni che riceverai via email.</p>
       </div>
     <?php
       } else {
@@ -37,7 +35,6 @@
     ?>
         <h1 style="text-align: center;">Conferma email fallita</h1>
         <p style="margin-top: 10px;">Il codice di conferma non è valido.</p>
-        <p style="margin-top: 10px;">Se il problema persiste, contatta <?php echo MITTENTE_EMAIL; ?> a questo indirizzo <a href="mailto:<?php echo INDIRIZZO_MITTENTE; ?>"><?php echo INDIRIZZO_MITTENTE; ?></a>.</p>
     <?php
       } else {
         $sql = "SELECT  * FROM utenti WHERE codiceAttivazione = '".$codiceConferma."'";
@@ -58,21 +55,18 @@
             ?>
               <h1 style="text-align: center;">Conferma email fallita</h1>
               <p style="margin-top: 10px;">Impossibile completare la conferma.</p>
-              <p style="margin-top: 10px;">Se il problema persiste, contatta <?php echo MITTENTE_EMAIL; ?> a questo indirizzo <a href="mailto:<?php echo INDIRIZZO_MITTENTE; ?>"><?php echo INDIRIZZO_MITTENTE; ?></a>.</p>
             <?php
             }
           } else {
           ?>
             <h1 style="text-align: center;">Conferma email fallita</h1>
             <p style="margin-top: 10px;">Il codice di conferma non è valido.</p>
-            <p style="margin-top: 10px;">Se il problema persiste, contatta <?php echo MITTENTE_EMAIL; ?> a questo indirizzo <a href="mailto:<?php echo INDIRIZZO_MITTENTE; ?>"><?php echo INDIRIZZO_MITTENTE; ?></a>.</p>
           <?php
           }
         } else {
         ?>
           <h1 style="text-align: center;">Conferma email fallita</h1>
           <p style="margin-top: 10px;">Impossibile completare la conferma.</p>
-          <p style="margin-top: 10px;">Se il problema persiste, contatta <?php echo MITTENTE_EMAIL; ?> a questo indirizzo <a href="mailto:<?php echo INDIRIZZO_MITTENTE; ?>"><?php echo INDIRIZZO_MITTENTE; ?></a>.</p>
         <?php
         }
       }

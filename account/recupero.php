@@ -24,7 +24,6 @@
     </div>
     <div style="margin: 10px auto 30px auto; max-width: 520px; text-align: center; padding: 0 20px;">
       <h2>Ripristina la tua password</h2>
-      <p style="margin-top: 10px;">Inserisci il tuo indirizzo email, riceverai una mail da "<?php echo MITTENTE_EMAIL.' '.INDIRIZZO_MITTENTE.''; ?>" con la tua nuova password.</p>
       <form id="formRecupero">
         <input type="email" style="display: block; margin: 20px auto 20px auto;" id="email" autocomplete="off" placeholder="E-Mail" />
         <input type="submit" value="Ripristina" id="invioForm" />
