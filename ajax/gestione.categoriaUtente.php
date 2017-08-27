@@ -8,8 +8,6 @@
   $id = $mysqli -> real_escape_string(isset($_POST['id']) ? trim($_POST['id']) : '');
   $richiesta = $mysqli -> real_escape_string(isset($_POST['richiesta']) ? trim($_POST['richiesta']) : '');
   $nome = $mysqli -> real_escape_string(isset($_POST['nome']) ? trim($_POST['nome']) : '');
-  $portale = $mysqli -> real_escape_string(isset($_POST['portale']) ? trim($_POST['portale']) : '');
-  $rete = $mysqli -> real_escape_string(isset($_POST['rete']) ? trim($_POST['rete']) : '');
   $destinazione = $mysqli -> real_escape_string(isset($_POST['destinazione']) ? trim($_POST['destinazione']) : '');
 
 
@@ -25,7 +23,7 @@
     stampaErrore('Non hai effettuato l\'accesso!');
 
   // Controllo che l'utente abbia i permessi per effettuare la modifica
-  else if($autenticazione -> gestionePortale!= 1)
+  else if(!$permessi -> whatCanHeDo($autenticazione -> id)['gestioneGruppi']['stato'])
 
     // L'utente non ha i permessi
     stampaErrore('Non sei autorizzato ad effettuare la modifica!');
@@ -93,21 +91,7 @@
       // I valori vanno bene
       else {
 
-        // Potere di gestione della rete interna ai maker space
-        if($rete == 'true')
-          $rete = true;
-
-        else
-          $rete = false;
-
-        // Potere di gestione del portale
-        if($portale == 'true')
-          $portale = true;
-
-        else
-          $portale = false;
-
-        $sql = "INSERT INTO categorieUtenti (nome, gestionePortale, gestioneRete) VALUES ('{$nome}', '{$portale}', '{$rete}')";
+        $sql = "INSERT INTO categorieUtenti (nome) VALUES ('{$nome}')";
 
         if($query = $mysqli -> query($sql))
           echo '{}';

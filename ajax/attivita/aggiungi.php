@@ -31,7 +31,7 @@
     stampaErrore('Non hai effettuato l\'accesso!');
 
   // Controllo che l'utente abbia i permessi per effettuare la modifica
-  else if($autenticazione -> gestionePortale != 1)
+  else if(!$permessi -> whatCanHeDo($autenticazione -> id)['aggiuntaAttivita']['stato'])
 
     // L'utente non ha i permessi
     stampaErrore('Non sei autorizzato ad effettuare la modifica!');

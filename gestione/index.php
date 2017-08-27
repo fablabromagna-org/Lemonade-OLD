@@ -1,7 +1,17 @@
 <?php
   require_once('../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  $permessiUtente = $permessi -> whatCanHeDo($autenticazione -> id);
+  $dashboard = $permessiUtente['dashboard']['stato'];
+  $templates = $permessiUtente['visualizzareTemplate']['stato'];
+  $dizionario = $permessiUtente['dizionario']['stato'];
+  $makerspace = $permessiUtente['visualizzareMakerSpace']['stato'];
+  $log = $permessiUtente['visualizzareLog']['stato'];
+  $ricerca = $permessiUtente['visualizzareUtenti']['stato'];
+  $gruppi = $permessiUtente['visualizzareGruppi']['stato'];
+  $badge = $permessiUtente['visualizzareBadge']['stato'];
+
+  if(!$ricerca && !$gruppi && !$badge && !$makerspace && !$log && !$dizionario && !$templates && !$dashboard)
     header('Location: /');
 ?>
 <!DOCTYPE html>
@@ -28,6 +38,9 @@
             <a href="/gestione/utenti/" class="button">Apri Gestione Utenti</a>
           </div>
         </div>
+        <?php
+          if($dizionario || $templates || $dashboard) {
+        ?>
         <div class="box">
           <div class="titolo">
             <p>Generale</p>
@@ -37,6 +50,11 @@
             <a href="/gestione/generale/" class="button">Apri Gestione Generale</a>
           </div>
         </div>
+        <?php
+          }
+
+          if($makerspace) {
+        ?>
         <div class="box">
           <div class="titolo">
             <p>Maker Space</p>
@@ -46,6 +64,11 @@
             <a href="/gestione/makerspace/" class="button">Apri Gestione Maker Space</a>
           </div>
         </div>
+        <?php
+          }
+
+          if($log) {
+        ?>
         <div class="box">
           <div class="titolo">
             <p>Log</p>
@@ -55,6 +78,9 @@
             <a href="/gestione/logs.php" class="button">Vai a Log</a>
           </div>
         </div>
+        <?php
+          }
+        ?>
       </div>
     </div>
     <?php

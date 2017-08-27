@@ -1,5 +1,8 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
+
+  if(!$permessi -> whatCanHeDo($autenticazione -> id)['visualizzareAttivitaProprie']['stato'])
+    header('Location: /');
 ?>
 <!DOCTYPE html>
 <html lang="it">

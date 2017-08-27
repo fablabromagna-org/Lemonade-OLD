@@ -1,7 +1,7 @@
 <?php
   require_once('../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  if(!$permessi -> whatCanHeDo($autenticazione -> id)['visualizzareAttivitaProprie']['stato'])
     header('Location: /');
 ?>
 <!DOCTYPE html>
@@ -17,8 +17,6 @@
     ?>
     <div id="contenuto">
       <?php
-
-
         $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
 
         // Estraggo il profilo dell'utente

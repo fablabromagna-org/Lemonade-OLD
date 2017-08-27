@@ -15,8 +15,6 @@
   header('Content-Type: application/json');
 
   $categoria = $mysqli -> real_escape_string(isset($_POST['categoria']) ? trim($_POST['categoria']) : '');
-  $gestionePortale = $mysqli -> real_escape_string(isset($_POST['gestionePortale']) ? trim($_POST['gestionePortale']) : '');
-  $gestioneRete = $mysqli -> real_escape_string(isset($_POST['gestioneRete']) ? trim($_POST['gestioneRete']) : '');
   $sospensione = $mysqli -> real_escape_string(isset($_POST['sospensione']) ? trim($_POST['sospensione']) : '');
   $confermaMail = $mysqli -> real_escape_string(isset($_POST['confermaMail']) ? trim($_POST['confermaMail']) : '');
   $id = $mysqli -> real_escape_string(isset($_POST['id']) ? trim($_POST['id']) : '');
@@ -26,8 +24,6 @@
     exit();
   }
 
-  $confermaMail = ($confermaMail == '1') ? '0' : '1';
-
   // Controllo che l'utente abbia effettuato l'accesso
   if(!$autenticazione -> isLogged())
 
@@ -35,7 +31,7 @@
     stampaErrore('Non hai effettuato l\'accesso!');
 
   // Controllo che l'utente abbia i permessi per effettuare la modifica
-  else if($autenticazione -> gestionePortale != 1)
+  else if(!$permessi -> whatCanHeDo($autenticazione -> id)['gestioneUtentiAvanzata']['stato'])
 
     // L'utente non ha i permessi
     stampaErrore('Non sei autorizzato ad effettuare la modifica!');
@@ -50,12 +46,6 @@
     // Controllo che i valori siano validi
     else if($categoria == '')
       stampaErrore('Devi inserire una categoria!');
-
-    else if($gestionePortale != '0' && $gestionePortale != '1' && $gestionePortale != '2')
-      stampaErrore('Devi inserire il permesso di gestione del portale!');
-
-    else if($gestioneRete != '0' && $gestioneRete != '1' && $gestioneRete != '2')
-      stampaErrore('Devi inserire il permesso di gestione della rete!');
 
     else if($sospensione != '1' && $sospensione != '0')
       stampaErrore('Devi indicare lo stato di sospensione dell\'account!');
@@ -82,12 +72,6 @@
           $row = $query -> fetch_assoc();
 
           if($row['categoria'] != $categoria)
-            $modificati = true;
-
-          if($row['gestionePortale'] != $gestionePortale)
-            $modificati = true;
-
-          if($row['gestioneRete'] != $gestioneRete)
             $modificati = true;
 
           if($row['sospeso'] != $sospensione)
@@ -123,15 +107,15 @@
               if($row['codiceAttivazione'] == '0' && $confermaMail == '0')
                 $codiceAttivazione = uniqid();
 
-              $sql = "UPDATE utenti SET categoria = '{$categoria}', gestionePortale = '{$gestionePortale}', gestioneRete = '{$gestioneRete}', sospeso = '{$sospensione}', codiceAttivazione = '{$codiceAttivazione}' WHERE id = '{$id}'";
+              $sql = "UPDATE utenti SET categoria = '{$categoria}', sospeso = '{$sospensione}', codiceAttivazione = '{$codiceAttivazione}' WHERE id = '{$id}'";
 
               if($mysqli -> query($sql)) {
 
                 // Se la conferma dell'indirizzo email è cambiata
                 // Rinvio la mail
-                if($row['codiceAttivazione'] != $confermaMail) {
+                if($codiceAttivazione != '0') {
 
-                  $linkVerifica = $dizioanario -> getValue('urlSito').'/confermaMail.php?token='.$codiceAttivazione;
+                  $linkVerifica = $dizionario -> getValue('urlSito').'/confermaMail.php?token='.$codiceAttivazione;
 
                   try {
                     $replyTo = ($dizionario -> getValue('EMAIL_REPLY_TO') == false || $dizionario -> getValue('EMAIL_REPLY_TO') == null) ? $dizionario -> getValue('EMAIL_SOURCE') : $dizionario -> getValue('EMAIL_REPLY_TO');
@@ -146,7 +130,7 @@
                       'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
                       'ReplyToAddresses' => array($replyTo),
                       'Destination' => array(
-                        'ToAddresses' => array($email)
+                        'ToAddresses' => array($row['email'])
                       ),
                       'Message' => array(
                         'Subject' => array(

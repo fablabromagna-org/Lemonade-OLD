@@ -1,8 +1,14 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  $permessiUtente = $permessi -> whatCanHeDo($autenticazione -> id);
+  $dashboard = $permessiUtente['dashboard']['stato'];
+  $templates = $permessiUtente['visualizzareTemplate']['stato'];
+  $dizionario = $permessiUtente['dizionario']['stato'];
+
+  if(!$dizionario && !$templates && !$dashboard)
     header('Location: /');
+
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -19,6 +25,9 @@
     <div id="contenuto">
       <h1>Gestione generale</h1>
       <div id="contenitoreBox">
+      <?php
+        if($dashboard) {
+      ?>
         <div class="box">
           <div class="titolo">
             <p>Messaggi sulla dashboard</p>
@@ -28,6 +37,11 @@
             <a href="/gestione/generale/dashboard.php" class="button">Apri Messaggi sulla dashboard</a>
           </div>
         </div>
+        <?php
+          }
+
+          if($templates) {
+        ?>
         <div class="box">
           <div class="titolo">
             <p>Templates</p>
@@ -37,6 +51,11 @@
             <a href="/gestione/generale/templates/" class="button">Apri Templates</a>
           </div>
         </div>
+        <?php
+          }
+
+          if($dizionario) {
+        ?>
         <div class="box">
           <div class="titolo">
             <p>Dizionario</p>
@@ -47,6 +66,9 @@
             <a href="/gestione/generale/dizionario.php" class="button">Apri Dizionario</a>
           </div>
         </div>
+        <?php
+          }
+        ?>
       </div>
     </div>
     <?php

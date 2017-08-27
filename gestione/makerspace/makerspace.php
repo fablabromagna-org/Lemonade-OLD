@@ -1,8 +1,12 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  $permessiUtente = $permessi -> whatCanHeDo($autenticazione -> id);
+  if(!$permessiUtente['visualizzareMakerSpace']['stato'])
     header('Location: /');
+
+  $visualizzareTotem = $permessiUtente['visualizzareTotem']['stato'];
+  $gestireTotem = $permessiUtente['gestireTotem']['stato'];
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -22,10 +26,14 @@
 
       #elencoTotem { margin-top: 10px; padding-top: 10px; border-top: 1px solid #cecece; }
     </style>
+
     <script type="text/javascript" src="/js/makerspace/modifica.js"></script>
+
+    <?php if($gestireTotem) { ?>
     <script type="text/javascript" src="/js/totem/presenze/aggiungi.js"></script>
     <script type="text/javascript" src="/js/totem/presenze/elimina.js"></script>
     <script type="text/javascript" src="/js/totem/presenze/revoca.js"></script>
+    <?php } ?>
   </head>
   <body>
     <?php
@@ -60,14 +68,17 @@
           </form>
         </div>
       </div>
+      <?php if($visualizzareTotem) { ?>
       <div class="box">
         <div>Gestione totem</div>
         <div>
+          <?php if($gestireTotem) { ?>
           <form id="aggiungiTotemForm">
             <label for="nomeTotem">Nome del nuovo totem</label>
             <input type="text" id="nomeTotem" placeholder="Nome totem" style="display: block; margin-top: 5px;" />
             <input type="submit" value="Aggiungi" id="aggiungiTotem" />
           </form>
+          <?php } ?>
           <div id="elencoTotem">
             <?php
               $sql = "SELECT * FROM totemPresenze WHERE idMakerSpace = '{$id}' ORDER BY id ASC";
@@ -92,7 +103,13 @@
                     echo "<tr>";
                     echo "<td><a href=\"/gestione/makerspace/makerspace.php?id={$row['id']}\">{$row['id']}</a></td>";
                     echo "<td><p>{$row['nome']}</p><p style=\"margin-top: 4px;\">Token: {$row['token']}</p></td>";
-                    echo "<td><a onclick=\"revoca(this, {$row['id']})\">Revoca token</a><br /><a onclick=\"elimina(this, {$row['id']})\">Elimina</a></td>";
+
+                    if($gestireTotem)
+                      echo "<td><a onclick=\"revoca(this, {$row['id']})\">Revoca token</a><br /><a onclick=\"elimina(this, {$row['id']})\">Elimina</a></td>";
+
+                    else
+                      echo '<td></td>';
+
                     echo "</tr>";
                   }
                 ?>
@@ -111,6 +128,7 @@
         </div>
       </div>
       <?php
+            }
           }
         }
       ?>

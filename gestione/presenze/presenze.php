@@ -1,5 +1,8 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
+
+  if(!$permessi -> whatCanHeDo($autenticazione -> id)['visualizzarePresenze']['stato'])
+    header('Location: /');
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -7,7 +10,7 @@
     <?php
       require_once('../../inc/header.inc.php');
     ?>
-    <script type="text/javascript" src="/js/presenze.js"></script> 
+    <script type="text/javascript" src="/js/presenze.js"></script>
     <style type="text/css">
       #contenuto > h1 { margin-bottom: 20px; }
     </style>

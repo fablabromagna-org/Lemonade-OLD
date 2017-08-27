@@ -101,7 +101,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     xhr.open('POST', '/ajax/gestione.categoriaUtente.php', true)
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    xhr.send('nome='+encodeURIComponent($('nome').value)+'&portale='+encodeURIComponent($('portale').checked)+'&rete='+encodeURIComponent($('rete').checked)+'&richiesta=aggiungi')
+    xhr.send('nome='+encodeURIComponent($('nome').value)+'&richiesta=aggiungi')
 
     xhr.onreadystatechange = function() {
 

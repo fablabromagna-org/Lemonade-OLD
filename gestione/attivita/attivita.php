@@ -1,7 +1,7 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  if(!$permessi -> whatCanHeDo($autenticazione -> id)['visualizzareAttivita']['stato'])
     header('Location: /');
 ?>
 <!DOCTYPE html>
@@ -39,7 +39,7 @@
             $fabcoin = ($row['fabcoin'] === null) ? '<em>nessun FabCoin è stato assegnato</em>': 'F'.$row['fabcoin'];
 
             echo '<h1>Riepilogo attività</h1>';
-            
+
             echo "<p style=\"margin-top: 20px\"><b>ID attività:</b> {$id}</p>";
             echo "<p><b>Registrata il </b> ".date("d/m/Y", $row['aggiuntoIl'])." <b>alle</b> ".date("H:i", $row['aggiuntoIl'])."<b>.</b></p>";
             echo "<p><b>Iniziata il </b> ".date("d/m/Y", $row['inizio'])." <b>alle</b> ".date("H:i", $row['inizio'])."<b>.</b></p>";

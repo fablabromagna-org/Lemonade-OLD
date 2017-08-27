@@ -1,7 +1,7 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  if(!$permessi -> whatCanHeDo($autenticazione -> id)['visualizzareBadge']['stato'])
     header('Location: /');
 ?>
 <!DOCTYPE html>

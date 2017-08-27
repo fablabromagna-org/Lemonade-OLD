@@ -1,7 +1,8 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  $permessiTmp = $permessi -> whatCanHeDo($autenticazione -> id);
+  if(!$permessiTmp['visualizzareUtenti']['stato'])
     header('Location: /');
 ?>
 <!DOCTYPE html>
@@ -68,11 +69,12 @@
     ?>
     <div id="contenuto">
       <h1>Profilo di <?php echo $profilo['nome'].' '.$profilo['cognome']; ?></h1>
-      <p class="link"><a href="/gestione/attivita/?id=<?php echo $id; ?>">Visualizza le attività svolte</a></p>
-      <p class="link"><a href="/gestione/badge/utente.php?id=<?php echo $profilo['id']; ?>">Gestione badge</a></p>
-      <p class="link"><a href="/gestione/transazioni/utenteFabCoin.php?id=<?php echo $profilo['id']; ?>">Transazioni FabCoin</a></p>
+      <?php if($permessiTmp['visualizzareAttivita']['stato']) { ?><p class="link"><a href="/gestione/attivita/?id=<?php echo $id; ?>">Visualizza le attività svolte</a></p><?php } ?>
+      <?php if($permessiTmp['visualizzareBadge']['stato']) { ?><p class="link"><a href="/gestione/badge/utente.php?id=<?php echo $profilo['id']; ?>">Gestione badge</a></p><?php } ?>
+      <?php if($permessiTmp['visualizzareTransazioniFabCoin']['stato']) { ?><p class="link"><a href="/gestione/transazioni/utenteFabCoin.php?id=<?php echo $profilo['id']; ?>">Transazioni FabCoin</a></p><?php } ?>
       <p class="link"><a href="/gestione/utenti/social.php?id=<?php echo $profilo['id']; ?>">Social Networks</a></p>
-      <p class="link"><a href="/gestione/presenze/presenze.php?id=<?php echo $profilo['id']; ?>">Presenze</a></p>
+      <?php if($permessiTmp['visualizzarePresenze']['stato']) { ?><p class="link"><a href="/gestione/presenze/presenze.php?id=<?php echo $profilo['id']; ?>">Presenze</a></p><?php } ?>
+      <?php if($permessiTmp['visualizzarePermessi']['stato']) { ?><p class="link"><a href="/gestione/permessi/utente/?id=<?php echo $profilo['id']; ?>">Permessi dell'utente</a></p><?php } ?>
       <div class="box">
         <div>Profilo</div>
         <div>
@@ -96,22 +98,6 @@
           </div>
           <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
             <form id="modificaPermessi">
-              <div>
-                <label for="profiloGestione">Gestione portale</label>
-                <select id="profiloGestione">
-                  <option value="0" <?php if($profilo['gestionePortale'] == 0) echo 'selected' ?>>Non abilitata</option>
-                  <option value="1" <?php if($profilo['gestionePortale'] == 1) echo 'selected' ?>>Abilitata</option>
-                  <option value="2" <?php if($profilo['gestionePortale'] == 2) echo 'selected' ?>>Default dalla categoria</option>
-                </select>
-              </div>
-              <div>
-                <label for="profiloGestioneRete">Gestione rete</label>
-                <select id="profiloGestioneRete">
-                  <option value="0" <?php if($profilo['gestioneRete'] == 0) echo 'selected' ?>>Non abilitata</option>
-                  <option value="1" <?php if($profilo['gestioneRete'] == 1) echo 'selected' ?>>Abilitata</option>
-                  <option value="2" <?php if($profilo['gestioneRete'] == 2) echo 'selected' ?>>Default dalla categoria</option>
-                </select>
-              </div>
               <div>
                 <label for="profiloSospeso">Sospensione</label>
                 <select id="profiloSospeso">

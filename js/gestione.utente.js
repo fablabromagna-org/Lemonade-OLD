@@ -112,8 +112,6 @@
 
       // Recupero tutti gli input
       var sospensione = $('profiloSospeso')
-      var gestionePortale = $('profiloGestione')
-      var gestioneRete = $('profiloGestioneRete')
       var confermaMail = $('profiloConferma')
       var categoria = $('profiloCategoria')
       var idUtente = $('idUtente').value
@@ -121,8 +119,6 @@
 
       // Disabilito i campi
       sospensione.disabled = true
-      gestionePortale.disabled = true
-      gestioneRete.disabled = true
       confermaMail.disabled = true
       categoria.disabled = true
       bottone.disabled = true
@@ -136,8 +132,6 @@
 
         // Disabilito i campi
         sospensione.disabled = false
-        gestionePortale.disabled = false
-        gestioneRete.disabled = false
         confermaMail.disabled = false
         categoria.disabled = false
         bottone.disabled = false
@@ -159,7 +153,7 @@
       xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
 
       // Invio la richiesta
-      xhr.send('sospensione='+encodeURIComponent(sospensione.value)+'&gestionePortale='+encodeURIComponent(gestionePortale.value)+'&gestioneRete='+encodeURIComponent(gestioneRete.value)+'&categoria='+encodeURIComponent(categoria.value)+'&confermaMail='+encodeURIComponent(confermaMail.value)+'&id='+encodeURIComponent(idUtente))
+      xhr.send('sospensione='+encodeURIComponent(sospensione.value)+'&categoria='+encodeURIComponent(categoria.value)+'&confermaMail='+encodeURIComponent(confermaMail.value)+'&id='+encodeURIComponent(idUtente))
 
       xhr.onreadystatechange = function() {
 

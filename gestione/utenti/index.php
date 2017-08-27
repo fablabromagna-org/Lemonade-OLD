@@ -1,7 +1,12 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
 
-  if($autenticazione -> gestionePortale != 1)
+  $permessiUtente = $permessi -> whatCanHeDo($autenticazione -> id);
+  $ricerca = $permessiUtente['visualizzareUtenti']['stato'];
+  $gruppi = $permessiUtente['visualizzareGruppi']['stato'];
+  $badge = $permessiUtente['visualizzareBadge']['stato'];
+
+  if(!$ricerca && !$gruppi && !$badge)
     header('Location: /');
 ?>
 <!DOCTYPE html>
@@ -19,6 +24,7 @@
     <div id="contenuto">
       <h1>Gestione utenti</h1>
       <div id="contenitoreBox">
+        <?php if($ricerca) { ?>
         <div class="box">
           <div class="titolo">
             <p>Ricerca utenti</p>
@@ -28,6 +34,11 @@
             <a href="ricerca.php" class="button">Vai a Ricerca utenti</a>
           </div>
         </div>
+        <?php
+          }
+
+          if($gruppi) {
+        ?>
         <div class="box">
           <div class="titolo">
             <p>Categorie utenti</p>
@@ -37,6 +48,11 @@
             <a href="categorie.php" class="button">Vai a Categorie utenti</a>
           </div>
         </div>
+        <?php
+          }
+
+          if($badge) {
+        ?>
         <div class="box">
           <div class="titolo">
             <p>Ricerca badge</p>
@@ -46,6 +62,7 @@
             <a href="/gestione/badge/" class="button">Vai a Ricerca Badge</a>
           </div>
         </div>
+        <?php } ?>
       </div>
     </div>
     <?php

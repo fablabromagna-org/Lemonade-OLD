@@ -52,8 +52,6 @@
             $this -> email = $dati['email'];
             $this -> password = $dati['password'];
             $this -> sospeso = $dati['sospeso'];
-            $this -> gestionePortale = $dati['gestionePortale'];
-            $this -> gestioneRete = $dati['gestioneRete'];
             $this -> ipRegistrazione = $dati['ipRegistrazione'];
             $this -> id = $dati['id'];
             $this -> hashSessione = $hash;
@@ -65,17 +63,8 @@
 
             if($query = $this -> mysqli -> query($sql)) {
 
-              $gestionePortaleCategoria = 0;
-              $gestioneReteCategoria = 0;
-
               while($key = $query -> fetch_array(MYSQLI_ASSOC)) {
                 $categorieUtenti[$key['id']] = $key['nome'];
-
-                // Memorizzo i permessi della categoria dell'utente
-                if($key['id'] == $dati['categoria']) {
-                  $gestionePortaleCategoria = $key['gestionePortale'];
-                  $gestioneReteCategoria = $key['gestioneRete'];
-                }
               }
 
             } else {
@@ -85,21 +74,6 @@
 
             // Memorizzo la categoria dell'utente
             $this -> categoria = array((int)$dati['categoria'], $categorieUtenti[(int)$dati['categoria']]);
-
-            // Ricavo i permessi dell'utente paragonando i permessi
-            // Singoli con quelli della categoria
-            if($this -> gestioneRete == 0 || ($this -> gestioneRete == 2 && $gestioneReteCategoria == 0))
-              $this -> gestioneRete = 0;
-
-            else
-              $this -> gestioneRete = 1;
-
-            if($this -> gestionePortale == 0 || ($this -> gestionePortale== 2 && $gestionePortaleCategoria == 0))
-              $this -> gestionePortale = 0;
-
-            else
-              $this -> gestionePortale = 1;
-
 
             return true;
 
