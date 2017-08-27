@@ -6,7 +6,7 @@
       $this -> mysqli = $mysqli;
     }
 
-    public function log($msg, $id) {
+    public function log($msg, $id = 0) {
       $msg = $this -> mysqli -> real_escape_string($msg);
       $id = $this -> mysqli -> real_escape_string($id);
 
@@ -16,14 +16,17 @@
         return $this -> mysqli -> error;
     }
 
-    public function warn($msg, $id) {
+    public function warn($msg, $id = 0) {
       $msg = $this -> mysqli -> real_escape_string($msg);
       $id = $this -> mysqli -> real_escape_string($id);
 
-      @$this -> mysqli -> query("INSERT INTO log (livello, idUtente, messaggio, data) VALUES ('WARN', '{$id}', '{$msg}', '".time()."')");
+      if(@$this -> mysqli -> query("INSERT INTO log (livello, idUtente, messaggio, data) VALUES ('WARN', '{$id}', '{$msg}', '".time()."')")) {
+        return true;
+      } else
+        return $this -> mysqli -> error;
     }
 
-    public function alert($msg, $id) {
+    public function alert($msg, $id = 0) {
       $msg = $this -> mysqli -> real_escape_string($msg);
       $id = $this -> mysqli -> real_escape_string($id);
 
