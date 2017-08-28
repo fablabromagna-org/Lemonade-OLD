@@ -120,16 +120,22 @@
               stampaErrore('Impossibile inviare l\'email!');
             }
 
-          } else
-            stampaErrore('Impossibile eseguire la richiesta al database! #3');
+          } else {
+            $console -> alert('Impossibile eseguire la richiesta al database! '.$mysqli -> error);
+            stampaErrore('Impossibile completare la richiesta.');
+          }
 
-        } else
-          stampaErrore('Impossibile eseguire la richiesta al database! #2');
+        } else {
+          $console -> alert('Impossibile eseguire la richiesta al database! '.$mysqli -> error);
+          stampaErrore('Impossibile completare la richiesta.');
+        }
 
       } else
         stampaErrore('E-Mail già utilizzata!');
 
-    } else
-      stampaErrore('Impossibile eseguire la richiesta al database! #1');
+    } else {
+      $console -> alert('Impossibile eseguire la richiesta al database! '.$mysqli -> error);
+      stampaErrore('Impossibile completare la richiesta.');
+    }
   }
 ?>
