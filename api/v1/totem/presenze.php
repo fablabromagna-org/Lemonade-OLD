@@ -19,7 +19,7 @@
   else if(!preg_match("/^[0-9]{10}+$/", $rfid))
     stampaErrore('RFID non valido!');
 
-  else if(!preg_match("/^[0-9]{11}+$/", $timestamp) || (int)$timestamp < time() - 12 * 60 * 60 || (int)$timestamp > time() + 5 * 60)
+  else if(!preg_match("/^[0-9]{10,11}+$/", $timestamp) || (int)$timestamp < time() - 12 * 60 * 60 || (int)$timestamp > time() + 5 * 60)
     stampaErrore('Timestamp non valido!');
 
   // Controllo la validità del token del totem
