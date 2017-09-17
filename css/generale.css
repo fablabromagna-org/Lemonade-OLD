@@ -6,6 +6,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abb
 
 /* Generale */
 * { outline: none; }
+html, body { height: 100%; }
 body { font-family: 'Roboto', sans-serif; color: #151515; font-size: 15px; font-smooth: never; -webkit-font-smoothing : antialiased; -moz-osx-font-smoothing: grayscale; }
 a { text-decoration: none; font-weight: 700; color: #151515; cursor: pointer !important; }
 a:hover, a:focus { text-decoration: underline; }
@@ -61,7 +62,7 @@ input[type='submit'][disabled] { background: #fff; padding: 4px 13px; color: #aa
 #nav { background: #fff14b; text-align: center; }
 #nav a.button { margin: 5px; }
 
-#contenuto { margin: 30px auto 0 auto; max-width: 640px; padding: 0 20px; }
+#contenuto { margin: 30px auto 0 auto; max-width: 640px; padding: 0 20px; height: auto !important; min-height: 100%; }
 
 @media screen and (max-width: 640px) {
   #topBar { height: auto; }
