@@ -74,13 +74,13 @@
       $nome = $mysqli -> real_escape_string(isset($_GET['nome']) ? trim($_GET['nome']) : '');
       $cognome = $mysqli -> real_escape_string(isset($_GET['cognome']) ? trim($_GET['cognome']) : '');
       $email = $mysqli -> real_escape_string(isset($_GET['email']) ? trim($_GET['email']) : '');
-      $gestione = $mysqli -> real_escape_string(isset($_GET['gestione']) ? trim($_GET['gestione']) : '');
-      $gestioneRete = $mysqli -> real_escape_string(isset($_GET['gestioneRete']) ? trim($_GET['gestioneRete']) : '');
       $sospeso = $mysqli -> real_escape_string(isset($_GET['sospeso']) ? trim($_GET['sospeso']) : '');
       $ci = $mysqli -> real_escape_string(isset($_GET['ci']) ? trim($_GET['ci']) : '');
       $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
       $conferma = $mysqli -> real_escape_string(isset($_GET['conferma']) ? trim($_GET['conferma']) : '');
       $categoria = $mysqli -> real_escape_string(isset($_GET['categoria']) ? trim($_GET['categoria']) : '');
+      $ordinamento = $mysqli -> real_escape_string(isset($_GET['ordinamento']) ? trim($_GET['ordinamento']) : '');
+      $ordinaSu = $mysqli -> real_escape_string(isset($_GET['ordinaSu']) ? trim($_GET['ordinaSu']) : '');
       $filtroColonne = @$_GET['filtroColonne'];
 
       if(!isset($filtroColonne) || gettype($filtroColonne) != 'array')
@@ -127,19 +127,19 @@
             </select>
           </div>
           <div>
-            <label for="gestione">Gestione portale</label>
-            <select name="gestione" id="gestione">
-              <option>Tutti</option>
-              <option value="1" <?php if($gestione == 1) echo 'selected' ?>>Non abilitata</option>
-              <option value="2" <?php if($gestione == 2) echo 'selected' ?>>Abilitata</option>
+            <label for="ordinamento">Ordinamento</label>
+            <select name="ordinamento" id="ordinamento">
+              <option>Ascendente</option>
+              <option value="1" <?php if($ordinamento == 1) echo 'selected' ?>>Discendente</option>
             </select>
           </div>
           <div>
-            <label for="gestioneRete">Gestione rete</label>
-            <select name="gestioneRete" id="gestioneRete">
-              <option>Tutti</option>
-              <option value="1" <?php if($gestioneRete == 1) echo 'selected' ?>>Non abilitata</option>
-              <option value="2" <?php if($gestioneRete == 2) echo 'selected' ?>>Abilitata</option>
+            <label for="ordinaSu">Ordina su</label>
+            <select name="ordinaSu" id="ordinaSu">
+              <option>ID</option>
+              <option value="1" <?php if($ordinaSu == 1) echo 'selected' ?>>Cognome</option>
+              <option value="2" <?php if($ordinaSu== 2) echo 'selected' ?>>Nome</option>
+              <option value="3" <?php if($ordinaSu == 3) echo 'selected' ?>>E-Mail</option>
             </select>
           </div>
           <div>
@@ -192,26 +192,6 @@
         if($id != "")
           $sql .= "utenti.id = '".$id."' AND ";
 
-        switch($gestione) {
-          case 1:
-            $sql .= "utenti.gestionePortale = '0' OR utenti.gestionePortale = '2' AND categorieUtenti.gestionePortale = '0' AND ";
-            break;
-
-          case 2:
-          $sql .= "utenti.gestionePortale = '1' OR utenti.gestionePortale = '2' AND categorieUtenti.gestionePortale = '1' AND ";
-            break;
-        }
-
-        switch($gestioneRete) {
-          case 1:
-            $sql .= "utenti.gestioneRete = '0' OR utenti.gestioneRete = '2' AND categorieUtenti.gestioneRete = '0' AND ";
-            break;
-
-          case 2:
-          $sql .= "utenti.gestioneRete = '1' OR utenti.gestioneRete = '2' AND categorieUtenti.gestioneRete = '1' AND ";
-            break;
-        }
-
         switch($conferma) {
           default:
             $sql .= "codiceAttivazione = '0' AND ";
@@ -235,6 +215,24 @@
             break;
         }
 
+        switch($ordinaSu) {
+          case 1:
+            $ordinaSu = 'cognome';
+            break;
+
+          case 2:
+            $ordinaSu = 'nome';
+            break;
+
+          case 3:
+            $ordinaSu = 'email';
+            break;
+
+          default:
+            $ordinaSu = 'id';
+            break;
+        }
+
         // Pulisco la query
         if(mb_substr($sql, -strlen(" AND ")) == " AND ")
           $sql = mb_substr($sql, 0, strlen($sql)-strlen(" AND "));
@@ -246,6 +244,9 @@
 
         if(!preg_match("/^[0-9]+$/", $pagina))
           $pagina = 1;
+
+        $ordinamento = ($ordinamento == 1) ? 'DESC' : 'ASC';
+        $sql .= " ORDER BY {$ordinaSu} {$ordinamento}";
 
         $query = new Paginator($mysqli, $sql, $pagina, 10);
 
