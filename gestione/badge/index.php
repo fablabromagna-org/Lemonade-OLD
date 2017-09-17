@@ -96,7 +96,7 @@
                     echo "<tr>";
                     echo "<td>{$row['id']}</td>";
                     echo "<td><a href=\"/gestione/utenti/utente.php?id={$row['idUtenteRilascio']}\" class=\"button\" style=\"padding: 3px 5px;\">{$row['idUtenteRilascio']}</a></td>";
-                    echo "<td><a href=\"/gestione/utenti/utente.php?id={$row['idUtenteRilascio']}\" class=\"button\" style=\"padding: 3px 5px;\">{$row['idUtente']}</a></td>";
+                    echo "<td><a href=\"/gestione/utenti/utente.php?id={$row['idUtente']}\" class=\"button\" style=\"padding: 3px 5px;\">{$row['idUtente']}</a></td>";
                     echo "<td>{$row['rfid']}</td>";
                     echo "<td>".date("d/m/Y H:i:s", $row['dataRilascio'])."</td>";
                     echo ($row['revocato'] == false) ? '<td>NO</td>' : '<td><span style="padding: 3px 5px; border-radius: 3px; color: #fff; margin-top: 3px; display: inline-block; background: #f44336; font-weight: 700;">SI</span></td>';
