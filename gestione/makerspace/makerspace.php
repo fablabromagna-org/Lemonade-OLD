@@ -72,6 +72,10 @@
       <div class="box">
         <div>Gestione totem</div>
         <div>
+          <div style="border: 1.5px solid #F9A825; padding: 10px; border-radius: 3px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 5px;">Informazione</h4>
+            <p>Questa sezione presto cambierà nome e verrà utilizzata per autenticare i collegamenti di tutti gli apparati nei Maker Space che lo richiedono.</p>
+          </div>
           <?php if($gestireTotem) { ?>
           <form id="aggiungiTotemForm">
             <label for="nomeTotem">Nome del nuovo totem</label>
