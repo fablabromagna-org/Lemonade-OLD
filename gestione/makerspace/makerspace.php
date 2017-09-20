@@ -33,7 +33,7 @@
     <script type="text/javascript" src="/js/totem/presenze/aggiungi.js"></script>
     <script type="text/javascript" src="/js/totem/presenze/elimina.js"></script>
     <script type="text/javascript" src="/js/totem/presenze/revoca.js"></script>
-    <?php } ?>
+    <?php } ?>
   </head>
   <body>
     <?php
