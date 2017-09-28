@@ -1,6 +1,4 @@
 {
-    "name": "edoardosavini/flr-auth",
-    "type": "project",
     "require": {
         "aws/aws-sdk-php": "2.*",
         "ext-mbstring": "*",
