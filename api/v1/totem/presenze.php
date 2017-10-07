@@ -78,6 +78,9 @@
       stampaErrore('Impossibile completare la richiesta!');
     }
 
+    $notificheUtente = new Notifiche($mysqli, $userId);
+    $notificheUtente -> noLink('Abbiamo registrato l\'inizio della tua presenza! 🤓');
+
     echo '{}';
 
   // L'utente ha una presenza da chiudere
@@ -93,6 +96,9 @@
       $console -> alert('Impossibile eseguire la query! '.$mysqli -> error, 0);
       stampaErrore('Impossibile completare la richiesta!');
     }
+
+    $notificheUtente = new Notifiche($mysqli, $userId);
+    $notificheUtente -> noLink('Abbiamo registrato la fine della tua presenza! 👋');
 
     echo '{}';
   }
