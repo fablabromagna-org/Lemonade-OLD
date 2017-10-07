@@ -42,13 +42,13 @@
         return $this -> mysqli -> error;
     }
 
-    private function social($msg, $link = null) {
+    private function social($msg, $linkNotifica = false) {
       if($GLOBALS['dizionario'] -> getValue('telegramBotName') !== false && $GLOBALS['dizionario'] -> getValue('telegramBotName') !== null) {
 
         $sql = "SELECT * FROM socialNetworks WHERE idUtente = {$this -> idUtente} AND tipo = 'telegram' AND authCode IS NULL LIMIT 0, 1";
         $query = $this -> mysqli -> query($sql);
 
-        $link = $GLOBALS['dizionario'] -> getValue('urlSito').$link;
+        $link = $GLOBALS['dizionario'] -> getValue('urlSito').$linkNotifica;
 
         if($query) {
           if($query -> num_rows == 1) {
@@ -66,9 +66,9 @@
                 'chat_id' => $row['idSocial'],
                 'text' => $msg
             ];
-
+            var_dump($link);
             // Se il link esiste aggiungo un bottone per aprirlo
-            if($link !== null) {
+            if($linkNotifica !== false) {
               $inline_keyboard = array("inline_keyboard" => array(array(array(
                 'text' => 'Apri',
                 'url' => $link
