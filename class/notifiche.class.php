@@ -66,7 +66,7 @@
                 'chat_id' => $row['idSocial'],
                 'text' => $msg
             ];
-            var_dump($link);
+            
             // Se il link esiste aggiungo un bottone per aprirlo
             if($linkNotifica !== false) {
               $inline_keyboard = array("inline_keyboard" => array(array(array(
