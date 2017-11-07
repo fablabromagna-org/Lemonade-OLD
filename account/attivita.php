@@ -32,7 +32,7 @@
     ?>
     <div id="contenuto">
       <h1>Attività svolte</h1>
-      <p>In questa pagina sono presenti tutte le attività che hai svolto all'interno di FabLab Romagna e ti sono state riconosciute.</p>
+      <p>Qui trovi le attività svolte presso FabLab Romagna e riconosciute dall'associazione.</p>
       <div style="overflow-x: auto;">
         <table>
           <thead>

@@ -20,7 +20,7 @@
     ?>
     <div id="contenuto">
       <h1>Borsello FabCoin</h1>
-      <p>In questa pagina sono elencate tutte le tue transazioni coni FabCoin.<br />Le transazioni <del>barrate</del> sono state annullate.<br />I FabCoin non sono convertibili in euro.</p>
+      <p>In questa pagina sono elencate tutte le tue transazioni in FabCoin.<br />Le transazioni <del>barrate</del> sono state annullate.<br />I FabCoin non sono convertibili in Euro.</p>
       <?php
         $sql = "SELECT SUM(valore) AS somma FROM transazioniFabCoin WHERE idUtente = '{$autenticazione -> id}' AND annullata  = FALSE";
         $query = $mysqli -> query($sql);
@@ -30,7 +30,7 @@
           if($row['somma'] == '')
             $row['somma'] = 0;
 
-          echo '<p style="margin-top: 20px;">Il tuo saldo FabCoin è di <b>'.$row['somma'].'</b>.</p>';
+          echo '<p style="margin-top: 20px;">Il tuo saldo è di <b>'.$row['somma'].'</b> FabCoin.</p>';
         }
 
       ?>

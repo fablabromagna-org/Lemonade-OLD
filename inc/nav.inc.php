@@ -23,6 +23,6 @@
     <?php if($permessiTmp['_bottoneGestione']) { ?>
       <a href="/gestione/" class="button">Gestione</a>
     <?php } ?>
-    <a href="/logout.php" class="button">Esci</a>
+    <a href="/logout.php" class="button">Log out</a>
   </div>
 </div>
