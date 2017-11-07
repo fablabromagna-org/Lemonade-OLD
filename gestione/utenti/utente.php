@@ -1,5 +1,9 @@
 <?php
   require_once('../../inc/autenticazione.inc.php');
+  require_once('../../vendor/autoload.php');
+
+  use CodiceFiscale\Checker;
+  use CodiceFiscale\Subject;
 
   $permessiTmp = $permessi -> whatCanHeDo($autenticazione -> id);
   if(!$permessiTmp['visualizzareUtenti']['stato'])
@@ -29,6 +33,18 @@
 
       .link { text-align: right; margin-bottom: 5px; }
     </style>
+
+    <script type="text/javascript">
+      var finestra
+
+      function openPopup(popurl){
+        finestra = window.open(popurl, "", "width=560,height=380,titlebar=no,resizable=no,status=no,location=no")
+        finestra.onunload = function() {
+          window.parent.location.reload()
+          finestra = undefined
+        }
+      }
+    </script>
   </head>
   <body>
     <?php
@@ -126,6 +142,61 @@
               <input type="submit" id="salvaPermessi" value="Salva" />
             </form>
           </div>
+        </div>
+      </div>
+      <div class="box">
+        <div>Anagrafiche</div>
+        <div>
+          <?php
+            // Alert incosistenza dati anagrafici
+            if($profilo['cf'] != null
+              && $profilo['luogoNascita'] != null
+              && $profilo['dataNascita'] != null
+              && $profilo['sesso'] != null) {
+
+                $subject = new Subject(
+                  array(
+                    'name' => $profilo['nome']
+                    ,'surname' => $profilo['cognome']
+                    ,'birthDate' => date('Y-m-d', $profilo['dataNascita'])
+                    ,'gender' => ($profilo['sesso'] ? 'F' : 'M')
+                    ,'belfioreCode' => $profilo['luogoNascita']
+                  )
+                );
+
+                $checker = new Checker($subject, array(
+                  "codiceFiscaleToCheck" => $profilo['cf'],
+                  "omocodiaLevel" => Checker::ALL_OMOCODIA_LEVELS
+                ));
+                if(!$checker -> check()) {
+          ?>
+          <div style="border: 1.5px solid #F9A825; padding: 10px; border-radius: 3px; margin-bottom: 20px;">
+            <h3 style="margin-bottom: 5px;">Attenzione</h4>
+            <p>Il controllo sul codice fiscale ha dato esito negativo!<br />Ricontrolla i dati anagrafici.</p>
+          </div>
+          <?php
+                }
+              }
+          ?>
+          <p>Data di nascita: <?php if($profilo['dataNascita'] == null) echo 'N/D'; else echo '<b>'.date("d/m/Y", $profilo['dataNascita']).'</b>'; ?> <a href="javascript:openPopup('/gestione/utenti/popup/dataNascita.php?id=<?php echo $id ?>')" style="float: right">Modifica</a></p>
+          <?php
+            if($profilo['luogoNascita'] != null) {
+              $sql = "SELECT * FROM comuni WHERE codiceCatastale = '{$profilo['luogoNascita']}' LIMIT 0, 1";
+              $query = $mysqli -> query($sql);
+
+              if(!$query) {
+                $luogo = $profilo['luogoNascita'];
+                $console -> alert('Impossibile estrarre il luogo di nascita. '.$mysqli -> error, $autenticazione -> id);
+
+              } else {
+                $row = $query -> fetch_assoc();
+                $luogo = ($row['stato'] == null) ? $row['comune'] : $row['stato'];
+              }
+            }
+          ?>
+          <p>Luogo di nascita: <?php if($profilo['luogoNascita'] == null) echo 'N/D'; else echo '<b>'.$luogo.'</b>'; ?> <a href="javascript:openPopup('/gestione/utenti/popup/luogoNascita.php?id=<?php echo $id ?>')" style="float: right">Modifica</a></p>
+          <p>Sesso: <?php if($profilo['sesso'] == null) echo 'N/D'; else echo '<b>'.($profilo['sesso'] ? 'Donna' : 'Uomo').'</b>'; ?> <a href="javascript:openPopup('/gestione/utenti/popup/sesso.php?id=<?php echo $id ?>')" style="float: right">Modifica</a></p>
+          <p>Codice Fiscale: <?php if($profilo['cf'] == null) echo 'N/D'; else echo '<b>'.$profilo['cf'].'</b>'; ?> <a href="javascript:openPopup('/gestione/utenti/popup/codiceFiscale.php?id=<?php echo $id ?>')" style="float: right">Modifica</a></p>
         </div>
       </div>
       <div class="box">

@@ -62,6 +62,44 @@
           <p>Se hai dimenticato la tua password, puoi richiederne una nuova effettuando il logout e cliccando su "Ho dimenticato la password".</p>
         </div>
       </div>
+      <div class="box">
+        <div>Anagrafiche</div>
+        <div>
+          <?php
+            $sql = "SELECT * FROM utenti WHERE id = '{$autenticazione -> id}'";
+
+            if(!$query = $mysqli -> query($sql)) {
+              echo 'Impossibile estrarre le anagrafiche.';
+              $console -> alert('Impossibile estrarre le anagrafiche. '.$mysqli -> error, $autenticazione -> id);
+
+            } else {
+
+              $profilo = $query -> fetch_assoc();
+          ?>
+            <p>Data di nascita: <?php if($profilo['dataNascita'] == null) echo 'N/D'; else echo '<b>'.date("d/m/Y", $profilo['dataNascita']).'</b>'; ?></p>
+            <?php
+              if($profilo['luogoNascita'] != null) {
+                $sql = "SELECT * FROM comuni WHERE codiceCatastale = '{$profilo['luogoNascita']}' LIMIT 0, 1";
+                $query = $mysqli -> query($sql);
+
+                if(!$query) {
+                  $luogo = $profilo['luogoNascita'];
+                  $console -> alert('Impossibile estrarre il luogo di nascita. '.$mysqli -> error, $autenticazione -> id);
+
+                } else {
+                  $row = $query -> fetch_assoc();
+                  $luogo = ($row['stato'] == null) ? $row['comune'] : $row['stato'];
+                }
+              }
+            ?>
+            <p>Luogo di nascita: <?php if($profilo['luogoNascita'] == null) echo 'N/D'; else echo '<b>'.$luogo.'</b>'; ?></p>
+            <p>Sesso: <?php if($profilo['sesso'] == null) echo 'N/D'; else echo '<b>'.($profilo['sesso'] ? 'Donna' : 'Uomo').'</b>'; ?></p>
+            <p>Codice Fiscale: <?php if($profilo['cf'] == null) echo 'N/D'; else echo '<b>'.$profilo['cf'].'</b>'; ?></p>
+          </div>
+        <?php
+          }
+        ?>
+      </div>
     </div>
     <?php
       include_once('../inc/footer.inc.php');
