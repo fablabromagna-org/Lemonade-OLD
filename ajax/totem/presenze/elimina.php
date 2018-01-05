@@ -46,7 +46,7 @@
     $totem = $query -> fetch_array();
 
     // Creo il Maker Space
-    $sql = "DELETE FROM totemPresenze WHERE id = '{$id}'";
+    $sql = "UPDATE totemPresenze SET eliminato = TRUE WHERE id = '{$id}'";
     $query = $mysqli -> query($sql);
 
     if(!$query) {

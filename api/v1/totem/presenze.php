@@ -23,7 +23,7 @@
     stampaErrore('Timestamp non valido!');
 
   // Controllo la validità del token del totem
-  $sql = "SELECT totemPresenze.id FROM totemPresenze INNER JOIN makerspace ON makerspace.id = totemPresenze.idMakerSpace WHERE totemPresenze.token = '{$token}' AND makerspace.eliminato = FALSE LIMIT 0, 1";
+  $sql = "SELECT totemPresenze.id FROM totemPresenze INNER JOIN makerspace ON makerspace.id = totemPresenze.idMakerSpace WHERE totemPresenze.token = '{$token}' AND totemPresenze.eliminato IS FALSE AND makerspace.eliminato = FALSE LIMIT 0, 1";
   $query = $mysqli -> query($sql);
 
   // Impossibile completare la richiesta

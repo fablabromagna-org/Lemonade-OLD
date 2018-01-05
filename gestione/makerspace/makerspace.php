@@ -85,7 +85,7 @@
           <?php } ?>
           <div id="elencoTotem">
             <?php
-              $sql = "SELECT * FROM totemPresenze WHERE idMakerSpace = '{$id}' ORDER BY id ASC";
+              $sql = "SELECT * FROM totemPresenze WHERE idMakerSpace = '{$id}' AND eliminato IS FALSE ORDER BY id ASC";
 
               if($query = $mysqli -> query($sql)) {
 
