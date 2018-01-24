@@ -4,14 +4,19 @@
   $permessiUtente = $permessi -> whatCanHeDo($autenticazione -> id);
   $dashboard = $permessiUtente['dashboard']['stato'];
   $templates = $permessiUtente['visualizzareTemplate']['stato'];
-  $dizionario = $permessiUtente['dizionario']['stato'];
+  $diz = $permessiUtente['dizionario']['stato'];
   $makerspace = $permessiUtente['visualizzareMakerSpace']['stato'];
   $log = $permessiUtente['visualizzareLog']['stato'];
   $ricerca = $permessiUtente['visualizzareUtenti']['stato'];
   $gruppi = $permessiUtente['visualizzareGruppi']['stato'];
   $badge = $permessiUtente['visualizzareBadge']['stato'];
 
-  if(!$ricerca && !$gruppi && !$badge && !$makerspace && !$log && !$dizionario && !$templates && !$dashboard)
+  $aggiuntaModificaCorsi = $permessiUtente['aggiuntaModificaCorsi']['stato'];
+  $visAvanzataCorsi = $permessiUtente['visualizzazioneAvanzataCorsi']['stato'];
+
+  if(!$ricerca && !$gruppi && !$badge && !$makerspace && !$log
+      && !$diz && !$templates && !$dashboard
+      && !$aggiuntaModificaCorsi && !$visAvanzataCorsi)
     header('Location: /');
 ?>
 <!DOCTYPE html>
@@ -39,7 +44,7 @@
           </div>
         </div>
         <?php
-          if($dizionario || $templates || $dashboard) {
+          if($diz || $templates || $dashboard) {
         ?>
         <div class="box">
           <div class="titolo">
@@ -62,6 +67,20 @@
           <div class="descrizione">
             <p>Pannello di gestione dei Maker Space.</p>
             <a href="/gestione/makerspace/" class="button">Apri Gestione Maker Space</a>
+          </div>
+        </div>
+        <?php
+          }
+
+          if($aggiuntaModificaCorsi || $visAvanzataCorsi) {
+        ?>
+        <div class="box">
+          <div class="titolo">
+            <p>Gestione Corsi</p>
+          </div>
+          <div class="descrizione">
+            <p>Pannello di controllo avanzato dei corsi.</p>
+            <a href="/gestione/corsi/" class="button">Apri Gestione Corsi</a>
           </div>
         </div>
         <?php

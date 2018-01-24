@@ -4,9 +4,9 @@
   $permessiUtente = $permessi -> whatCanHeDo($autenticazione -> id);
   $dashboard = $permessiUtente['dashboard']['stato'];
   $templates = $permessiUtente['visualizzareTemplate']['stato'];
-  $dizionario = $permessiUtente['dizionario']['stato'];
+  $diz = $permessiUtente['dizionario']['stato'];
 
-  if(!$dizionario && !$templates && !$dashboard)
+  if(!$diz && !$templates && !$dashboard)
     header('Location: /');
 
 ?>
@@ -54,7 +54,7 @@
         <?php
           }
 
-          if($dizionario) {
+          if($diz) {
         ?>
         <div class="box">
           <div class="titolo">
