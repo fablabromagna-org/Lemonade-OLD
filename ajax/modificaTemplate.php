@@ -20,7 +20,7 @@
     stampaErrore('Non hai effettuato l\'accesso!');
 
   // Controllo che l'utente abbia i permessi per effettuare la modifica
-  else if(!$permessi -> whatCanHeDo($autenticazione -> id)['modificaTemplate']['stato'])
+  else if(!$permessi -> whatCanHeDo($autenticazione -> id)['modificareTemplate']['stato'])
 
     // L'utente non ha i permessi
     stampaErrore('Non sei autorizzato ad effettuare la modifica!');

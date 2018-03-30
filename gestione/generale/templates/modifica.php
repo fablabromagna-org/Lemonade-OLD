@@ -51,7 +51,7 @@
             editor = new Quill('#editor', {
               theme: 'snow'
             })
-            editor.clipboard.dangerouslyPasteHTML('<?php echo base64_decode($row['sorgente']); ?>')
+            editor.clipboard.dangerouslyPasteHTML('<?php echo str_replace( array( "\n", "\r", "'" ), array( "\\n", "\\r", "\'" ), base64_decode($row['sorgente'])); ?>')
           </script>
           <div style="margin-top: 20px;">
             <input type="submit" id="salva" value="Salva il template" />
