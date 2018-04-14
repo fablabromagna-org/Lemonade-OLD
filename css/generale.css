@@ -62,7 +62,7 @@ input[type='submit'][disabled] { background: #fff; padding: 4px 13px; color: #aa
 #nav { background: #fff14b; text-align: center; }
 #nav a.button { margin: 5px; }
 
-#contenuto { margin: 30px auto 0 auto; max-width: 640px; padding: 0 20px; height: auto !important; min-height: 100%; }
+#contenuto { margin: 30px auto 0 auto; max-width: 960px; padding: 0 20px; height: auto !important; min-height: 100%; }
 
 @media screen and (max-width: 640px) {
   #topBar { height: auto; }
