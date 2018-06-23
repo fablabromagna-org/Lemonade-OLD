@@ -199,7 +199,7 @@ namespace FabLabRomagna {
                 $nome = $row['stato'] == null ? $row['comune'] : $row['stato'];
                 $stato = $row['stato'] == null ? false : true;
 
-                $tmp[] = new Comune($nome, $row['belfiore'], $stato);
+                $tmp[] = new Comune($nome, $row['codiceCatastale'], $stato);
             }
 
             return $tmp;
