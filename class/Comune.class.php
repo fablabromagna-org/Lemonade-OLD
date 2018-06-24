@@ -136,6 +136,10 @@ namespace FabLabRomagna {
 
             global $mysqli;
 
+            if (!is_a($mysqli, 'mysqli')) {
+                throw new \Exception('MySQLi as global variable expected!');
+            }
+
             $nome = mb_strtoupper($nome);
 
             $s = $simile ? 'LIKE ?' : '= ?';
@@ -177,6 +181,9 @@ namespace FabLabRomagna {
         protected static function trova_comune_by_belfiore($codice_belfiore)
         {
             global $mysqli;
+
+            if (!is_a($mysqli, 'mysqli'))
+                throw new \Exception('MySQLi as global variable expected!');
 
             $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE codiceCatastale = ?");
 
