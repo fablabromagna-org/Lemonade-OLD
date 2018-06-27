@@ -1,11 +1,14 @@
 {
     "require": {
+      "php": ">=7.1.0",
         "aws/aws-sdk-php": "2.*",
         "ext-mbstring": "*",
         "dompdf/dompdf": "^0.8.0",
         "longman/telegram-bot": "^0.47.1",
         "facebook/graph-sdk": "^5.6",
-        "davidepastore/codice-fiscale": "^0.2.2"
+      "davidepastore/codice-fiscale": "^0.3.0",
+      "browscap/browscap-php": "^3.1",
+      "phpoffice/phpword": "^0.14.0"
     },
     "minimum-stability": "dev",
     "authors": [
