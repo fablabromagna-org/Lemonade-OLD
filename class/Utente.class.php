@@ -13,6 +13,20 @@ namespace FabLabRomagna {
      * @package FabLabRomagna
      *
      * @author  Edoardo Savini <edoardo.savini@fablabromagna.org>
+     *
+     * @property-read $id
+     * @property      $nome
+     * @property      $cognome
+     * @property      $email
+     * @property      $data_registrazione
+     * @property      $ip_registrazione
+     * @property      $sospeso
+     * @property      $codice_attivazione
+     * @property      $data_nascita
+     * @property      $codice_fiscale
+     * @property      $luogo_nascita
+     * @property      $sesso
+     * @property      $secretato
      */
     class Utente
     {
@@ -212,6 +226,39 @@ namespace FabLabRomagna {
             if (!$stmt->execute()) {
                 throw new \Exception('Impossibile eseguire la query!');
             }
+
+            $this->{$campo} = $valore;
+        }
+
+        /**
+         * @param string $name Nome della proprietà
+         *
+         * @throws \Exception
+         *
+         * @return mixed
+         */
+        public function __get($name)
+        {
+            if (property_exists($this, $name)) {
+                return $this->{$name};
+            }
+
+            throw new \Exception('Undefined property');
+        }
+
+        /**
+         * @param mixed $name
+         * @param mixed $value
+         *
+         * @throws \Exception
+         */
+        public function __set($name, $value)
+        {
+            if (!property_exists($this, $name)) {
+                throw new \Exception('Undefined property');
+            }
+
+            $this->set_campo($name, $value);
         }
 
         /**
@@ -323,17 +370,6 @@ namespace FabLabRomagna {
                     } else {
                         return true;
                     }
-
-                case 'password':
-
-                    if (gettype($valore) !== 'string') {
-                        return false;
-                    }
-
-                    // Deve contenere almeno un carattere speciale, una lettera maiuscola,
-                    // Una lettera minuscola e un numero
-                    // Lunghezza minima 6 caratteri
-                    return (bool)preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\p{L}\p{D}]).{6,}$/', $valore);
 
                 case 'data_registrazione':
                     if (gettype($valore) !== 'integer') {
