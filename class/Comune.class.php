@@ -7,6 +7,10 @@ namespace FabLabRomagna {
      * Class Comune
      *
      * @package FabLabRomagna
+     *
+     * @property-read string $nome
+     * @property-read string $codice_belfiore
+     * @property-read bool   $is_stato_estero
      */
     class Comune
     {
@@ -182,8 +186,9 @@ namespace FabLabRomagna {
         {
             global $mysqli;
 
-            if (!is_a($mysqli, 'mysqli'))
+            if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('MySQLi as global variable expected!');
+            }
 
             $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE codiceCatastale = ?");
 
