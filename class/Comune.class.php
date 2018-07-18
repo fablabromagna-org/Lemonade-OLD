@@ -135,7 +135,7 @@ namespace FabLabRomagna {
          *
          * @return \FabLabRomagna\Comune[]
          */
-        protected static function trova_comune_by_nome($nome, $simile)
+        protected static function trova_comune_by_nome($nome)
         {
 
             global $mysqli;
@@ -146,10 +146,8 @@ namespace FabLabRomagna {
 
             $nome = mb_strtoupper($nome);
 
-            $s = $simile ? 'LIKE ?' : '= ?';
-
-            $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE comune $s OR stato $s");
-            $sql->bind_param('ss', $nome, $nome);
+            $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE nome LIKE ?");
+            $sql->bind_param('s', $nome);
 
 
             if (!$sql->execute()) {
@@ -162,8 +160,8 @@ namespace FabLabRomagna {
 
             while ($row = $result->fetch_assoc()) {
 
-                $nome = $row['stato'] == null ? $row['comune'] : $row['stato'];
-                $stato = $row['stato'] == null ? false : true;
+                $nome = $row['nome'];
+                $stato = (bool)$row['stato_estero'];
 
                 $tmp[] = new Comune($nome, $row['belfiore'], $stato);
             }
@@ -190,7 +188,7 @@ namespace FabLabRomagna {
                 throw new \Exception('MySQLi as global variable expected!');
             }
 
-            $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE codiceCatastale = ?");
+            $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE belfiore = ?");
 
             if ($sql === false) {
                 throw new \Exception('Impossibile preparare la query! ' . $mysqli->error);
@@ -208,10 +206,10 @@ namespace FabLabRomagna {
 
             while ($row = $result->fetch_assoc()) {
 
-                $nome = $row['stato'] == null ? $row['comune'] : $row['stato'];
-                $stato = $row['stato'] == null ? false : true;
+                $nome = $row['nome'];
+                $stato = $row['stato_estero'];
 
-                $tmp[] = new Comune($nome, $row['codiceCatastale'], $stato);
+                $tmp[] = new Comune($nome, $row['belfiore'], $stato);
             }
 
             return $tmp;
