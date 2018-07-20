@@ -114,7 +114,7 @@ namespace FabLabRomagna {
             }
 
             if ($campo === 'nome') {
-                return self::trova_comune_by_nome($valore, $simile);
+                return self::trova_comune_by_nome($valore);
             } elseif ($campo === 'codice_belfiore') {
                 return self::trova_comune_by_belfiore($valore);
             } else {
@@ -129,7 +129,6 @@ namespace FabLabRomagna {
          * @global \mysqli $mysqli Connessione al database
          *
          * @param string   $nome   Nome del comune
-         * @param bool     $simile Indica se la ricerca deve essere fatta per somiglianza o uguaglianza
          *
          * @throws \Exception
          *
@@ -148,7 +147,6 @@ namespace FabLabRomagna {
 
             $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE nome LIKE ?");
             $sql->bind_param('s', $nome);
-
 
             if (!$sql->execute()) {
                 throw new \Exception('Impossibile eseguire la query!');
@@ -207,7 +205,7 @@ namespace FabLabRomagna {
             while ($row = $result->fetch_assoc()) {
 
                 $nome = $row['nome'];
-                $stato = $row['stato_estero'];
+                $stato = (bool)$row['stato_estero'];
 
                 $tmp[] = new Comune($nome, $row['belfiore'], $stato);
             }
