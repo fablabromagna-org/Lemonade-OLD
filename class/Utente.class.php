@@ -559,6 +559,8 @@ namespace FabLabRomagna {
                         return false;
                     } elseif (filter_var($valore, FILTER_VALIDATE_IP) === false) {
                         return false;
+                    } elseif (filter_var($valore, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) === false && !DEBUG) {
+                        return false;
                     } else {
                         return true;
                     }
