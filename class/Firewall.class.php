@@ -36,7 +36,7 @@ namespace FabLabRomagna {
          *
          * @global \mysqli $mysqli   Connessione al database
          *
-         * @return int ID della regola
+         * @return int|null ID della regola, null se la regola è stata ignorata
          *
          * @throws \Exception
          */
@@ -64,6 +64,33 @@ namespace FabLabRomagna {
                 throw new \Exception('Invalid exipiration!');
             }
 
+            // Controllo se la regola esiste già
+            // Nel caso ignoro l'inserimento
+            $sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE ip = ? AND cidr = ? AND (ts_scadenza >= ? OR ts_scadenza IS NULL)";
+            $stmt = $mysqli->prepare($sql);
+
+            if ($stmt === false) {
+                throw new \Exception('Unable to prepare the query!');
+            }
+
+            $ts = time();
+            if (!$stmt->bind_param('sii', $ip, $cidr, $ts)) {
+                throw new \Exception('Unable to bind params!');
+            }
+
+            if (!$stmt->execute()) {
+                throw new \Exception('Unable to execute the statment!');
+            }
+
+            $res = $stmt->get_result();
+
+            if ($res->num_rows !== 0) {
+                return null;
+            }
+
+            $stmt->close();
+
+            // Inserisco la regola
             $sql = "INSERT INTO " . self::TABLE_NAME . " (action, ip, cidr, ts_scadenza) VALUES (?, ?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
 
