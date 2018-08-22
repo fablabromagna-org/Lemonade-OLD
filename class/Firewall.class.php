@@ -2,7 +2,7 @@
 
 namespace {
 
-    require_once('../vendor/autoload.php');
+    require_once(__DIR__ . '/../vendor/autoload.php');
 }
 
 namespace FabLabRomagna {
@@ -64,6 +64,8 @@ namespace FabLabRomagna {
                 throw new \Exception('Invalid exipiration!');
             }
 
+            $scadenza = time() + $scadenza;
+
             // Controllo se la regola esiste già
             // Nel caso ignoro l'inserimento
             $sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE ip = ? AND cidr = ? AND (ts_scadenza >= ? OR ts_scadenza IS NULL)";
@@ -73,8 +75,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Unable to prepare the query!');
             }
 
-            $ts = time();
-            if (!$stmt->bind_param('sii', $ip, $cidr, $ts)) {
+            if (!$stmt->bind_param('sii', $ip, $cidr, $scadenza)) {
                 throw new \Exception('Unable to bind params!');
             }
 
