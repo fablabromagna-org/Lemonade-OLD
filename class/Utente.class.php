@@ -2,7 +2,7 @@
 
 namespace {
 
-    require_once('../vendor/autoload.php');
+    require_once(__DIR__ . '/../vendor/autoload.php');
 }
 
 namespace FabLabRomagna {
@@ -657,7 +657,7 @@ namespace FabLabRomagna {
      * @property int|null   $total_rows
      * @property array|null $order
      */
-    class RicercaUtente
+    class RicercaUtente implements \Countable
     {
 
         /**
@@ -720,6 +720,16 @@ namespace FabLabRomagna {
             $this->limit = $limit;
             $this->total_rows = $total_rows;
             $this->order = $order;
+        }
+
+        /**
+         * Metodo dell'interfaccia Countable
+         *
+         * @return int
+         */
+        public function count()
+        {
+            return count($this->risultato);
         }
     }
 }
