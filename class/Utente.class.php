@@ -386,9 +386,14 @@ namespace FabLabRomagna {
 
             foreach ($dati as $campo => $valore) {
 
-                $copia = str_replace('%', '', $valore);
+                if (self::PROP_UTENTE[$campo] === 's') {
+                    $copia = str_replace('%', '', $valore);
+                } else {
+                    $copia = $valore;
+                }
 
                 if (!self::valida_campo($campo, $copia)) {
+
                     unset($dati[$campo]);
                 } else {
                     $tipi .= self::PROP_UTENTE[$campo];
