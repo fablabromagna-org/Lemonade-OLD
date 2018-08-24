@@ -14,13 +14,6 @@ namespace FabLabRomagna {
      */
     class Firewall
     {
-
-        /**
-         * Nome della tabella nel database
-         */
-        protected const TABLE_NAME = 'firewall';
-
-
         /**
          * Indirizzo della pagina per la quale va effettuata la redirect
          */
@@ -68,7 +61,7 @@ namespace FabLabRomagna {
 
             // Controllo se la regola esiste già
             // Nel caso ignoro l'inserimento
-            $sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE ip = ? AND cidr = ? AND (ts_scadenza >= ? OR ts_scadenza IS NULL)";
+            $sql = "SELECT * FROM firewall WHERE ip = ? AND cidr = ? AND (ts_scadenza >= ? OR ts_scadenza IS NULL)";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -92,7 +85,7 @@ namespace FabLabRomagna {
             $stmt->close();
 
             // Inserisco la regola
-            $sql = "INSERT INTO " . self::TABLE_NAME . " (action, ip, cidr, ts_scadenza) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO firewall (action, ip, cidr, ts_scadenza) VALUES (?, ?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -143,7 +136,7 @@ namespace FabLabRomagna {
                 return false;
             }
 
-            $sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE ts_scadenza > ? OR ts_scadenza IS NULL ORDER BY cidr ASC, id_regola_firewall ASC";
+            $sql = "SELECT * FROM firewall WHERE ts_scadenza > ? OR ts_scadenza IS NULL ORDER BY cidr ASC, id_regola_firewall ASC";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {

@@ -30,13 +30,6 @@ namespace FabLabRomagna {
      */
     class Utente
     {
-
-        /**
-         * Nome della tabella
-         */
-        protected const TABLE_NAME = 'utenti';
-
-
         /**
          * Elenco delle proprietà dell'utente
          */
@@ -211,7 +204,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Campo ' . $campo . ' con valore \'' . $valore . '\' inesistente o non valido!');
             }
 
-            $stmt = $mysqli->prepare("UPDATE " . self::TABLE_NAME . " SET $campo = ? WHERE id_utente = " . $this->id_utente);
+            $stmt = $mysqli->prepare("UPDATE utenti SET $campo = ? WHERE id_utente = " . $this->id_utente);
 
             if ($stmt === false) {
                 throw new \Exception('Impossibile preparare la query!');
@@ -311,7 +304,7 @@ namespace FabLabRomagna {
             $dati = array_merge(array($tipi), $dati_sql);
             $placeholders = implode(',', $placeholders);
 
-            $stmt = $mysqli->prepare("INSERT INTO " . self::TABLE_NAME . " ($cols) VALUES ($placeholders)");
+            $stmt = $mysqli->prepare("INSERT INTO utenti ($cols) VALUES ($placeholders)");
 
             if ($stmt === false) {
                 throw new \Exception('Impossibile preparare la query!');
@@ -415,7 +408,7 @@ namespace FabLabRomagna {
                 $calc = ' SQL_CALC_FOUND_ROWS';
             }
 
-            $query = "SELECT" . $calc . " * FROM " . self::TABLE_NAME;
+            $query = "SELECT" . $calc . " * FROM utenti";
 
             if ($where_query !== '') {
                 $query .= ' WHERE' . $where_query;

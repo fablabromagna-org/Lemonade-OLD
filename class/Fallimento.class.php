@@ -10,12 +10,6 @@ namespace FabLabRomagna {
     class Fallimento
     {
         /**
-         * Nome della tabella nel database
-         */
-        protected const TABLE_NAME = 'fallimenti';
-
-
-        /**
          * @var int $id_fallimento ID del fallimento
          */
         protected $id_fallimento;
@@ -131,7 +125,7 @@ namespace FabLabRomagna {
             }
 
             $ts = time() - $scadenza;
-            $sql = "SELECT * FROM " . self::TABLE_NAME . " WHERE pacchetto = ? AND oggetto = ? AND ip = ? AND ts_inserimento >= ? ORDER BY id_fallimento ASC";
+            $sql = "SELECT * FROM fallimenti WHERE pacchetto = ? AND oggetto = ? AND ip = ? AND ts_inserimento >= ? ORDER BY id_fallimento ASC";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -199,7 +193,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Expected string in $note');
             }
 
-            $sql = "INSERT INTO " . self::TABLE_NAME . " (ts_inserimento, pacchetto, oggetto, note, ip) VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO fallimenti (ts_inserimento, pacchetto, oggetto, note, ip) VALUES (?, ?, ?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {

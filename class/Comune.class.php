@@ -31,12 +31,6 @@ namespace FabLabRomagna {
          */
         protected $is_stato_estero;
 
-
-        /**
-         * Nome della tabella nel database
-         */
-        protected const TABLE_NAME = 'comuni';
-
         /**
          * Comune constructor.
          *
@@ -145,7 +139,7 @@ namespace FabLabRomagna {
 
             $nome = mb_strtoupper($nome);
 
-            $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE nome LIKE ?");
+            $sql = $mysqli->prepare("SELECT * FROM comuni WHERE nome LIKE ?");
             $sql->bind_param('s', $nome);
 
             if (!$sql->execute()) {
@@ -186,7 +180,7 @@ namespace FabLabRomagna {
                 throw new \Exception('MySQLi as global variable expected!');
             }
 
-            $sql = $mysqli->prepare("SELECT * FROM " . self::TABLE_NAME . " WHERE belfiore = ?");
+            $sql = $mysqli->prepare("SELECT * FROM comuni WHERE belfiore = ?");
 
             if ($sql === false) {
                 throw new \Exception('Impossibile preparare la query! ' . $mysqli->error);

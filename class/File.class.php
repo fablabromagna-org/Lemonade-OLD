@@ -18,12 +18,6 @@ namespace FabLabRomagna {
     class File
     {
         /**
-         * Nome della tabella
-         */
-        protected const TABLE_NAME = 'files';
-
-
-        /**
          * @var int $id_file ID del file
          */
         protected $id_file;
@@ -138,7 +132,7 @@ namespace FabLabRomagna {
                 throw new \Exception('File not found!');
             }
 
-            $sql = "DELETE FROM " . self::TABLE_NAME . " WHERE id_file = ?";
+            $sql = "DELETE FROM files WHERE id_file = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -180,7 +174,7 @@ namespace FabLabRomagna {
                 throw new \Exception('File not found!');
             }
 
-            $sql = "SELECT file FROM " . self::TABLE_NAME . " WHERE id_file = ?";
+            $sql = "SELECT file FROM files WHERE id_file = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -248,7 +242,7 @@ namespace FabLabRomagna {
                 throw new \Exception('The file is a directory!');
             }
 
-            $sql = "INSERT INTO " . self::TABLE_NAME . " (file, mime, nome, ts_inserimento) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO files (file, mime, nome, ts_inserimento) VALUES (?, ?, ?, ?)";
 
             $stmt = $mysqli->prepare($sql);
 
@@ -318,7 +312,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Invalid file timestamp!');
             }
 
-            $sql = "SELECT nome, mime, ts_inserimento, id_file FROM " . self::TABLE_NAME . " WHERE id_file = ?";
+            $sql = "SELECT nome, mime, ts_inserimento, id_file FROM files WHERE id_file = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {

@@ -13,18 +13,6 @@ namespace FabLabRomagna {
     class Autenticazione
     {
         /**
-         * Nome della tabella della password
-         */
-        public const PWD_TABLE_NAME = 'password';
-
-
-        /**
-         * Nome della tabella delle sessioni
-         */
-        public const SESSIONS_TABLE_NAME = 'sessioni';
-
-
-        /**
          * Metodo per controllare la validità SINTATTICA di una password
          *
          * @param $password
@@ -73,7 +61,7 @@ namespace FabLabRomagna {
                 throw new \Exception('La password deve essere una stringa');
             }
 
-            $stmt = $mysqli->prepare("SELECT * FROM " . self::PWD_TABLE_NAME . " WHERE id_utente = ? ORDER BY id_password DESC LIMIT 0, 1");
+            $stmt = $mysqli->prepare("SELECT * FROM password WHERE id_utente = ? ORDER BY id_password DESC LIMIT 0, 1");
 
             if ($stmt === false) {
                 throw new \Exception('Impossibile preparare la query!');
@@ -147,7 +135,7 @@ namespace FabLabRomagna {
                 throw new \Exception('La password deve essere una stringa');
             }
 
-            $sql = "INSERT INTO " . self::PWD_TABLE_NAME . " (id_utente, password, ts_inserimento) VALUES (?, ?, ?)";
+            $sql = "INSERT INTO password (id_utente, password, ts_inserimento) VALUES (?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -198,7 +186,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Expected integer in $mesi (>= 0).');
             }
 
-            $sql = "SELECT * FROM " . self::PWD_TABLE_NAME . " WHERE id_utente = ?";
+            $sql = "SELECT * FROM password WHERE id_utente = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -276,7 +264,7 @@ namespace FabLabRomagna {
             $ts_creazione = $ts_ultima_attivita = time();
             $ts_scadenza = time() + $secondi_durata;
 
-            $sql = "INSERT INTO " . self::SESSIONS_TABLE_NAME . " (id_utente, token, tipo_dispositivo, user_agent, 
+            $sql = "INSERT INTO sessioni (id_utente, token, tipo_dispositivo, user_agent, 
                 ts_creazione, ts_scadenza, ts_ultima_attivita) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             $stmt = $mysqli->prepare($sql);
@@ -333,7 +321,7 @@ namespace FabLabRomagna {
                 return null;
             }
 
-            $sql = "SELECT * FROM " . self::SESSIONS_TABLE_NAME . " WHERE token = ?";
+            $sql = "SELECT * FROM sessioni WHERE token = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -490,7 +478,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Session not found!');
             }
 
-            $sql = "UPDATE " . Autenticazione::SESSIONS_TABLE_NAME . " SET ts_ultima_attivita = ? WHERE id_sessione = ?";
+            $sql = "UPDATE sessioni SET ts_ultima_attivita = ? WHERE id_sessione = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -518,8 +506,24 @@ namespace FabLabRomagna {
          * @global \mysqli $mysqli         Connessione al database
          *
          * @throws \Exception
+         *
+         * @deprecated Utilizzare Sessione -> termina() al suo posto.
          */
         public function elimina($elimina_cookie = true)
+        {
+            $this->termina($elimina_cookie);
+        }
+
+        /**
+         * Metodo per terminare la sessione
+         *
+         * @param bool     $elimina_cookie Se true elimina anche il cookie (default: true)
+         *
+         * @global \mysqli $mysqli         Connessione al database
+         *
+         * @throws \Exception
+         */
+        public function termina($elimina_cookie = true)
         {
             global $mysqli;
 
@@ -531,7 +535,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Session not found!');
             }
 
-            $sql = "DELETE FROM " . Autenticazione::SESSIONS_TABLE_NAME . " WHERE id_sessione = ?";
+            $sql = "UPDATE sessioni SET terminata = TRUE WHERE id_sessione = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -581,7 +585,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Session not found!');
             }
 
-            $sql = "UPDATE " . Autenticazione::SESSIONS_TABLE_NAME . " SET token = ? WHERE id_sessione = ?";
+            $sql = "UPDATE sessioni SET token = ? WHERE id_sessione = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {

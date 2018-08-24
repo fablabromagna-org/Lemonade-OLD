@@ -20,12 +20,6 @@ namespace FabLabRomagna {
     class Log
     {
         /**
-         * Tabella dove salvare i log
-         */
-        protected const TABLE_NAME = 'log';
-
-
-        /**
          * @var int $id_log ID del log
          */
         protected $id_log;
@@ -172,7 +166,7 @@ namespace FabLabRomagna {
                 $ip = Firewall::get_valid_ip();
             }
 
-            $sql = "INSERT INTO " . self::TABLE_NAME . " (id_utente, livello, pacchetto, oggetto, testo, debug, ip, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO log (id_utente, livello, pacchetto, oggetto, testo, debug, ip, ts) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
