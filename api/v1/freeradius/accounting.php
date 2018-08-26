@@ -1,5 +1,4 @@
 <?php
-  header('Content-Type: application/json');
-
-  http_response_code(204);
+http_response_code(410);
 ?>
+API discontinued.
