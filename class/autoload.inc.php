@@ -4,6 +4,7 @@ error_reporting(E_ALL & ~E_NOTICE);
 
 require_once(__DIR__ . '/../inc/config.inc.php');
 require_once(__DIR__ . '/../inc/utilities.inc.php');
+require_once(__DIR__ . '/../inc/permessi.inc.php');
 
 $mysqli = new mysqli(MYSQL_HOST, MYSQL_USERNAME, MYSQL_PWD, MYSQL_DB);
 
@@ -14,5 +15,7 @@ require_once(__DIR__ . '/Utente.class.php');
 require_once(__DIR__ . '/Autenticazione.class.php');
 require_once(__DIR__ . '/Fallimento.class.php');
 require_once(__DIR__ . '/Log.class.php');
+require_once(__DIR__ . '/Gruppo.class.php');
+require_once(__DIR__ . '/Permesso.class.php');
 
 session_start();

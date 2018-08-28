@@ -6,6 +6,12 @@ namespace FabLabRomagna {
      * Class Gruppo
      *
      * @package FabLabRomagna
+     *
+     * @property-read $id_gruppo
+     * @property-read $nome
+     * @property-read $descrizione
+     * @property-read $eliminato
+     * @property-read $default
      */
     class Gruppo
     {
@@ -150,6 +156,10 @@ namespace FabLabRomagna {
         {
             global $mysqli;
 
+            if ($this->id_gruppo === null) {
+                throw new \Exception('Group not found!');
+            }
+
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
             }
@@ -188,6 +198,9 @@ namespace FabLabRomagna {
         public function rimuovi_utente($utente)
         {
             global $mysqli;
+
+            if ($this->id_gruppo === null)
+                throw new \Exception('Group not found!');
 
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
@@ -229,6 +242,9 @@ namespace FabLabRomagna {
         public function fa_parte($utente)
         {
             global $mysqli;
+
+            if ($this->id_gruppo === null)
+                throw new \Exception('Group not found!');
 
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
@@ -276,6 +292,9 @@ namespace FabLabRomagna {
         public function get_utenti()
         {
             global $mysqli;
+
+            if ($this->id_gruppo === null)
+                throw new \Exception('Group not found!');
 
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
@@ -422,6 +441,9 @@ namespace FabLabRomagna {
         {
             global $mysqli;
 
+            if ($this->id_gruppo === null)
+                throw new \Exception('Group not found!');
+
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
             }
@@ -456,6 +478,32 @@ namespace FabLabRomagna {
                     }
                 }
             }
+        }
+
+        /**
+         * Metodo per eliminare un gruppo
+         *
+         * @global \mysqli $mysqli Connessione al database
+         *
+         * @throws \Exception
+         */
+        public function elimina()
+        {
+            global $mysqli;
+
+            if ($this->id_gruppo === null) {
+                throw new \Exception('Group not found!');
+            }
+
+            if (!is_a($mysqli, 'mysqli')) {
+                throw new \Exception('Expected \mysqli instance in $mysqli!');
+            }
+
+            /*
+             * ToDo: Completare eliminazione del gruppo
+             *          - Aggiungere flag eliminato
+             *          - Rimuovere eventuali utenti rimasti
+             */
         }
     }
 }
