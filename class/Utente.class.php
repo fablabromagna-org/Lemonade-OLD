@@ -375,7 +375,7 @@ namespace FabLabRomagna {
 
             $tipi = '';
             $dati_sql = [];
-            $where_query = '';
+            $where_query = [];
 
             foreach ($dati as $campo => $valore) {
 
@@ -398,10 +398,11 @@ namespace FabLabRomagna {
                         $cs = 'COLLATE utf8mb4_unicode_ci ';
                     }
 
-                    $where_query .= ' ' . $campo . ' ' . $cs . ' LIKE ? ';
+                    $where_query[] = $campo . ' ' . $cs . ' LIKE ?';
                 }
             }
 
+            $where_query = implode(' AND ', $where_query);
             $calc = '';
 
             if ($limit !== null) {
@@ -411,7 +412,7 @@ namespace FabLabRomagna {
             $query = "SELECT" . $calc . " * FROM utenti";
 
             if ($where_query !== '') {
-                $query .= ' WHERE' . $where_query;
+                $query .= ' WHERE ' . $where_query;
             }
 
             if ($order !== null) {
@@ -430,7 +431,7 @@ namespace FabLabRomagna {
             $stmt = $mysqli->prepare($query);
 
             if ($stmt === false) {
-                throw new \Exception('Unable to prepare the query!');
+                throw new \Exception('Unable to prepare the query!' . $query);
             }
 
             if ($tipi !== '') {
