@@ -321,14 +321,15 @@ namespace FabLabRomagna {
                 return null;
             }
 
-            $sql = "SELECT * FROM sessioni WHERE token = ?";
+            $sql = "SELECT * FROM sessioni WHERE token = ? AND ts_scadenza > ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
                 throw new \Exception('Unable to prepare the statment!');
             }
 
-            if (!$stmt->bind_param('s', $cookie)) {
+            $ts = time();
+            if (!$stmt->bind_param('si', $cookie, $ts)) {
                 throw new \Exception('Unable to bind param!');
             }
 
