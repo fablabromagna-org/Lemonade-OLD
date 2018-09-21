@@ -63,6 +63,7 @@ namespace FabLabRomagna\SQLOperator {
             $this->colonna = $colonna;
             $this->valore = $valore;
             $this->tipo = $tipo;
+            $this->case_insensitive = $case_insensitive;
         }
 
         /**
