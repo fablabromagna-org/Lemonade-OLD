@@ -5,6 +5,7 @@ use FabLabRomagna\Utente;
 use FabLabRomagna\Autenticazione;
 use FabLabRomagna\Fallimento;
 use FabLabRomagna\Firewall;
+use FabLabRomagna\SQLOperator\Equals;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     reply(405, 'Method Not Allowed');
@@ -47,9 +48,9 @@ try {
         ));
     }
 
-    $utente = Utente::ricerca(array(
-        'email' => $email
-    ));
+    $utente = Utente::ricerca([
+        new Equals('email', $email)
+    ]);
 
     if (count($utente) !== 1) {
 

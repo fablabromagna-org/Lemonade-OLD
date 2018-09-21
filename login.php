@@ -22,44 +22,49 @@ try {
         <?php
         require_once('./inc/header.inc.php');
         ?>
-        <link type="text/css" rel="stylesheet" media="screen" href="css/index.css"/>
         <script type="text/javascript" src="js/accesso.js"></script>
     </head>
     <body>
-        <div id="header">
-            <a href="/" class="button" id="bottoneFlottante">Registrazione</a>
-            <div>
-                <p><?php echo NOME_SITO; ?><p>
+        <?php
+        include_once('./inc/nav.inc.php');
+        ?>
+        <div class="contenuto">
+            <h1 class="title is-1 has-text-centered">Accesso</h1>
+            <div class="container is-fluid">
+                <div class="columns">
+                    <form id="formAccesso" class="column is-4 is-offset-4 has-text-centered">
+
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-primary" type="text" id="email" placeholder="E-Mail"/>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-primary" type="password" id="password" placeholder="Password"/>
+                            </div>
+                        </div>
+                        <div class="notification">
+                            <h3 class="is-3">Verifica di sicurezza</h3>
+                            <img id="captchaImg" src="/ajax/captcha.php" alt/>
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input is-primary" type="text" id="captcha"
+                                           placeholder="Codice di verifica"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lds-ring center" style="display: none;">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
+                        <input type="submit" value="Accedi" class="button is-primary" id="invioForm"/>
+                        <a class="is-block" href="/account/recupero.php">Ho dimenticato la password</a>
+                    </form>
+                </div>
             </div>
-            <img src="images/logo.png" alt="Logo"/>
-        </div>
-        <div id="accesso">
-            <h2>Accesso</h2>
-            <form id="formAccesso">
-                <div id="contenitoreBox">
-                    <div class="box" id="credenziali">
-                        <input type="text" id="email" placeholder="E-Mail"/>
-                        <input type="password" id="password" placeholder="Password"/>
-                        <a style="display: block;" href="/account/recupero.php">Ho dimenticato la password</a>
-                    </div>
-                    <div class="box" style="display: none;" id="captchaBox">
-                        <p>Dimostra di non essere un robot</p>
-                        <img id="captchaImg" src="/ajax/captcha.php" alt/>
-                        <input type="text" id="captcha" placeholder="Codice di verifica"/>
-                    </div>
-                </div>
-                <div class="box" id="spinnerBox" style="display: none;">
-                    <p>Attendi mentre elaboriamo la tua richiesta...</p>
-                    <div class="spinner" style="margin: 0 auto 10px auto">
-                        <div class="rect1"></div>
-                        <div class="rect2"></div>
-                        <div class="rect3"></div>
-                        <div class="rect4"></div>
-                        <div class="rect5"></div>
-                    </div>
-                </div>
-                <input type="submit" value="Avanti" id="invioForm"/>
-            </form>
         </div>
         <?php
         include_once('inc/footer.inc.php');

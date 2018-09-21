@@ -7,6 +7,8 @@ namespace {
 
 namespace FabLabRomagna {
 
+    use FabLabRomagna\SQLOperator\SQLOperator;
+
     /**
      * Class Utente
      *
@@ -325,19 +327,17 @@ namespace FabLabRomagna {
         /**
          * Metodo per cercare uno o più utenti
          *
-         * @param array      $dati           Campi di ricerca
-         * @param bool       $case_insentive Case insensitive (default: true)
-         * @param int|null   $limit          Lunghezza della ricerca
-         * @param int|null   $offset         Offset di ricerca
-         * @param array|null $order          Ordinamento: [campo, ascendente] (default: ['id_utente', true] )
+         * @param \FabLabRomagna\SQLOperator\SQLOperator[] $dati   Campi di ricerca
+         * @param int|null                                 $limit  Lunghezza della ricerca
+         * @param int|null                                 $offset Offset di ricerca
+         * @param array|null                               $order  Ordinamento: [campo, ascendente] (default: ['id_utente', true] )
          *
          * @throws \Exception
          *
-         * @return \FabLabRomagna\RicercaUtente
+         * @return \FabLabRomagna\RisultatoRicerca
          */
         public static function ricerca(
             $dati,
-            $case_insentive = true,
             $limit = null,
             $offset = null,
             $order = ['id_utente', true]
@@ -351,10 +351,6 @@ namespace FabLabRomagna {
 
             if (gettype($dati) !== 'array') {
                 throw new \Exception('$dati deve essere un array!');
-            }
-
-            if (gettype($case_insentive) !== 'boolean') {
-                throw new \Exception('Invalid case insensitive option!');
             }
 
             if ($offset !== null && gettype($offset) !== 'integer') {
@@ -377,28 +373,13 @@ namespace FabLabRomagna {
             $dati_sql = [];
             $where_query = [];
 
-            foreach ($dati as $campo => $valore) {
-
-                if (self::PROP_UTENTE[$campo] === 's') {
-                    $copia = str_replace('%', '', $valore);
-                } else {
-                    $copia = $valore;
-                }
-
-                if (!self::valida_campo($campo, $copia)) {
-
-                    unset($dati[$campo]);
-                } else {
-                    $tipi .= self::PROP_UTENTE[$campo];
-                    $dati_sql[] = $valore;
-
-                    $cs = '';
-
-                    if ($case_insentive && self::PROP_UTENTE[$campo] === 's') {
-                        $cs = 'COLLATE utf8mb4_unicode_ci ';
+            foreach ($dati as $campo_ricerca) {
+                if (is_subclass_of($campo_ricerca, 'FabLabRomagna\SQLOperator\SQLOperator')) {
+                    if (isset(self::PROP_UTENTE[$campo_ricerca->colonna])) {
+                        $tipi .= $campo_ricerca->get_type();
+                        $where_query[] = $campo_ricerca->get_sql();
+                        $dati_sql[] = $campo_ricerca->valore;
                     }
-
-                    $where_query[] = $campo . ' ' . $cs . ' LIKE ?';
                 }
             }
 
@@ -471,7 +452,7 @@ namespace FabLabRomagna {
                 ]);
             }
 
-            $res = new RicercaUtente($res, $case_insentive, $limit, $offset, null, $order);
+            $res = new RisultatoRicerca($res, $limit, $offset, null, $order);
 
             if ($limit !== null) {
 
@@ -641,94 +622,6 @@ namespace FabLabRomagna {
                 return $refs;
             }
             return $arr;
-        }
-    }
-
-    /**
-     * Class RicercaUtente
-     *
-     * @package FabLabRomagna
-     *
-     * @property Utente[]   $risultato
-     * @property bool       $case_insensitive
-     * @property int|null   $limit
-     * @property int|null   $offset
-     * @property int|null   $total_rows
-     * @property array|null $order
-     */
-    class RicercaUtente implements \Countable
-    {
-
-        /**
-         * @var Utente[] $risultato Risultato della ricerca
-         */
-        public $risultato;
-
-
-        /**
-         * @var bool $case_insensitive Case insensitive
-         */
-        public $case_insensitive;
-
-
-        /**
-         * @var int|null $offset Offset utilizzato nella ricerca
-         */
-        public $offset;
-
-
-        /**
-         * @var int|null $limit Lunghezza della ricerca
-         */
-        public $limit;
-
-
-        /**
-         * @var int|null $total_rows Numero di elementi totali corrispondenti alla ricerca
-         */
-        public $total_rows;
-
-
-        /**
-         * @var array|null $order Ordinamento: [$campo, $ascendente]
-         */
-        public $order;
-
-
-        /**
-         * RicercaUtente constructor.
-         *
-         * @param Utente[]   $risultato
-         * @param bool       $case_insensitive
-         * @param int|null   $limit
-         * @param int|null   $offset
-         * @param int|null   $total_rows
-         * @param array|null $order
-         */
-        public function __construct(
-            $risultato,
-            $case_insensitive = true,
-            $limit = null,
-            $offset = null,
-            $total_rows = null,
-            $order = null
-        ) {
-            $this->risultato = $risultato;
-            $this->case_insensitive = $case_insensitive;
-            $this->offset = $offset;
-            $this->limit = $limit;
-            $this->total_rows = $total_rows;
-            $this->order = $order;
-        }
-
-        /**
-         * Metodo dell'interfaccia Countable
-         *
-         * @return int
-         */
-        public function count()
-        {
-            return count($this->risultato);
         }
     }
 }

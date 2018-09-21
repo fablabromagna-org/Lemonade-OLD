@@ -8,6 +8,16 @@ require_once(__DIR__ . '/../inc/permessi.inc.php');
 
 $mysqli = new mysqli(MYSQL_HOST, MYSQL_USERNAME, MYSQL_PWD, MYSQL_DB);
 
+require_once(__DIR__ . '/SQLOperator/SQLOperator.class.php');
+require_once(__DIR__ . '/SQLOperator/SQLLike.class.php');
+require_once(__DIR__ . '/SQLOperator/SQLEquals.class.php');
+require_once(__DIR__ . '/SQLOperator/SQLNotEquals.class.php');
+require_once(__DIR__ . '/SQLOperator/SQLGreaterThan.class.php');
+require_once(__DIR__ . '/SQLOperator/SQLGreaterThanEquals.class.php');
+require_once(__DIR__ . '/SQLOperator/SQLLowerThan.class.php');
+require_once(__DIR__ . '/SQLOperator/SQLLowerThanEquals.class.php');
+
+require_once(__DIR__ . '/RisultatoRicerca.class.php');
 require_once(__DIR__ . '/Comune.class.php');
 require_once(__DIR__ . '/File.class.php');
 require_once(__DIR__ . '/Firewall.class.php');

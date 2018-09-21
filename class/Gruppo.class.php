@@ -199,8 +199,9 @@ namespace FabLabRomagna {
         {
             global $mysqli;
 
-            if ($this->id_gruppo === null)
+            if ($this->id_gruppo === null) {
                 throw new \Exception('Group not found!');
+            }
 
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
@@ -243,8 +244,9 @@ namespace FabLabRomagna {
         {
             global $mysqli;
 
-            if ($this->id_gruppo === null)
+            if ($this->id_gruppo === null) {
                 throw new \Exception('Group not found!');
+            }
 
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
@@ -293,8 +295,9 @@ namespace FabLabRomagna {
         {
             global $mysqli;
 
-            if ($this->id_gruppo === null)
+            if ($this->id_gruppo === null) {
                 throw new \Exception('Group not found!');
+            }
 
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
@@ -321,7 +324,9 @@ namespace FabLabRomagna {
             $tmp = [];
 
             while ($row = $res->fetch_assoc()) {
-                $tmp[] = Utente::ricerca(['id_utente' => $row['id_utente']])->risultato[0];
+                $tmp[] = Utente::ricerca([
+                    new SQLOperator\Equals('id_utente', $row['id_utente'])
+                ])->risultato[0];
             }
 
             return $tmp;
@@ -441,8 +446,9 @@ namespace FabLabRomagna {
         {
             global $mysqli;
 
-            if ($this->id_gruppo === null)
+            if ($this->id_gruppo === null) {
                 throw new \Exception('Group not found!');
+            }
 
             if (!is_a($mysqli, 'mysqli')) {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
@@ -504,6 +510,56 @@ namespace FabLabRomagna {
              *          - Aggiungere flag eliminato
              *          - Rimuovere eventuali utenti rimasti
              */
+        }
+
+        /**
+         * @param bool $eliminati
+         *
+         * @return Gruppo[]
+         *
+         * @throws \Exception
+         */
+        public static function get_groups($eliminati = false)
+        {
+
+            global $mysqli;
+
+            if (!is_a($mysqli, 'mysqli')) {
+                throw new \Exception('Expected \mysqli instance in $mysqli!');
+            }
+
+            if (gettype($eliminati) !== 'boolean') {
+                throw new \Exception('Expected boolean in $eliminati!');
+            }
+
+            $sql = "SELECT * FROM gruppi";
+
+            if ($eliminati) {
+                $sql .= " WHERE eliminato IS TRUE";
+            }
+
+            $stmt = $mysqli->prepare($sql);
+
+            if ($stmt === false) {
+                throw new \Exception('Unable to prepare the query!');
+            }
+
+            if (!$stmt->execute()) {
+                throw new \Exception('Unable to execute the query!');
+            }
+
+            $res = $stmt->get_result();
+
+            $stmt->close();
+
+            $tmp = [];
+
+            while ($row = $res->fetch_assoc()) {
+                $tmp[] = new Gruppo($row['id_gruppo'], $row['nome'], $row['descrizione'], (bool)$row['eliminato'],
+                    (bool)$row['default']);
+            }
+
+            return $tmp;
         }
     }
 }
