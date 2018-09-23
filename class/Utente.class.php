@@ -7,8 +7,6 @@ namespace {
 
 namespace FabLabRomagna {
 
-    use FabLabRomagna\SQLOperator\SQLOperator;
-
     /**
      * Class Utente
      *
@@ -157,7 +155,7 @@ namespace FabLabRomagna {
             }
 
             if ($this->luogo_nascita !== null) {
-                $this->luogo_nascita = Comune::trova_comune_by('belfiore', $this->luogo_nascita);
+                $this->luogo_nascita = Comune::trova_comune_by('codice_belfiore', $this->luogo_nascita)[0];
             }
         }
 
