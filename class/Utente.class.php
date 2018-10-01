@@ -428,11 +428,23 @@ namespace FabLabRomagna {
                 throw new \Exception('Impossibile eseguire la query!');
             }
 
-            $stmt = $stmt->get_result();
+            $risultati = $stmt->get_result();
+
+            if ($limit !== null) {
+                $stmt->close();
+                $sql = "SELECT FOUND_ROWS() AS 'totale'";
+                $stmt = $mysqli->query($sql);
+
+                $row = $stmt->fetch_assoc();
+
+                $totale = (int)$row['totale'];
+            } else {
+                $totale = $risultati->num_rows;
+            }
 
             $res = [];
 
-            while ($row = $stmt->fetch_assoc()) {
+            while ($row = $risultati->fetch_assoc()) {
                 $res[] = new Utente([
                     'id_utente' => (int)$row['id_utente'],
                     'nome' => $row['nome'],
@@ -450,21 +462,7 @@ namespace FabLabRomagna {
                 ]);
             }
 
-            $res = new RisultatoRicerca($res, $limit, $offset, null, $order);
-
-            if ($limit !== null) {
-
-                $sql = "SELECT FOUND_ROWS() AS 'totale'";
-                $stmt = $mysqli->prepare($sql);
-                $stmt->execute();
-                $stmt = $stmt->get_result();
-
-                $row = $stmt->fetch_assoc();
-
-                $res->total_rows = $row['totale'];
-            } else {
-                $res->total_rows = count($res->risultato);
-            }
+            $res = new RisultatoRicerca($res, $limit, $offset, $totale, $order);
 
             $stmt->close();
 
