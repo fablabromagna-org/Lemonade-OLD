@@ -23,13 +23,13 @@ namespace FabLabRomagna\SQLOperator {
          * NotEquals constructor.
          *
          * @param string      $colonna          Colonna in cui effettuare la ricerca
-         * @param string      $valore           Valore per cui si effettua la ricerca
+         * @param mixed       $valore           Valore per cui si effettua la ricerca
          * @param bool        $case_insensitive Indica se il campo deve essere case insensitive
          * @param string|null $tipo
          */
         public function __construct(
             string $colonna,
-            string $valore,
+            $valore,
             bool $case_insensitive = true,
             ?string $tipo = null
         ) {
@@ -52,7 +52,7 @@ namespace FabLabRomagna\SQLOperator {
                 $cs = 'COLLATE utf8mb4_unicode_ci ';
             }
 
-            return $this->colonna . ' ' . $cs . ' <> ?';
+            return 'NOT(' . $this->colonna . ' ' . $cs . ' <=> ?)';
         }
     }
 }

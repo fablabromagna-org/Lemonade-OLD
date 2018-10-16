@@ -23,13 +23,13 @@ namespace FabLabRomagna\SQLOperator {
          * GreaterThan constructor.
          *
          * @param string      $colonna          Colonna in cui effettuare la ricerca
-         * @param string      $valore           Valore per cui si effettua la ricerca
+         * @param mixed       $valore           Valore per cui si effettua la ricerca
          * @param bool        $case_insensitive Indica se il campo deve essere case insensitive
          * @param string|null $tipo
          */
         public function __construct(
             string $colonna,
-            string $valore,
+            $valore,
             bool $case_insensitive = true,
             ?string $tipo = null
         ) {
