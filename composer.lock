@@ -4,7 +4,7 @@
       "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-  "content-hash": "0fa98f6655a07644d4e376c08d44a652",
+  "content-hash": "e82445b5b249eccf6492173559e5d2be",
     "packages": [
         {
           "name": "davidepastore/codice-fiscale",
@@ -3187,7 +3187,8 @@
     "prefer-lowest": false,
     "platform": {
       "php": ">=7.1.0",
-      "ext-mysqli": "^7.1"
+      "ext-mysqli": "^7.1",
+      "ext-json": "^1.5"
     },
     "platform-dev": []
 }

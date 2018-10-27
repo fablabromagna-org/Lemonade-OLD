@@ -1,35 +1,38 @@
-<?php
-  require_once('carica.inc.php');
-  $autenticazione = new Autenticazione($mysqli);
-?>
 <title><?php echo NOME_SITO; ?></title>
-<link type="text/css" rel="stylesheet" media="screen" href="/css/generale.css" />
-<link type="text/css" rel="stylesheet" media="screen" href="/fonts/font-awesome/css/font-awesome.min.css" />
+
+<link type="text/css" rel="stylesheet" media="screen" href="/css/spinner.css"/>
+<link type="text/css" rel="stylesheet" href="/bulma/css/bulma.min.css"/>
+<link type="text/css" rel="stylesheet" href="/bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css"/>
+
+<link type="text/css" rel="stylesheet" href="/font-awesome/css/fontawesome.min.css"/>
+<link type="text/css" rel="stylesheet" href="/font-awesome/css/all.min.css"/>
+
+<link rel="apple-touch-icon" sizes="57x57" href="/images/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/images/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/images/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/images/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/images/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/images/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/images/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/images/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/images/icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/images/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+
+<link rel="manifest" href="/manifest.webmanifest">
+
 <meta charset="utf-8">
-<meta name="theme-color" content="<?php echo TEMA_BG_PRINCIPALE ?>">
-<meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.5">
+<meta name="theme-color" content="#E42D39">
+<meta name="msapplication-TileColor" content="#E42D39">
+<meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png">
 
-<script type="text/javascript" src="/js/cookie.js"></script>
+<meta name="viewport"
+      content="width=device-width, user-scalable=yes, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.5">
 
-<style type="text/css">
-  body { color: <?php echo TEMA_COL_TESTO_PRINCIPALE; ?> !important; }
-  #header div { background: <?php echo TEMA_BG_PRINCIPALE ?> !important; }
-  #footer { background: <?php echo TEMA_BG_PRINCIPALE ?> !important; }
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/query-string/index.js"></script>
 
-  <?php
-    // CSS per utenti autenticati
-    if($autenticazione -> isLogged()) {
-  ?>
-    #topBar { background: <?php echo TEMA_BG_PRINCIPALE ?> !important; }
-    #nav { background: <?php echo TEMA_BG_PRINCIPALE_LOGGED ?> !important; }
-    #footer { background: <?php echo TEMA_BG_PRINCIPALE_LOGGED ?> !important; color: <?php echo TEMA_COL_TESTO_LOGGED ?> !important; }
-
-  <?php
-    }
-  ?>
-
-  .button, input[type='submit'] { border: 1px solid <?php echo TEMA_BG_BTN_NOHOVER; ?> !important; transition: .2s background, color !important; background: <?php echo TEMA_BG_BTN_NOHOVER; ?> !important; color: <?php echo TEMA_COL_BTN_NOHOVER; ?> !important; }
-  .button:active, input[type='submit']:active { transition: .2s background, color !important; background: <?php echo TEMA_BG_BTN_HOVER; ?> !important; color: <?php echo TEMA_COL_BTN_HOVER; ?> !important; }
-  .button.disabled, input[type='submit'][disabled] { border: 2px dashed <?php echo TEMA_COL_BTN_BORDER_DISABLED; ?> !important; background: #fff; background: <?php echo TEMA_BG_BTN_HOVER; ?> !important; color: <?php echo TEMA_COL_BTN_HOVER; ?> !important; }
-  input[type='text']:focus, input[type='text']:hover, input[type='email']:focus, input[type='email']:hover, input[type='password']:focus, input[type='password']:hover, select:hover, select:focus { border-color: <?php echo TEMA_BG_BTN_NOHOVER; ?> !important; }
-</style>
+<script type="text/javascript" src="/js/generale.js"></script>
+<script type="text/javascript" src="/js/HTMLDataGrid.js"></script>
