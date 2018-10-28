@@ -14,6 +14,8 @@ namespace FabLabRomagna {
      * @property-read int         $id_file
      * @property-read resource    $file
      * @property-read int         $ts_inserimento
+     * @property-read string      $sha256
+     * @property-read int         $md5
      */
     class File
     {
@@ -50,6 +52,17 @@ namespace FabLabRomagna {
 
 
         /**
+         * @var string $sha256 SHA256 del file inserito
+         */
+        protected $sha256;
+
+
+        /**
+         * @var string $md5 MD5 del file inserito
+         */
+        protected $md5;
+
+        /**
          * File constructor.
          *
          * @param int         $id_file        ID del file
@@ -60,7 +73,15 @@ namespace FabLabRomagna {
          *
          * @throws \Exception
          */
-        public function __construct($id_file, $ts_inserimento, $mime = null, $nome = null, $file = null)
+        public function __construct(
+            $id_file,
+            $ts_inserimento,
+            $mime = null,
+            $nome = null,
+            $file = null,
+            $md5 = null,
+            $sha256 = null
+        )
         {
             if (gettype($id_file) !== 'integer' || $id_file < 1) {
                 throw new \Exception('Invalid file ID!');
@@ -78,11 +99,21 @@ namespace FabLabRomagna {
                 throw new \Exception('Invalid file name!');
             }
 
+            if ((gettype($md5) !== 'string' || strlen($md5) !== 32) && $md5 !== null) {
+                throw new \Exception('Invalid MD5 hash!');
+            }
+
+            if ((gettype($sha256) !== 'string' || strlen($sha256) !== 64) && $sha256 !== null) {
+                throw new \Exception('Invalid SHA256 hash!');
+            }
+
             $this->id_file = $id_file;
             $this->ts_inserimento = $ts_inserimento;
             $this->mime = $mime;
             $this->nome = $nome;
             $this->file = $file;
+            $this->md5 = $md5;
+            $this->sha256 = $sha256;
         }
 
         /**
