@@ -3,20 +3,20 @@
 namespace FabLabRomagna {
 
     /**
-     * Class Fallimento
+     * Class OggettoRegistro
      *
      * @package FabLabRomagna
      */
-    class Fallimento
+    class OggettoRegistro
     {
         /**
-         * @var int $id_fallimento ID del fallimento
+         * @var int $id_oggetto ID dell'oggetto di registro
          */
-        protected $id_fallimento;
+        protected $id_oggetto;
 
 
         /**
-         * @var int $ts_inserimento Unix Time Stamp dell'inserimento del fallimento
+         * @var int $ts_inserimento Unix Time Stamp dell'inserimento dell'oggetto di registro
          */
         protected $ts_inserimento;
 
@@ -72,18 +72,18 @@ namespace FabLabRomagna {
         }
 
         /**
-         * Fallimento constructor.
+         * OggettoRegistro constructor.
          *
-         * @param string $id_fallimento  ID del fallimento
-         * @param string $ts_inserimento Unix Time Stamp dell'inserimento del fallimento
+         * @param string $id_oggetto     ID dell'oggetto di registro
+         * @param string $ts_inserimento Unix Time Stamp dell'inserimento dell'oggetto di registro
          * @param string $pacchetto      Pacchetto generatore
          * @param string $oggetto        Oggetto di cui tener traccia
          * @param string $note           Eventuali note, non standardizzate
          * @param string $ip             IP generatore dell'evento
          */
-        public function __construct($id_fallimento, $ts_inserimento, $pacchetto, $oggetto, $note, $ip)
+        public function __construct($id_oggetto, $ts_inserimento, $pacchetto, $oggetto, $note, $ip)
         {
-            $this->id_fallimento = $id_fallimento;
+            $this->id_oggetto = $id_oggetto;
             $this->ts_inserimento = $ts_inserimento;
             $this->pacchetto = $pacchetto;
             $this->oggetto = $oggetto;
@@ -100,7 +100,7 @@ namespace FabLabRomagna {
          * @param string $ip        Indirizzo IP per cui registrare il fallimento
          * @param int    $scadenza  Numero di secondi per il quale vale il fallimento (default: 900, 15 minuti)
          *
-         * @return Fallimento[]
+         * @return OggettoRegistro[]
          *
          * @throws \Exception
          */
@@ -125,7 +125,7 @@ namespace FabLabRomagna {
             }
 
             $ts = time() - $scadenza;
-            $sql = "SELECT * FROM fallimenti WHERE pacchetto = ? AND oggetto = ? AND ip = ? AND ts_inserimento >= ? ORDER BY id_fallimento ASC";
+            $sql = "SELECT * FROM registro WHERE pacchetto = ? AND oggetto = ? AND ip = ? AND ts_inserimento >= ? ORDER BY id_oggetto ASC";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -146,7 +146,7 @@ namespace FabLabRomagna {
             $tmp = [];
 
             while ($row = $res->fetch_assoc()) {
-                $tmp[] = new Fallimento($row['id_fallimento'], $row['ts_inserimento'], $row['pacchetto'],
+                $tmp[] = new OggettoRegistro($row['id_oggetto'], $row['ts_inserimento'], $row['pacchetto'],
                     $row['oggetto'],
                     $row['note'], $row['ip']);
             }
@@ -155,16 +155,16 @@ namespace FabLabRomagna {
         }
 
         /**
-         * Metodo per registrare un nuovo fallimento
+         * Metodo per registrare un nuovo oggetto di registro
          *
          * @param string   $pacchetto Pacchetto dell'oggetto generatore
          * @param string   $oggetto   Oggetto generatore
-         * @param string   $ip        Indirizzo IP per cui registrare il fallimento
+         * @param string   $ip        Indirizzo IP per cui registrare l'oggetto di registro
          * @param string   $note      Eventuali note (nessuno schema specificato)
          *
          * @global \mysqli $mysqli    Conessione al database
          *
-         * @return Fallimento
+         * @return OggettoRegistro
          *
          * @throws \Exception
          */
@@ -193,7 +193,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Expected string in $note');
             }
 
-            $sql = "INSERT INTO fallimenti (ts_inserimento, pacchetto, oggetto, note, ip) VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO registro (ts_inserimento, pacchetto, oggetto, note, ip) VALUES (?, ?, ?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -209,7 +209,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Unable to execute the statment!');
             }
 
-            return new Fallimento($stmt->insert_id, $ts, $pacchetto, $oggetto, $note, $ip);
+            return new OggettoRegistro($stmt->insert_id, $ts, $pacchetto, $oggetto, $note, $ip);
         }
     }
 }

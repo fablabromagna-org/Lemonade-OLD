@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../class/autoload.inc.php');
 
 use FabLabRomagna\Utente;
 use FabLabRomagna\Autenticazione;
-use FabLabRomagna\Fallimento;
+use FabLabRomagna\OggettoRegistro;
 use FabLabRomagna\Firewall;
 use FabLabRomagna\SQLOperator\Equals;
 
@@ -54,9 +54,9 @@ try {
 
     if (count($utente) !== 1) {
 
-        Fallimento::crea('FabLabRomagna\Autenticazione', 'login', $ip);
+        OggettoRegistro::crea('FabLabRomagna\Autenticazione', 'login', $ip);
 
-        if (count(Fallimento::ricerca_da_ip('FabLabRomagna\Autenticazione', 'login', $ip)) > 3) {
+        if (count(OggettoRegistro::ricerca_da_ip('FabLabRomagna\Autenticazione', 'login', $ip)) > 3) {
             Firewall::aggiungi_regola($ip, 32, 'reject', 900);
         }
 
@@ -78,9 +78,9 @@ try {
 
     if (!Autenticazione::verify_password_hash($utente, $password)) {
 
-        Fallimento::crea('FabLabRomagna\Autenticazione', 'login', $ip);
+        OggettoRegistro::crea('FabLabRomagna\Autenticazione', 'login', $ip);
 
-        if (count(Fallimento::ricerca_da_ip('FabLabRomagna\Autenticazione',
+        if (count(OggettoRegistro::ricerca_da_ip('FabLabRomagna\Autenticazione',
                 'login', $ip, $utente->id_utente)) > 3) {
             Firewall::aggiungi_regola($ip, 32, 'reject', 900);
         }
