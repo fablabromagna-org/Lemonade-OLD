@@ -12,6 +12,11 @@ namespace FabLabRomagna\Data {
     {
 
         /**
+         * @var array $colonne_da_aggiungere Colonne da aggiungere alla fine della tabella
+         */
+        private $colonne_da_aggiungere = [];
+
+        /**
          * Metodo per generare i bottoni di paging
          *
          * @param int         $pagina_attuale
@@ -112,7 +117,7 @@ namespace FabLabRomagna\Data {
                 $html = $this->genera_bottoni($pagina_attuale, $qs_pagina);
             }
 
-            if (count($this->data->risultato) == 0) {
+            if (count($this->data) == 0) {
                 return $html;
             }
 
@@ -155,6 +160,10 @@ namespace FabLabRomagna\Data {
                 }
             }
 
+            foreach ($this->colonne_da_aggiungere as $colonna) {
+                $html .= "<th>{$colonna[0]}</th>";
+            }
+
             $html .= '</thead><tbody>';
 
 
@@ -168,9 +177,21 @@ namespace FabLabRomagna\Data {
                     }
                 }
 
+                foreach ($this->colonne_da_aggiungere as $colonna) {
+
+                    $col = $colonna[1];
+
+                    foreach ($fields as $field => $valore) {
+
+                        $col = preg_replace('/{{' . $field . '}}/',
+                            $colonna[2] ? $value->{$field} : $value->HTMLDataGridFormatter($field), $col);
+                    }
+
+                    $html .= "<td>{$col}</td>";
+                }
+
                 $html .= '</tr>';
             }
-
 
             $html .= '</tbody></table></div>';
 
@@ -257,6 +278,24 @@ namespace FabLabRomagna\Data {
             $qs = implode('&', $qs);
 
             return strtok($_SERVER['REQUEST_URI'], '?') . '?' . $qs;
+        }
+
+        /**
+         * Metodo per aggiungere delle colonne alla fine della tabella
+         * Non è possibile effettuare l'ordinamento su questi campi
+         *
+         * @param string $header    Intestazione
+         * @param string $contenuto Contenuto (mettendo tra delle {{graffe}} un campo, questo verrà sostituito con il
+         *                          contenuto reale)
+         * @param bool   $raw       Indica se il cambo deve essere formattato o meno
+         */
+        public function aggiungiColonna(string $header = '', string $contenuto = '', bool $raw = true)
+        {
+            $this->colonne_da_aggiungere[] = [
+                $header,
+                $contenuto,
+                $raw
+            ];
         }
     }
 }
