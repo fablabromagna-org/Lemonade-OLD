@@ -1,326 +1,323 @@
 <?php
-  require_once('../../inc/autenticazione.inc.php');
+require_once(__DIR__ . '/../../class/autoload.inc.php');
 
-  if(!$permessi -> whatCanHeDo($autenticazione -> id)['visualizzareUtenti']['stato'])
-    header('Location: /');
+use \FabLabRomagna\Utente;
+use \FabLabRomagna\Log;
+use \FabLabRomagna\SQLOperator\Like;
+use \FabLabRomagna\SQLOperator\Equals;
+use \FabLabRomagna\SQLOperator\NotEquals;
+use FabLabRomagna\Data\HTMLDataGrid;
+
+try {
+    if (!\FabLabRomagna\Firewall::controllo()) {
+        \FabLabRomagna\Firewall::firewall_redirect();
+    }
+
+    $sessione = \FabLabRomagna\Autenticazione::get_sessione_attiva();
+
+    if ($sessione === null) {
+        header('Location: /login.php');
+        exit();
+    }
+
+    $sessione->aggiorna_token(true);
+
+    $utente = \FabLabRomagna\Utente::ricerca([
+        new FabLabRomagna\SQLOperator\Equals('id_utente', $sessione->id_utente)
+    ]);
+
+    if (count($utente) !== 1) {
+        header('Location: /login.php');
+        exit();
+    }
+
+    $utente = $utente->risultato[0];
+
+    $permessi = \FabLabRomagna\Permesso::what_can_i_do($utente);
+
+    if (!$permessi['gestione.utenti.visualizzare_utenti']['reale']) {
+        header('Location: /dashboard.php');
+        exit();
+    }
+
+} catch (Exception $e) {
+    Log::crea(null, 3, '/gestione/utenti/ricerca.php', 'page_request',
+        'Impossibile completare la richiesta.', (string)$e);
+    reply(500, 'Internal Server Error');
+}
+
+Log::crea($utente, 0, '/gestione/utenti/ricerca.php', 'view',
+    'L\'utente ha aperto la finestra di ricerca utente con i seguenti parametri: ' . $_SERVER['QUERY_STRING']);
 ?>
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <?php
-      require_once('../../inc/header.inc.php');
-    ?>
-    <style type="text/css">
-      form { margin-top: 20px; }
-      form div { margin-bottom: 10px; }
-      form div input { margin-right: 5px; margin-bottom: 10px; }
+    <head>
+        <?php
+        require_once('../../inc/header.inc.php');
+        ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('.avanzate').hide()
 
-      #contenitoreAvanzate { display: none; }
+                $('#avanzate').click(function () {
+                    $('.avanzate').toggle()
+                })
 
-      #filtroColonneContainer { display: none; background: rgba(0, 0, 0, 0.6); position: absolute; height: 100vh; z-index: 998; left: 0; right: 0; top: 0; bottom: 0; }
-      #filtroColonne { left: calc(calc(100% - 320px) / 2); width: 320px; height: 180px; text-align: center; background: #fff; position: absolute; z-index: 999; top: 12vh; border-radius: 3px; }
-    </style>
-    <script type="text/javascript">
-      // Apro e chiudo il bottone delle avanzate
-      window.addEventListener('DOMContentLoaded', function() {
+            })
+        </script>
+    </head>
+    <body>
+        <?php
+        include_once('../../inc/nav.inc.php');
 
-        // Filtro colonne
-        document.getElementById('filtroColonneBottone').addEventListener('click', function(e) {
-          e.preventDefault();
+        $dati = [];
 
-          document.getElementById('filtroColonneContainer').style.display = 'block';
-        });
+        // Pulisco i dati
+        $nome = isset($_GET['nome']) ? trim($_GET['nome']) : '';
+        $cognome = isset($_GET['cognome']) ? trim($_GET['cognome']) : '';
+        $email = isset($_GET['email']) ? trim($_GET['email']) : '';
+        $id = isset($_GET['id']) ? trim($_GET['id']) : '';
+        $cf = isset($_GET['cf']) ? trim($_GET['cf']) : '';
+        $conferma_email = isset($_GET['confermaEmail']) ? trim($_GET['confermaEmail']) : '';
+        $sesso = isset($_GET['sesso']) ? trim($_GET['sesso']) : '';
+        $sospensione = isset($_GET['sospensione']) ? trim($_GET['sospensione']) : '';
+        $n_risultati = isset($_GET['nRisultati']) ? (int)trim($_GET['nRisultati']) : 0;
+        $pagina = isset($_GET['p']) ? (int)trim($_GET['p']) : 0;
 
-        // Impostazioni avanzate
-        var chiuso = true
-        document.getElementById('avanzate').addEventListener('click', function(e) {
-          e.preventDefault()
+        if ($n_risultati < 1) {
+            $n_risultati = 10;
 
-          if(chiuso) {
-            document.getElementById('avanzate').innerHTML = 'Chiudi avanzate'
-            chiuso = false
-            document.getElementById('contenitoreAvanzate').style.display = 'block'
+        } elseif ($n_risultati > 100) {
+            $n_risultati = 100;
+        }
 
-          } else {
-            document.getElementById('avanzate').innerHTML = 'Visualizza avanzate'
-            chiuso = true
-            document.getElementById('contenitoreAvanzate').style.display = 'none'
-          }
-        })
-      })
-    </script>
-  </head>
-  <body>
-    <?php
-      include_once('../../inc/nav.inc.php');
+        if ($pagina < 1) {
+            $pagina = 1;
+        }
 
-      // Estraggo tutte le categorie degli utenti
-      $sql = "SELECT id, nome FROM categorieUtenti";
+        if ($nome !== '') {
+            $dati[] = new Like('nome', $nome);
+        }
 
-      $categorieUtenti = array();
+        if ($cognome !== '') {
+            $dati[] = new Like('cognome', $cognome);
+        }
 
-      if($query = $mysqli -> query($sql)) {
+        if ($email !== '') {
+            $dati[] = new Like('email', $email);
+        }
 
-        while($key = $query -> fetch_array(MYSQLI_ASSOC))
-          $categorieUtenti[$key['id']] = $key['nome'];
+        if ($id !== '') {
+            $dati[] = new Like('id_utente', $id);
+        }
 
+        if ($cf !== '') {
+            $dati[] = new Like('codice_fiscale', $cf);
+        }
 
-      } else {
-        echo 'Impossibile estrarre le categorie degli utenti.';
-        exit();
-      }
+        if ($conferma_email === '2') {
+            $dati[] = new NotEquals('codice_attivazione', null);
 
-      // Pulisco i dati
-      $nome = $mysqli -> real_escape_string(isset($_GET['nome']) ? trim($_GET['nome']) : '');
-      $cognome = $mysqli -> real_escape_string(isset($_GET['cognome']) ? trim($_GET['cognome']) : '');
-      $email = $mysqli -> real_escape_string(isset($_GET['email']) ? trim($_GET['email']) : '');
-      $sospeso = $mysqli -> real_escape_string(isset($_GET['sospeso']) ? trim($_GET['sospeso']) : '');
-      $ci = $mysqli -> real_escape_string(isset($_GET['ci']) ? trim($_GET['ci']) : '');
-      $id = $mysqli -> real_escape_string(isset($_GET['id']) ? trim($_GET['id']) : '');
-      $conferma = $mysqli -> real_escape_string(isset($_GET['conferma']) ? trim($_GET['conferma']) : '');
-      $categoria = $mysqli -> real_escape_string(isset($_GET['categoria']) ? trim($_GET['categoria']) : '');
-      $ordinamento = $mysqli -> real_escape_string(isset($_GET['ordinamento']) ? trim($_GET['ordinamento']) : '');
-      $ordinaSu = $mysqli -> real_escape_string(isset($_GET['ordinaSu']) ? trim($_GET['ordinaSu']) : '');
-      $filtroColonne = @$_GET['filtroColonne'];
+        } elseif ($conferma_email !== '1') {
+            $dati[] = new Equals('codice_attivazione', null);
+        }
 
-      if(!isset($filtroColonne) || gettype($filtroColonne) != 'array')
-        $filtroColonne = array();
-    ?>
-    <div id="contenuto">
-      <h1>Ricerca utenti</h1>
-      <form method="get">
-        <div>
-          <input type="text" name="nome" placeholder="Nome" value="<?php echo $nome; ?>" />
-          <input type="text" name="cognome" placeholder="Cognome" value="<?php echo $cognome; ?>" />
-          <input type="text" name="email" placeholder="E-Mail" value="<?php echo $email; ?>" />
-          <input type="text" name="id" placeholder="ID" style="width: 46px; min-width: 46px;" value="<?php echo $id; ?>" />
-          <a id="avanzate">Visualizza avanzate</a>
-        </div>
-        <div id="contenitoreAvanzate">
-          <div>
-            <label for="conferma">Conferma email</label>
-            <select name="conferma" id="conferma">
-              <option>Confermati</option>
-              <option value="1" <?php if($conferma == 1) echo 'selected' ?>>Tutti</option>
-              <option value="2" <?php if($conferma == 2) echo 'selected' ?>>Da confermare</option>
-            </select>
-          </div>
-          <div>
-            <label for="categoria">Categoria account</label>
-            <select name="categoria" id="categoria">
-              <option>Tutti</option>
-              <?php
-                foreach($categorieUtenti as $key => $value) {
-                  $selected = ($categoria == $key) ? 'selected': '';
-                  echo "<option value=\"{$key}\" {$selected}>{$value}</option>";
+        if ($sesso == 1) {
+            $dati[] = new Equals('sesso', false);
+        } elseif ($sesso == 2) {
+            $dati[] = new Equals('sesso', true);
+        } elseif ($sesso == 3) {
+            $dati[] = new Equals('sesso', null);
+        }
+
+        if ($sospensione == 0) {
+            $dati[] = new Equals('sospeso', false);
+        } elseif ($sospensione == 2) {
+            $dati[] = new Equals('sospeso', true);
+        }
+        ?>
+        <div class="container is-fluid contenuto">
+            <h1 class="title is-1 has-text-centered">Ricerca utenti</h1>
+            <form method="get">
+
+                <div class="columns">
+                    <div id="form_prop" class="column is-4 is-offset-4 has-text-centered">
+                        <div class="columns">
+                            <div class="column is-half">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input is-primary" type="text" name="nome"
+                                               placeholder="Nome"
+                                               value="<?php echo $nome; ?>"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column is-half">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input is-primary" type="text" name="cognome"
+                                               placeholder="Cognome"
+                                               value="<?php echo $cognome; ?>"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input is-primary" type="text" name="email"
+                                               placeholder="E-Mail"
+                                               value="<?php echo $email; ?>"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column is-3">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input is-primary" type="text" name="id" placeholder="ID"
+                                               value="<?php echo $id; ?>"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns">
+                            <div class="column is-half">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input is-primary" type="text" name="cf"
+                                               placeholder="Codice Fiscale"
+                                               value="<?php echo $cf; ?>"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column is-half">
+                                <a id="avanzate" class="button">Avanzate</a>
+                            </div>
+                        </div>
+                        <div class="columns avanzate">
+                            <div class="column is-half">
+                                <label for="confermaEmail">Verifica E-Mail</label>
+                                <div class="select">
+                                    <select name="confermaEmail" id="confermaEmail">
+                                        <option value="1" <?php echo $conferma_email == '1' ? 'selected' : ''; ?>>
+                                            Tutti
+                                        </option>
+                                        <option value="0" <?php echo $conferma_email != '1' && $conferma_email != '2' ? 'selected' : ''; ?>>
+                                            Solo verificate
+                                        </option>
+                                        <option value="2" <?php echo $conferma_email == '2' ? 'selected' : ''; ?>>
+                                            Solo non verificate
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="column is-half">
+                                <label for="sospensione">Sospensione</label>
+                                <div class="select">
+                                    <select name="sospensione" id="sospensione">
+                                        <option value="1" <?php echo $sospensione != '0' && $sospensione != '2' ? 'selected' : ''; ?>>
+                                            Tutti
+                                        </option>
+                                        <option value="0" <?php echo $sospensione == '0' ? 'selected' : ''; ?>>Non
+                                            attiva
+                                        </option>
+                                        <option value="2" <?php echo $sospensione == '2' ? 'selected' : ''; ?>>Attiva
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="columns avanzate">
+                            <div class="column is-half">
+                                <label for="sesso">Sesso</label>
+                                <div class="select">
+                                    <select name="sesso" id="sesso">
+                                        <option value="0" <?php echo $sesso != '1' && $sesso != '2' && $sesso != '3' ? 'selected' : ''; ?>>
+                                            Tutti
+                                        </option>
+                                        <option value="1" <?php echo $sesso === '1' ? 'selected' : ''; ?>>Maschile
+                                        </option>
+                                        <option value="2" <?php echo $sesso == '2' ? 'selected' : ''; ?>>Femminile
+                                        </option>
+                                        <option value="3" <?php echo $sesso == '3' ? 'selected' : ''; ?>>Non
+                                            specificato
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="column is-half">
+                                <label for="nRisultati">N. risultati per pagina</label>
+                                <div class="select">
+                                    <select name="nRisultati" id="nRisultati">
+                                        <option value="10" <?php echo $n_risultati != '25' && $n_risultati != '50' && $n_risultati != '100' ? 'selected' : ''; ?>>
+                                            10
+                                        </option>
+                                        <option value="25" <?php echo $n_risultati === '25' ? 'selected' : ''; ?>>25
+                                        </option>
+                                        <option value="50" <?php echo $n_risultati == '50' ? 'selected' : ''; ?>>50
+                                        </option>
+                                        <option value="100" <?php echo $n_risultati == '100' ? 'selected' : ''; ?>>100
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="buttons has-addons is-centered">
+                            <a href="/gestione/utenti/ricerca.php" class="button">Pulisci</a>
+                            <a href="/gestione/utenti/esporta.php?<?php echo $_SERVER['QUERY_STRING'] ?>"
+                               class="button" download>Esporta</a>
+                            <input class="button is-primary" type="submit" value="Cerca"/>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <?php
+            $ricerca = false;
+            try {
+                $order = HTMLDataGrid::dataTableOrder2array();
+                $order_ok = [];
+                $fields = utente::getDataGridTableHeaders();
+
+                foreach ($order as $value) {
+
+                    if (isset($fields[$value['column']])) {
+                        $order_ok[] = [
+                            $value['column'],
+                            !(bool)$value['order']
+                        ];
+                    }
                 }
 
-              ?>
-            </select>
-          </div>
-          <div>
-            <label for="sospeso">Sospensione</label>
-            <select name="sospeso" id="sospeso">
-              <option>Tutti</option>
-              <option value="1" <?php if($sospeso == 1) echo 'selected' ?>>Solo sospesi</option>
-              <option value="2" <?php if($sospeso == 2) echo 'selected' ?>>Solo attivi</option>
-            </select>
-          </div>
-          <div>
-            <label for="ordinamento">Ordinamento</label>
-            <select name="ordinamento" id="ordinamento">
-              <option>Ascendente</option>
-              <option value="1" <?php if($ordinamento == 1) echo 'selected' ?>>Discendente</option>
-            </select>
-          </div>
-          <div>
-            <label for="ordinaSu">Ordina su</label>
-            <select name="ordinaSu" id="ordinaSu">
-              <option>ID</option>
-              <option value="1" <?php if($ordinaSu == 1) echo 'selected' ?>>Cognome</option>
-              <option value="2" <?php if($ordinaSu== 2) echo 'selected' ?>>Nome</option>
-              <option value="3" <?php if($ordinaSu == 3) echo 'selected' ?>>E-Mail</option>
-            </select>
-          </div>
-          <div>
-            <input type="checkbox" name="ci" value="1" <?php if($ci == '1') echo 'checked'; ?> />
-            Case sensitive
-          </div>
-        </div>
-        <a href="/gestione/utenti/ricerca.php" class="button">Reset</a>
-        <input type="submit" value="Cerca" />
-        <a id="filtroColonneBottone">Filtro colonne</a>
-        <div id="filtroColonneContainer">
-          <div id="filtroColonne">
-            <select name="filtroColonne[]" multiple style="height: 95px; margin-top: 10px;">
-              <option value="id" <?php if(array_search('id', $filtroColonne) !== false || $filtroColonne == []) echo 'selected' ?>>ID</option>
-              <option value="nome" <?php if(array_search('nome', $filtroColonne) !== false || $filtroColonne == []) echo 'selected' ?>>Nome</option>
-              <option value="cognome" <?php if(array_search('cognome', $filtroColonne) !== false || $filtroColonne == []) echo 'selected' ?>>Cognome</option>
-              <option value="email" <?php if(array_search('email', $filtroColonne) !== false || $filtroColonne == []) echo 'selected' ?>>E-Mail</option>
-              <option value="dataIscrizione" <?php if(array_search('dataIscrizione', $filtroColonne) !== false) echo 'selected' ?>>Data Iscrizione</option>
-              <option value="categoria" <?php if(array_search('categoria', $filtroColonne) !== false) echo 'selected' ?>>Categoria</option>
-              <option value="confEmail" <?php if(array_search('confEmail', $filtroColonne) !== false) echo 'selected' ?>>Conferma E-Mail</option>
-            </select>
-            <input type="submit" value="Applica" style="display: block; margin: 20px auto;" />
-          </div>
-        </div>
-      </form>
-      <?php
-        // Creo una query SQL generica
-        $sql = "SELECT utenti.nome nome,
-                categorieUtenti.nome nomeCategoria,
-                utenti.id,
-                utenti.email,
-                 utenti.cognome,
-                 utenti.categoria,
-                 utenti.codiceAttivazione,
-                 utenti.dataRegistrazione FROM utenti INNER JOIN categorieUtenti ON categorieUtenti.id = utenti.categoria WHERE ";
+                if (count($order_ok) === 0) {
+                    $order_ok[] = ['id_utente', true];
+                }
 
-        // Case sensitive o insensitive
-        $ci = ($ci == 1) ? '' : ' COLLATE utf8mb4_general_ci';
+                $ricerca = Utente::ricerca($dati, $n_risultati, $n_risultati * ($pagina - 1), $order_ok);
+            } catch (Exception $e) {
 
-        // Aggiungo i campi di ricerca
-        if($nome != "")
-          $sql .= "utenti.nome LIKE _utf8mb4 '%".$nome."%'".$ci." AND ";
+                echo '<p style="margin-top: 20px;">Impossibile completare la richiesta.</p>';
+                Log::crea($utente, 3, '/gestione/utenti/ricerca.php', 'page_request',
+                    'Impossibile completare la richiesta.', (string)$e);
+            }
 
-        if($cognome != "")
-          $sql .= "cognome LIKE _utf8mb4 '%".$cognome."%'".$ci." AND ";
-
-        if($email != "")
-          $sql .= "email LIKE _utf8mb4 '%".$email."%'".$ci." AND ";
-
-        if($id != "")
-          $sql .= "utenti.id = '".$id."' AND ";
-
-        switch($conferma) {
-          default:
-            $sql .= "codiceAttivazione = '0' AND ";
-            break;
-
-          case 2:
-            $sql .= "codiceAttivazione <> '0' AND ";
-            break;
-
-          case 1:
-            $sql .= ""; // Non seleziono nulla
-            break;
-        }
-
-        if($categoria != 'Tutti' && $categoria != '')
-          $sql .= "categoria = '{$categoria}' AND ";
-
-        switch($sospeso) {
-          case 1:
-            $sql .= "sospeso = TRUE AND ";
-            break;
-        }
-
-        switch($ordinaSu) {
-          case 1:
-            $ordinaSu = 'cognome';
-            break;
-
-          case 2:
-            $ordinaSu = 'nome';
-            break;
-
-          case 3:
-            $ordinaSu = 'email';
-            break;
-
-          default:
-            $ordinaSu = 'id';
-            break;
-        }
-
-        // Pulisco la query
-        if(mb_substr($sql, -strlen(" AND ")) == " AND ")
-          $sql = mb_substr($sql, 0, strlen($sql)-strlen(" AND "));
-
-        if(mb_substr($sql, -strlen(" WHERE ")) == " WHERE ")
-          $sql = mb_substr($sql, 0, strlen($sql)-strlen(" WHERE "));
-
-        $pagina = $mysqli -> real_escape_string(isset($_GET['p']) ? trim($_GET['p']) : '');
-
-        if(!preg_match("/^[0-9]+$/", $pagina))
-          $pagina = 1;
-
-        $ordinamento = ($ordinamento == 1) ? 'DESC' : 'ASC';
-        $sql .= " ORDER BY {$ordinaSu} {$ordinamento}";
-
-        $query = new Paginator($mysqli, $sql, $pagina, 10);
-
-        // Eseguo la query
-        if($query -> result) {
-
-          // Sono presenti degli utenti con i criteri selezionati
-          if($query -> result -> num_rows > 0) {
-
-          ?>
-          <style type="text/css">
-            .id {  display: <?php if(array_search('id', $filtroColonne) !== false || $filtroColonne == []) echo 'auto'; else echo 'none'; ?>; }
-            .nome {  display: <?php if(array_search('nome', $filtroColonne) !== false || $filtroColonne == []) echo 'auto'; else echo 'none'; ?>; }
-            .cognome {  display: <?php if(array_search('cognome', $filtroColonne) !== false || $filtroColonne == []) echo 'auto'; else echo 'none'; ?>; }
-            .email {  display: <?php if(array_search('email', $filtroColonne) !== false || $filtroColonne == []) echo 'auto'; else echo 'none'; ?>; }
-            .dataIscrizione {  display: <?php if(array_search('dataIscrizione', $filtroColonne) !== false) echo 'auto'; else echo 'none'; ?>; }
-            .categoria {  display: <?php if(array_search('categoria', $filtroColonne) !== false) echo 'auto'; else echo 'none'; ?>; }
-            .confEmail {  display: <?php if(array_search('confEmail', $filtroColonne) !== false) echo 'auto'; else echo 'none'; ?>; }
-          </style>
-          <p style="margin-top: 20px;">Trovato/i <?php echo $query -> result -> num_rows ?> utente/i.</p>
-          <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th class="id">ID</th>
-                  <th class="nome">Nome</th>
-                  <th class="cognome">Cognome</th>
-                  <th class="email">E-Mail</th>
-                  <th class="dataIscrizione">Data iscrizione</th>
-                  <th class="categoria">Categoria</th>
-                  <th class="confEmail">Conf. email</th>
-                </tr>
-              </thead>
-              <tbody>
-            <?php
-              // Stampo gli utenti
-              while($row = $query -> result -> fetch_assoc()) {
-
-                if($row['codiceAttivazione'] != 0)
-                  $row['codiceAttivazione'] = 'NO';
-
-                else
-                  $row['codiceAttivazione'] = 'SI';
+            if ($ricerca !== false):
 
 
-                echo "<tr>";
-                echo "<td class=\"id\"><a href=\"utente.php?id={$row['id']}\" class=\"button\">{$row['id']}</a></td>";
-                echo "<td class=\"nome\">{$row['nome']}</td>";
-                echo "<td class=\"cognome\">{$row['cognome']}</td>";
-                echo "<td class=\"email\">{$row['email']}</td>";
-                echo "<td class=\"dataIscrizione\">".date("d/m/Y", $row['dataRegistrazione'])."</td>";
-                echo "<td class=\"categoria\">{$row['nomeCategoria']}</td>";
-                echo "<td class=\"confEmail\">{$row['codiceAttivazione']}</td>";
-                echo "</tr>";
-              }
+                $dataset = new HTMLDataGrid($ricerca);
+                $dataset->remove_field('secretato');
+                echo $dataset->render([
+                    'pagina_attuale' => $pagina,
+                    'qs_pagina' => 'p',
+                    'headers' => Utente::getDataGridTableHeaders()
+                ]);
+            endif;
+
+
             ?>
-              </tbody>
-            </table>
-          </div>
-          <div style="margin: 20px 0; text-align: center;"><?php echo $query -> getButtons('p'); ?></div>
-          <?php
-          } else
-            echo "<p style=\"margin-top: 20px;\">Nessun utente è presente nel database con i criteri impostati.</p>";
-
-        } else {
-          echo "Impossibile completare la richiesta.";
-          $console -> alert('Impossibile contattare il database! '.$mysqli -> error, $autenticazione -> id);
-        }
-
-
-      ?>
-    </div>
-    <?php
-      include_once('../../inc/footer.inc.php');
-    ?>
-  </body>
+        </div>
+        <?php
+        include_once('../../inc/footer.inc.php');
+        ?>
+    </body>
 </html>
