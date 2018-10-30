@@ -7,6 +7,9 @@ namespace {
 
 namespace FabLabRomagna {
 
+    use FabLabRomagna\Data\DataGridFields;
+    use FabLabRomagna\Data\TableHeader;
+
     /**
      * Class Utente
      *
@@ -15,20 +18,20 @@ namespace FabLabRomagna {
      * @author  Edoardo Savini <edoardo.savini@fablabromagna.org>
      *
      * @property-read $id_utente
-     * @property      $nome
-     * @property      $cognome
-     * @property      $email
-     * @property      $data_registrazione
-     * @property      $ip_registrazione
-     * @property      $sospeso
-     * @property      $codice_attivazione
-     * @property      $data_nascita
-     * @property      $codice_fiscale
-     * @property      $luogo_nascita
-     * @property      $sesso
-     * @property      $secretato
+     * @property-read $nome
+     * @property-read $cognome
+     * @property-read $email
+     * @property-read $data_registrazione
+     * @property-read $ip_registrazione
+     * @property-read $sospeso
+     * @property-read $codice_attivazione
+     * @property-read $data_nascita
+     * @property-read $codice_fiscale
+     * @property-read $luogo_nascita
+     * @property-read $sesso
+     * @property-read $secretato
      */
-    class Utente
+    class Utente implements DataGridFields
     {
         /**
          * Elenco delle proprietà dell'utente
@@ -338,7 +341,7 @@ namespace FabLabRomagna {
             $dati,
             $limit = null,
             $offset = null,
-            $order = ['id_utente', true]
+            $order = [['id_utente', true]]
         ) {
 
             global $mysqli;
@@ -363,7 +366,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Offset requires limit!');
             }
 
-            if ((gettype($order) !== 'array' || !isset($order[0]) || !isset($order[1])) && $order !== null) {
+            if ((gettype($order) !== 'array') && $order !== null) {
                 throw new \Exception('Invalid order!');
             }
 
@@ -395,8 +398,22 @@ namespace FabLabRomagna {
             }
 
             if ($order !== null) {
-                $t = $order[1] ? 'ASC' : 'DESC';
-                $query .= ' ORDER BY ' . $order[0] . ' ' . $t;
+
+                $is_first = true;
+                foreach ($order as $value) {
+                    if (isset(self::PROP_UTENTE[$value[0]])) {
+                        $t = $value[1] ? 'ASC' : 'DESC';
+
+                        if ($is_first) {
+                            $is_first = false;
+                            $query .= ' ORDER BY';
+                        } else {
+                            $query .= ',';
+                        }
+
+                        $query .= ' ' . $value[0] . ' ' . $t;
+                    }
+                }
             }
 
             if ($limit !== null) {
@@ -453,11 +470,11 @@ namespace FabLabRomagna {
                     'data_registrazione' => (int)$row['data_registrazione'],
                     'ip_registrazione' => $row['ip_registrazione'],
                     'sospeso' => (bool)$row['sospeso'],
-                    'codice_attivazione' => ($row['codice_attivazione'] == null) ? null : $row['codice_attivazione'],
-                    'data_nascita' => ($row['data_nascita'] == null) ? null : (int)$row['data_nascita'],
-                    'codice_fiscale' => ($row['codice_fiscale'] == null) ? null : $row['codice_fiscale'],
-                    'luogo_nascita' => ($row['luogo_nascita'] == null) ? null : $row['luogo_nascita'],
-                    'sesso' => ($row['sesso'] == null) ? null : $row['sesso'],
+                    'codice_attivazione' => $row['codice_attivazione'],
+                    'data_nascita' => $row['data_nascita'],
+                    'codice_fiscale' => $row['codice_fiscale'],
+                    'luogo_nascita' => $row['luogo_nascita'],
+                    'sesso' => ($row['sesso'] === null) ? null : (bool)$row['sesso'],
                     'secretato' => (bool)$row['secretato']
                 ]);
             }
@@ -618,6 +635,78 @@ namespace FabLabRomagna {
                 return $refs;
             }
             return $arr;
+        }
+
+        /**
+         * Metodo utilizzato dai figli di DataSet per ricavare tutte le proprietà
+         *
+         * @return array
+         */
+        public function getDataGridFields(): array
+        {
+            return get_object_vars($this);
+        }
+
+        /**
+         * @param mixed $field
+         * @param mixed $data
+         *
+         * @return mixed
+         */
+        public function HTMLDataGridFormatter($field)
+        {
+            switch ($field) {
+                case 'id_utente':
+                case 'nome':
+                case 'cognome':
+                case 'email':
+                    return '<a href="/gestione/utenti/utente.php?id=' . $this->id_utente . '">' . $this->{$field} . '</a>';
+
+                case 'data_registrazione':
+                    return $this->{$field} === null ? '' : date('d/m/Y H:m:i',
+                        $this->{$field});
+
+                case 'data_nascita':
+                    return $this->{$field} === null ? '' : date('d/m/Y',
+                        $this->{$field});
+
+                case 'sospeso':
+                case 'secretato':
+                    return $this->sospeso ? 'Sì' : 'No';
+
+                case 'codice_attivazione':
+                    return $this->codice_attivazione === null ? 'Verificato' : 'Non verificato';
+
+                case 'sesso':
+                    return $this->sesso === null ? '' : ($this->sesso ? 'Femminile' : 'Maschile');
+
+                default:
+                    return $this->{$field};
+            }
+        }
+
+        /**
+         * Metodo che restituisce tutte le intestazioni di tabella
+         *
+         * @return array
+         */
+        public static function getDataGridTableHeaders()
+        {
+            return [
+                'id_utente' => new TableHeader('#', 'ID utente'),
+                'nome' => new TableHeader('Nome'),
+                'cognome' => new TableHeader('Cognome'),
+                'email' => new TableHeader('E-Mail'),
+                'data_registrazione' => new TableHeader('Data reg.', 'Data di registrazione'),
+                'ip_registrazione' => new TableHeader('IP reg.', 'IP registrazione'),
+                'sospeso' => new TableHeader('Sospeso'),
+                'codice_attivazione' => new TableHeader('Verifica account'),
+                'data_nascita' => new TableHeader('Data di nascita'),
+                'codice_fiscale' => new TableHeader('Codice fiscale'),
+                'luogo_nascita' => new TableHeader('Luogo di nascita'),
+                'sesso' => new TableHeader('Sesso'),
+                'secretato' => new TableHeader('Secretato')
+            ];
         }
     }
 }
