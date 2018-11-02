@@ -46,8 +46,6 @@ namespace FabLabRomagna {
         }
 
         /**
-         * Utilizzato per estrarre le proprietà
-         *
          * @param string $name Nome della proprietà
          *
          * @throws \Exception
@@ -56,32 +54,11 @@ namespace FabLabRomagna {
          */
         public function __get($name)
         {
-            switch ($name) {
-                case 'codice_belfiore':
-                    return $this->codice_belfiore;
-
-                case 'nome':
-                    return $this->nome;
-
-                case 'is_stato_estero':
-                    return $this->is_stato_estero;
-
-                default:
-                    throw new \Exception('Property not found!');
+            if (property_exists($this, $name)) {
+                return $this->{$name};
             }
-        }
 
-        /**
-         * Questi valori non sono modificabili
-         *
-         * @param mixed $name
-         * @param mixed $value
-         *
-         * @throws \Exception
-         */
-        public function __set($name, $value)
-        {
-            throw new \Exception('You cannot set this properties!');
+            throw new \Exception('Property not found!');
         }
 
         /**
@@ -205,6 +182,14 @@ namespace FabLabRomagna {
             }
 
             return $tmp;
+        }
+
+        /**
+         * @return string
+         */
+        public function __toString()
+        {
+            return $this->nome;
         }
     }
 }
