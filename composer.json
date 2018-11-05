@@ -5,7 +5,8 @@
     "vectorface/whip": "^0.3.2",
     "gregwar/captcha": "v1.1.7",
     "ext-mysqli": "^7.1",
-    "ext-json": "^1.5"
+    "ext-json": "^1.5",
+    "aws/aws-sdk-php": "^3.70"
   },
   "authors": [
     {
