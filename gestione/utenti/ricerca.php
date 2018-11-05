@@ -6,7 +6,7 @@ use \FabLabRomagna\Log;
 use \FabLabRomagna\SQLOperator\Like;
 use \FabLabRomagna\SQLOperator\Equals;
 use \FabLabRomagna\SQLOperator\NotEquals;
-use FabLabRomagna\Data\HTMLDataGrid;
+use \FabLabRomagna\Data\HTMLDataGrid;
 
 try {
     if (!\FabLabRomagna\Firewall::controllo()) {
@@ -23,7 +23,10 @@ try {
     $sessione->aggiorna_token(true);
 
     $utente = \FabLabRomagna\Utente::ricerca([
-        new FabLabRomagna\SQLOperator\Equals('id_utente', $sessione->id_utente)
+        new Equals('id_utente', $sessione->id_utente),
+        new Equals('codice_attivazione', null),
+        new NotEquals('sospeso', true),
+        new NotEquals('secretato', true)
     ]);
 
     if (count($utente) !== 1) {
@@ -32,6 +35,10 @@ try {
     }
 
     $utente = $utente->risultato[0];
+
+    /**
+     * @var Utente $utente
+     */
 
     $permessi = \FabLabRomagna\Permesso::what_can_i_do($utente);
 
@@ -80,7 +87,7 @@ Log::crea($utente, 0, '/gestione/utenti/ricerca.php', 'view',
         $cf = isset($_GET['cf']) ? trim($_GET['cf']) : '';
         $conferma_email = isset($_GET['confermaEmail']) ? trim($_GET['confermaEmail']) : '';
         $sesso = isset($_GET['sesso']) ? trim($_GET['sesso']) : '';
-        $sospensione = isset($_GET['sospensione']) ? trim($_GET['sospensione']) : '';
+        $sospensione = isset($_GET['sospensione']) ? trim($_GET['sospensione']) : 1;
         $n_risultati = isset($_GET['nRisultati']) ? (int)trim($_GET['nRisultati']) : 0;
         $pagina = isset($_GET['p']) ? (int)trim($_GET['p']) : 0;
 
@@ -138,8 +145,7 @@ Log::crea($utente, 0, '/gestione/utenti/ricerca.php', 'view',
         ?>
         <div class="container is-fluid contenuto">
             <h1 class="title is-1 has-text-centered">Ricerca utenti</h1>
-            <form method="get">
-
+            <form method="get" class="no-traditional-sender">
                 <div class="columns">
                     <div id="form_prop" class="column is-4 is-offset-4 has-text-centered">
                         <div class="columns">
@@ -277,7 +283,7 @@ Log::crea($utente, 0, '/gestione/utenti/ricerca.php', 'view',
             try {
                 $order = HTMLDataGrid::dataTableOrder2array();
                 $order_ok = [];
-                $fields = utente::getDataGridTableHeaders();
+                $fields = Utente::getDataGridTableHeaders();
 
                 foreach ($order as $value) {
 
@@ -302,15 +308,18 @@ Log::crea($utente, 0, '/gestione/utenti/ricerca.php', 'view',
             }
 
             if ($ricerca !== false):
-
-
-                $dataset = new HTMLDataGrid($ricerca);
-                $dataset->remove_field('secretato');
-                echo $dataset->render([
-                    'pagina_attuale' => $pagina,
-                    'qs_pagina' => 'p',
-                    'headers' => Utente::getDataGridTableHeaders()
-                ]);
+                try {
+                    $dataset = new HTMLDataGrid($ricerca);
+                    $dataset->remove_field('secretato');
+                    $dataset->remove_field('id_foto');
+                    echo $dataset->render([
+                        'pagina_attuale' => $pagina,
+                        'qs_pagina' => 'p',
+                        'headers' => Utente::getDataGridTableHeaders()
+                    ]);
+                } catch (Exception $e) {
+                    echo '<p style="margin-top: 20px;">Impossibile completare la richiesta.</p>';
+                }
             endif;
 
 
