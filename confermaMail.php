@@ -1,82 +1,67 @@
 <?php
-  require_once('inc/carica.inc.php');
+require_once(__DIR__ . '/class/autoload.inc.php');
+
+try {
+    if (!\FabLabRomagna\Firewall::controllo()) {
+        \FabLabRomagna\Firewall::firewall_redirect();
+    }
+} catch (Exception $e) {
+    \FabLabRomagna\Log::crea(null, 3, '/confermaMail.php', 'page_request',
+        'Impossibile completare la richiesta.', (string)$e);
+    reply(500, 'Internal Server Error');
+}
 ?>
 <!DOCTYPE html>
-<html lang="it">
-  <head>
-    <?php
-      require_once('./inc/header.inc.php')
-    ?>
-    <link type="text/css" rel="stylesheet" media="screen" href="css/index.css" />
-  </head>
-  <body>
-    <div id="header">
-      <a href="/login.php" class="button" id="bottoneFlottante">Accesso</a>
-      <div>
-        <p><?php echo NOME_SITO; ?><p>
-      </div>
-      <img src="images/logo.png" alt="Logo" />
-    </div>
-    <?php
-      if(!isset($_GET['token'])) {
-    ?>
-      <div style="margin: 10px auto 30px auto; max-width: 520px; padding: 0 20px;">
-        <h1 style="text-align: center;">L'iscrizione è quasi terminata</h1>
-        <p>Devi confermare l'account seguendo le istruzioni che riceverai via email.</p>
-      </div>
-    <?php
-      } else {
-    ?>
-      <div style="margin: 10px auto 30px auto; max-width: 520px; text-align: center; padding: 0 20px;">
-    <?php
-      $codiceConferma = $mysqli -> real_escape_string($_GET['token']);
-
-      if($codiceConferma == "" || strlen($codiceConferma) !== 13) {
-    ?>
-        <h1 style="text-align: center;">Conferma email fallita</h1>
-        <p style="margin-top: 10px;">Il codice di conferma non è valido.</p>
-    <?php
-      } else {
-        $sql = "SELECT  * FROM utenti WHERE codiceAttivazione = '".$codiceConferma."'";
-
-        if($query = $mysqli -> query($sql)) {
-
-          if($query -> num_rows == 1) {
-
-            $row = $query -> fetch_assoc();
-            $sql = "UPDATE utenti SET codiceAttivazione = '0' WHERE id = '".$row['id']."'";
-
-            if($query = $mysqli -> query($sql)) {
-            ?>
-              <h1 style="text-align: center;">Conferma email completata</h1>
-              <p style="margin-top: 10px;">Ora puoi effettuare l'accesso.</p>
-            <?php
-            } else {
-            ?>
-              <h1 style="text-align: center;">Conferma email fallita</h1>
-              <p style="margin-top: 10px;">Impossibile completare la conferma.</p>
-            <?php
-            }
-          } else {
-          ?>
-            <h1 style="text-align: center;">Conferma email fallita</h1>
-            <p style="margin-top: 10px;">Il codice di conferma non è valido.</p>
-          <?php
-          }
-        } else {
-        ?>
-          <h1 style="text-align: center;">Conferma email fallita</h1>
-          <p style="margin-top: 10px;">Impossibile completare la conferma.</p>
+<html>
+    <head>
         <?php
-        }
-      }
-    ?>
-      </div>
-    <?php
-      }
-    ?>
-    <?php
-      require_once('inc/footer.inc.php');
-    ?>
-  </body>
+        require_once('./inc/header.inc.php');
+        ?>
+    </head>
+    <body>
+        <?php
+        include_once('./inc/nav.inc.php');
+
+        $id = isset($_GET['id']) ? trim($_GET['id']) : '';
+        $codice = isset($_GET['c']) ? trim($_GET['c']) : '';
+
+        if (!preg_match('/^[0-9]{1,11}$/', $id) || !preg_match('/^[0-9a-f]{13}$/', $codice)):
+
+            ?>
+            <div class="contenuto">
+                <h1 class="title is-1 has-text-centered">Errore</h1>
+                <h3 class="subtitle is-3 has-text-centered">ID utente o codice di attivazione non valido.</h3>
+            </div>
+        <?php
+        else:
+
+            $utente = \FabLabRomagna\Utente::ricerca(array(
+                new \FabLabRomagna\SQLOperator\Equals('id_utente', (int)$id),
+                new \FabLabRomagna\SQLOperator\Equals('codice_attivazione', $codice)
+            ));
+
+            if (count($utente) === 1):
+                $utente->risultato[0]->set_campo('codice_attivazione', null);
+                ?>
+                <div class="contenuto">
+                    <h1 class="title is-1 has-text-centered">Fantastico!</h1>
+                    <h3 class="subtitle is-3 has-text-centered">Hai verificato correttamente il tuo indirizzo
+                        email.</h3>
+                    <h3 class="subtitle is-3 has-text-centered">Ora puoi effettuare l'accesso.</h3>
+                </div>
+            <?php
+            else:
+                ?>
+                <div class="contenuto">
+                    <h1 class="title is-1 has-text-centered">Errore</h1>
+                    <h3 class="subtitle is-3 has-text-centered">ID utente o codice di attivazione non valido.</h3>
+                </div>
+            <?php
+            endif;
+
+        endif;
+
+        include_once('inc/footer.inc.php');
+        ?>
+    </body>
 </html>
