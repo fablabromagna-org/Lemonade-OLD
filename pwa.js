@@ -14,6 +14,9 @@ self.addEventListener('install', function (event) {
 //If any fetch fails, it will show the offline page.
 //Maybe this should be limited to HTML documents?
 self.addEventListener('fetch', function (event) {
+    if (event.request.url.indexOf('/ajax/') !== -1)
+        return
+
     event.respondWith(
         fetch(event.request).catch(function (error) {
                 console.error('[PWA Builder] Network request Failed. Serving offline page ' + error)
