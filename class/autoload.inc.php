@@ -17,15 +17,22 @@ require_once(__DIR__ . '/SQLOperator/SQLGreaterThanEquals.class.php');
 require_once(__DIR__ . '/SQLOperator/SQLLowerThan.class.php');
 require_once(__DIR__ . '/SQLOperator/SQLLowerThanEquals.class.php');
 
+require_once(__DIR__ . '/Data/DataGridFields.php');
+require_once(__DIR__ . '/Data/TableHeader.php');
+require_once(__DIR__ . '/Data/DataGrid.php');
+require_once(__DIR__ . '/Data/HTMLDataGrid.php');
+require_once(__DIR__ . '/Data/CSVDataGrid.php');
+
 require_once(__DIR__ . '/RisultatoRicerca.class.php');
 require_once(__DIR__ . '/Comune.class.php');
 require_once(__DIR__ . '/File.class.php');
 require_once(__DIR__ . '/Firewall.class.php');
 require_once(__DIR__ . '/Utente.class.php');
 require_once(__DIR__ . '/Autenticazione.class.php');
-require_once(__DIR__ . '/Fallimento.class.php');
+require_once(__DIR__ . '/OggettoRegistro.class.php');
 require_once(__DIR__ . '/Log.class.php');
 require_once(__DIR__ . '/Gruppo.class.php');
 require_once(__DIR__ . '/Permesso.class.php');
+require_once(__DIR__ . '/TemplateEmail.php');
 
 session_start();
