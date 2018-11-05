@@ -81,8 +81,7 @@ namespace FabLabRomagna {
             $file = null,
             $md5 = null,
             $sha256 = null
-        )
-        {
+        ) {
             if (gettype($id_file) !== 'integer' || $id_file < 1) {
                 throw new \Exception('Invalid file ID!');
             }
@@ -323,6 +322,61 @@ namespace FabLabRomagna {
         }
 
         /**
+         * Metodo per salvare un nuovo file dalla memoria
+         *
+         * @param string      $data   File da caricare
+         * @param string|null $mime
+         * @param string|null $nome
+         *
+         * @global \mysqli    $mysqli Connessione al database
+         *
+         * @return \FabLabRomagna\File
+         *
+         * @throws \Exception
+         */
+        public static function salva_mem($data, $mime = null, $nome = null)
+        {
+
+            global $mysqli;
+
+            if (!is_a($mysqli, 'mysqli')) {
+                throw new \Exception('Expected mysqli instance as global variable');
+            }
+
+            if (gettype($data) !== 'string') {
+                throw new \Exception('Invalid file path!');
+            }
+
+            if ((gettype($mime) !== 'string' || strlen($mime) < 1) && $mime !== null) {
+                throw new \Exception('Invalid mime type!');
+            }
+
+            if ((gettype($nome) !== 'string' || strlen($nome) < 1) && $nome !== null) {
+                throw new \Exception('Invalid file name!');
+            }
+
+            $sql = "INSERT INTO files (file, mime, nome, ts_inserimento) VALUES (?, ?, ?, ?)";
+
+            $stmt = $mysqli->prepare($sql);
+
+            if ($stmt === false) {
+                throw new \Exception('Impossibile preparare la query!');
+            }
+
+            $ts = time();
+
+            if (!$stmt->bind_param('sssi', $data, $mime, $nome, $ts)) {
+                throw new \Exception('Unable to bind params!');
+            }
+
+            if (!$stmt->execute()) {
+                throw new \Exception('Impossibile eseguire la query!' . $mysqli->error);
+            }
+
+            return self::get_by_id($stmt->insert_id);
+        }
+
+        /**
          * Metodo per estrarre un file conoscendo l'ID
          *
          * @param int $id ID del file da estrarre
@@ -343,7 +397,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Invalid file timestamp!');
             }
 
-            $sql = "SELECT nome, mime, ts_inserimento, id_file FROM files WHERE id_file = ?";
+            $sql = "SELECT nome, mime, ts_inserimento, id_file, `sha256`, `md5` FROM files WHERE id_file = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
