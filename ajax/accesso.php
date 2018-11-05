@@ -1,19 +1,17 @@
 <?php
 require_once(__DIR__ . '/../class/autoload.inc.php');
+require_once(__DIR__ . '/../vendor/autoload.php');
 
 use FabLabRomagna\Utente;
 use FabLabRomagna\Autenticazione;
 use FabLabRomagna\OggettoRegistro;
 use FabLabRomagna\Firewall;
 use FabLabRomagna\SQLOperator\Equals;
+use Aws\Ses\SesClient;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     reply(405, 'Method Not Allowed');
 }
-
-$email = isset($_POST['email']) ? $_POST['email'] : '';
-$password = isset($_POST['password']) ? $_POST['password'] : '';
-$captcha = isset($_POST['captcha']) ? $_POST['captcha'] : '';
 
 json();
 
@@ -24,10 +22,53 @@ try {
         reply(429, 'Too Many Requests');
     }
 
+    $client = new SesClient(array(
+        'version' => '2010-12-01',
+        'region' => AWS_REGION,
+        'credentials' => [
+            'key' => AWS_MAIL_KEY,
+            'secret' => AWS_MAIL_SECRET,
+        ]
+    ));
+
+    $dati = json_decode(file_get_contents('php://input'), true);
+
+    if ($dati === null) {
+        reply(400, 'Bad Request', array(
+            'refreshCaptcha' => true
+        ));
+    }
+
+    if (!is_array($dati)) {
+        reply(400, 'Bad Request', array(
+            'refreshCaptcha' => true
+        ));
+    }
+
+    $campi_validi = ['email', 'password', 'captcha'];
+
+    foreach ($dati as $key => $value) {
+        if (!in_array($key, $campi_validi)) {
+            reply(400, 'Bad Request', array(
+                'refreshCaptcha' => true
+            ));
+        }
+    }
+
+    if (count($dati) !== 3) {
+        reply(400, 'Bad Request', array(
+            'refreshCaptcha' => true
+        ));
+    }
+
+    $captcha = $dati['captcha'];
+    $email = $dati['email'];
+    $password = $dati['password'];
+
     $builder = new Gregwar\Captcha\CaptchaBuilder(isset($_SESSION['captcha']) ? $_SESSION['captcha'] : null);
 
     if (!$builder->testPhrase($captcha)) {
-        reply(401, 'Not Authorized', array(
+        reply(401, 'Unauthorized', array(
             'field' => 'captcha',
             'refreshCaptcha' => true
         ));
@@ -35,14 +76,14 @@ try {
 
 
     if (!Utente::valida_campo('email', $email)) {
-        reply(401, 'Not Authorized', array(
+        reply(400, 'Bad Request', array(
             'field' => 'email',
             'refreshCaptcha' => true
         ));
     }
 
     if (!Autenticazione::is_valid_password($password)) {
-        reply(401, 'Not Authorized', array(
+        reply(400, 'Bad Request', array(
             'field' => 'password',
             'refreshCaptcha' => true
         ));
@@ -60,7 +101,7 @@ try {
             Firewall::aggiungi_regola($ip, 32, 'reject', 900);
         }
 
-        reply(401, 'Not Authorized', array(
+        reply(401, 'Unauthorized', array(
             'field' => 'email',
             'refreshCaptcha' => true
         ));
@@ -69,9 +110,12 @@ try {
 
     $utente = $utente->risultato[0];
 
+    /**
+     * @var Utente $utente
+     */
     if ($utente->sospeso || $utente->secretato) {
-        reply(401, 'Not Authorized', array(
-            'alert' => 'Account non disponibile. Per ulteriori informazioni contatta l\'amministratore.',
+        reply(401, 'Unauthorized', array(
+            'alert' => 'Account non disponibile. Per ulteriori informazioni contatta l\'associazione.',
             'refreshCaptcha' => true
         ));
     }
@@ -85,7 +129,7 @@ try {
             Firewall::aggiungi_regola($ip, 32, 'reject', 900);
         }
 
-        reply(401, 'Not Authorized', array(
+        reply(401, 'Unauthorized', array(
             'field' => 'password',
             'refreshCaptcha' => true
         ));
@@ -94,10 +138,40 @@ try {
     Autenticazione::create_session($utente, 'browser', $_SERVER['HTTP_USER_AGENT'],
         3600 * 24 * 7, true);
 
-    FabLabRomagna\Log::crea($utente, 0, 'ajax/accesso.php', 'login',
+    FabLabRomagna\Log::crea($utente, 1, 'ajax/accesso.php', 'login',
         'Effettuato un nuovo accesso.');
 
-    reply();
+    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+        new \FabLabRomagna\SQLOperator\Equals('nome', 'nuovo_accesso')
+    ));
+
+    foreach ($utente->getDataGridFields() as $campo => $valore) {
+        $email->replace('utente.' . $campo, $valore);
+    }
+
+    $client->sendEmail([
+        'Destination' => [
+            'ToAddresses' => [$utente->email],
+        ],
+        'ReplyToAddresses' => [EMAIL_REPLY_TO],
+        'Source' => EMAIL_FROM,
+        'Message' => [
+            'Body' => [
+                'Html' => [
+                    'Charset' => 'UTF-8',
+                    'Data' => $email->file,
+                ]
+            ],
+            'Subject' => [
+                'Charset' => 'UTF-8',
+                'Data' => 'Nuovo accesso',
+            ]
+        ]
+    ]);
+
+    reply(200, 'Ok', array(
+        'redirect' => '/dashboard.php'
+    ));
 
 } catch (Exception $e) {
     reply(500, 'Internal Server Error', array(
