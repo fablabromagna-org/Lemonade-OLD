@@ -97,7 +97,7 @@ try {
 
         OggettoRegistro::crea('FabLabRomagna\Autenticazione', 'login', $ip);
 
-        if (count(OggettoRegistro::ricerca_da_ip('FabLabRomagna\Autenticazione', 'login', $ip)) > 3) {
+        if (count(OggettoRegistro::ricerca_da_ip('FabLabRomagna\Autenticazione', 'login', $ip, 300)) > 3) {
             Firewall::aggiungi_regola($ip, 32, 'reject', 900);
         }
 
@@ -125,7 +125,36 @@ try {
         OggettoRegistro::crea('FabLabRomagna\Autenticazione', 'login', $ip);
 
         if (count(OggettoRegistro::ricerca_da_ip('FabLabRomagna\Autenticazione',
-                'login', $ip, $utente->id_utente)) > 3) {
+                'login', $ip, 300)) > 3) {
+
+            $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+                new \FabLabRomagna\SQLOperator\Equals('nome', 'accessi_bloccati')
+            ));
+
+            foreach ($utente->getDataGridFields() as $campo => $valore) {
+                $email->replace('utente.' . $campo, $valore);
+            }
+
+            $client->sendEmail([
+                'Destination' => [
+                    'ToAddresses' => [$utente->email],
+                ],
+                'ReplyToAddresses' => [EMAIL_REPLY_TO],
+                'Source' => EMAIL_FROM,
+                'Message' => [
+                    'Body' => [
+                        'Html' => [
+                            'Charset' => 'UTF-8',
+                            'Data' => $email->file,
+                        ]
+                    ],
+                    'Subject' => [
+                        'Charset' => 'UTF-8',
+                        'Data' => 'Accessi falliti',
+                    ]
+                ]
+            ]);
+
             Firewall::aggiungi_regola($ip, 32, 'reject', 900);
         }
 
