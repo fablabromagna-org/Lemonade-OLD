@@ -52,7 +52,7 @@ $(document).ready(function () {
             invioInCorso = true
 
             var dati = {}
-            var elementi = $(this).find('input:not([type=\'submit\']), select')
+            var elementi = $(this).find('input:not([type=\'submit\']):not(.ajax-exclude), select:not(.ajax-exclude)')
 
             elementi.each(function () {
                 valorizzatore(this)
@@ -103,6 +103,12 @@ $(document).ready(function () {
                     } else if (res.status !== 200 && res.status !== 204)
                         alert('Impossibile completare la richiesta.')
 
+                    if ((res.status === 200 || res.status === 204) && $(_self).hasClass('is-modal')) {
+                        $(_self).children('div.modal.is-active').each(function () {
+                            $(this).removeClass('is-active')
+                        })
+                    }
+
                     invioInCorso = false
 
                     elementi.each(function () {
@@ -123,6 +129,9 @@ $(document).ready(function () {
 
                 if (data === null)
                     data = input.value
+
+                if (data === 'null')
+                    return null
 
                 if (input.dataset.type === undefined || input.dataset.type === 'string')
                     return data
