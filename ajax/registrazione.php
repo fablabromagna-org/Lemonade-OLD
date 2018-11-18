@@ -1,141 +1,207 @@
 <?php
-  require_once('../inc/carica.inc.php');
-  require_once('../vendor/autoload.php');
+require_once(__DIR__ . '/../class/autoload.inc.php');
+require_once(__DIR__ . '/../vendor/autoload.php');
 
-  // Configuro AWS SES
-  use Aws\Ses\SesClient;
-  $client = SesClient::factory(array(
-      'key' => $dizionario -> getValue('AWS_KEY'),
-      'secret' => $dizionario -> getValue('AWS_SECRET'),
-      'region'  => $dizionario -> getValue('AWS_REGION')
-  ));
+use FabLabRomagna\Utente;
+use FabLabRomagna\Autenticazione;
+use FabLabRomagna\SQLOperator\Equals;
+use FabLabRomagna\SQLOperator\NotEquals;
+use FabLabRomagna\Log;
+use Aws\Ses\SesClient;
 
-  header('Content-Type: application/json');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    reply(405, 'Method Not Allowed');
+}
 
-  // Raccolgo tutti i dati e li "pulisco"
-  $nome = $mysqli -> real_escape_string(isset($_POST['nome']) ? trim($_POST['nome']) : '');
-  $cognome = $mysqli -> real_escape_string(isset($_POST['cognome']) ? trim($_POST['cognome']) : '');
-  $pwd = $mysqli -> real_escape_string(isset($_POST['pwd']) ? trim($_POST['pwd']) : '');
-  $email = $mysqli -> real_escape_string(isset($_POST['email']) ? strtolower(trim($_POST['email'])) : '');
-  $ip = $mysqli -> real_escape_string(getIpAddress());
+json();
 
-  function stampaErrore($errore = 'Errore sconosciuto!') {
-    echo '{"errore":true,"msg":"'.$errore.'"}';
-    exit();
-  }
+try {
+    $sessione = Autenticazione::get_sessione_attiva();
 
-  // Controllo che le iscrizioni non siano state bloccate
-  if($dizionario -> getValue('bloccoIscrizioni') === 'true')
-    stampaErrore('Le iscrizioni sono state bloccate!');
+    if ($sessione !== null) {
+        reply(401, 'Unauthorized', null, true);
+    }
 
-  // Controllo i dati
-  if($nome === "")
-    stampaErrore('Il nome è obbligatorio!');
+    $dati = json_decode(file_get_contents('php://input'), true);
 
-  else if(!preg_match("/^[a-z ,.'-]+$/i", $nome))
-    stampaErrore('Devi inserire un nome valido!');
+    if ($dati === null) {
+        reply(400, 'Bad Request', null, true);
+    }
 
-  else if($cognome === "")
-    stampaErrore('Il cognome è obbligatorio!');
+    if (!is_array($dati)) {
+        reply(400, 'Bad Request', null, true);
+    }
 
-  else if(!preg_match("/^[a-z ,.'-]+$/i", $cognome))
-    stampaErrore('Devi inserire un cognome valido!');
+    $campi_modificabili = ['nome', 'cognome', 'email', 'password', 'captcha'];
 
-  else if($email === "")
-    stampaErrore('L\'indirizzo email è obbligatorio!');
+    // Controllo che tutti i campi inviati siano tra quelli modificabili
+    foreach ($dati as $key => $value) {
+        if (!in_array($key, $campi_modificabili)) {
+            reply(400, 'Bad Request', null, true);
+        }
+    }
 
-  else if(!filter_var($email, FILTER_VALIDATE_EMAIL))
-    stampaErrore('L\'indirizzo inserito non è valido!');
+    $nome = $dati['nome'];
+    $cognome = $dati['cognome'];
+    $email = $dati['email'];
+    $password = $dati['password'];
+    $captcha = $dati['captcha'];
 
-  else if($pwd === "")
-    stampaErrore('Devi inserire una password!');
+    $builder = new Gregwar\Captcha\CaptchaBuilder(isset($_SESSION['captcha']) ? $_SESSION['captcha'] : null);
 
-  else if(strlen($pwd) < 6)
-    stampaErrore('La password deve contenere almeno sei caratteri!');
+    if (!$builder->testPhrase($captcha)) {
+        reply(400, 'Bad Request', array(
+            'field' => 'captcha',
+            'refreshCaptcha' => true
+        ));
+    }
 
-  // Confronto i dati col database
-  else {
-
-    $sql = "SELECT email FROM utenti WHERE email = '".$email."' AND codiceAttivazione = '0'";
-
-    // Eseguo la query
-    if($query = $mysqli -> query($sql)) {
-
-      // Conto le righe
-      if($query -> num_rows === 0) {
-
-        // Controllo che l'account non sia da confermare
-        $sql = "SELECT email FROM utenti WHERE email = '".$email."'";
-
-        // Eseguo la query
-        if($query = $mysqli -> query($sql)) {
-
-          // Genero l'hash di conferma
-          $codiceConferma = uniqid();
-
-          if($query -> num_rows == 0)
-            $sql = "INSERT INTO utenti (nome, cognome, email, password, codiceAttivazione, ipRegistrazione, dataRegistrazione) VALUES ('".$nome."', '".$cognome."', '".$email."', '".md5($pwd)."', '".$codiceConferma."',  '".$ip."', '".time()."')";
-
-          else
-            $sql = "UPDATE utenti SET nome = '".$nome."', cognome = '".$cognome."', password = '".md5($pwd)."', codiceAttivazione = '".$codiceConferma."',  ipRegistrazione = '".$ip."', sospeso = 0, categoria = 1 WHERE email = '".$email."'";
-
-          if($query = $mysqli -> query($sql)) {
-
-            $link = $dizionario -> getValue('urlSito').'/confermaMail.php?token='.$codiceConferma;
-
-            try {
-
-              $replyTo = ($dizionario -> getValue('EMAIL_REPLY_TO') == false || $dizionario -> getValue('EMAIL_REPLY_TO') == null) ? $dizionario -> getValue('EMAIL_SOURCE') : $dizionario -> getValue('EMAIL_REPLY_TO');
-              $html = $templateManager -> getTemplate('registrazione', array(
-                'nome' => $nome,
-                'cognome' => $cognome,
-                'linkConferma' => $link,
-                'nomeSito' => $dizionario -> getValue('nomeSito')
-              ));
-
-              $client -> sendEmail(array(
-                'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
-                'ReplyToAddresses' => array($replyTo),
-                'Destination' => array(
-                  'ToAddresses' => array($email)
-                ),
-                'Message' => array(
-                  'Subject' => array(
-                    'Data' => 'Verifica indirizzo email',
-                    'Charset' => 'UTF-8'
-                  ),
-                  'Body' => array(
-                    'Html' => array(
-                      'Data' => $html,
-                      'Charset' => 'UTF-8'
-                    )
-                  )
-                )
-              ));
-
-              echo '{}';
-
-            } catch(Exception $e) {
-              $console -> alert('Impossibile inviare l\'email! '.$e, 0);
-              stampaErrore('Impossibile inviare l\'email!');
-            }
-
-          } else {
-            $console -> alert('Impossibile eseguire la richiesta al database! '.$mysqli -> error);
-            stampaErrore('Impossibile completare la richiesta.');
-          }
-
-        } else {
-          $console -> alert('Impossibile eseguire la richiesta al database! '.$mysqli -> error);
-          stampaErrore('Impossibile completare la richiesta.');
+    foreach ($dati as $key => $value) {
+        if ($key === 'captcha') {
+            continue;
         }
 
-      } else
-        stampaErrore('E-Mail già utilizzata!');
+        if ($key === 'password') {
 
-    } else {
-      $console -> alert('Impossibile eseguire la richiesta al database! '.$mysqli -> error);
-      stampaErrore('Impossibile completare la richiesta.');
+            if (!Autenticazione::is_valid_password($value)) {
+                reply(400, 'Bad Request', array(
+                    'field' => $key
+                ), true);
+            }
+
+        } elseif (!Utente::valida_campo($key, $value)) {
+            reply(400, 'Bad Request', array(
+                'field' => $key
+            ), true);
+        }
     }
-  }
-?>
+
+    // Controllo che non siano presenti altri utenti con lo stesso indirizzo email
+    $utente = Utente::ricerca(array(
+        new Equals('email', $email)
+    ));
+
+    // Sono presenti alcuni record nel db
+    if (count($utente) !== 0) {
+
+        // L'utente è confermato, annullo la richiesta
+        if ($utente->risultato[0]->codice_attivazione === null) {
+            reply(400, 'Bad Request', array(
+                'field' => 'email',
+                'alert' => 'E-Mail già in uso!'
+            ), true);
+
+            // L'account non è verificato, sovrascrivo le anagrafiche
+        } else {
+
+            $utente = $utente->risultato[0];
+
+            /**
+             * @var Utente $utente
+             */
+
+            $codice_attivazione = uniqid();
+
+            $utente->set_campo('nome', $nome);
+            $utente->set_campo('cognome', $cognome);
+            $utente->set_campo('ip_registrazione', \FabLabRomagna\Firewall::get_valid_ip());
+            $utente->set_campo('data_registrazione', time());
+            $utente->set_campo('codice_fiscale', null);
+            $utente->set_campo('sospeso', false);
+            $utente->set_campo('secretato', false);
+            $utente->set_campo('sesso', null);
+            $utente->set_campo('id_foto', null);
+            $utente->set_campo('codice_attivazione', $codice_attivazione);
+            $utente->set_campo('data_nascita', null);
+            $utente->set_campo('luogo_nascita', null);
+
+        }
+
+        // Non è presente nessun record relativo all'indirizzo nel db
+    } else {
+
+        $codice_attivazione = uniqid();
+
+        Utente::crea_utente(array(
+            'nome' => $nome,
+            'cognome' => $cognome,
+            'email' => $email,
+            'sospeso' => false,
+            'secretato' => false,
+            'codice_attivazione' => $codice_attivazione,
+            'data_registrazione' => time(),
+            'ip_registrazione' => \FabLabRomagna\Firewall::get_valid_ip()
+        ));
+
+        $utente = Utente::ricerca(array(
+            new Equals('email', $email)
+        ));
+
+        $utente = $utente->risultato[0];
+    }
+
+    /**
+     * @var Utente $utente
+     */
+
+    Autenticazione::set_user_password($utente, $password);
+
+    $link = URL_SITO . 'confermaMail.php?id=' . $utente->id_utente . '&c=' . $codice_attivazione;
+
+    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+        new \FabLabRomagna\SQLOperator\Equals('nome', 'registrazione')
+    ));
+
+    foreach ($utente->getDataGridFields() as $campo => $valore) {
+        $email->replace('utente.' . $campo, $valore);
+    }
+
+    $email->replace('link', $link);
+
+    $client = new SesClient(array(
+        'version' => '2010-12-01',
+        'region' => AWS_REGION,
+        'credentials' => [
+            'key' => AWS_MAIL_KEY,
+            'secret' => AWS_MAIL_SECRET,
+        ]
+    ));
+
+    $client->sendEmail([
+        'Destination' => [
+            'ToAddresses' => [$utente->email],
+        ],
+        'ReplyToAddresses' => [EMAIL_REPLY_TO],
+        'Source' => EMAIL_FROM,
+        'Message' => [
+            'Body' => [
+                'Html' => [
+                    'Charset' => 'UTF-8',
+                    'Data' => $email->file,
+                ]
+            ],
+            'Subject' => [
+                'Charset' => 'UTF-8',
+                'Data' => 'Completa la registrazione',
+            ]
+        ]
+    ]);
+
+    reply(200, 'Ok', array(
+        'redirect' => '/completaRegistrazione.php'
+    ), true);
+
+} catch (Exception $e) {
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.' . $e
+    ), true);
+
+    if ($utente instanceof Utente) {
+        Log::crea($utente, 3, 'ajax/registrazione.php', 'registrazione',
+            'Impossibile completare la richiesta.', (string)$e);
+    } else {
+        Log::crea(null, 3, 'ajax/registrazione.php', 'registrazione',
+            'Impossibile completare la richiesta.', (string)$e);
+    }
+
+}
