@@ -1,51 +1,122 @@
 <?php
-  require_once('inc/carica.inc.php');
+require_once(__DIR__ . '/class/autoload.inc.php');
 
-  $autenticazione = new Autenticazione($mysqli);
-  if($autenticazione -> isLogged())
-    header('Location: /dashboard.php');
+try {
+    if (!\FabLabRomagna\Firewall::controllo()) {
+        \FabLabRomagna\Firewall::firewall_redirect();
+    }
+
+    if (\FabLabRomagna\Autenticazione::get_sessione_attiva() !== null) {
+        header('Location: /dashboard.php');
+        exit();
+    }
+} catch (Exception $e) {
+    \FabLabRomagna\Log::crea(null, 3, '/login.php', 'page_request',
+        'Impossibile completare la richiesta.', (string)$e);
+    reply(500, 'Internal Server Error');
+}
 ?>
 <!DOCTYPE html>
-<html lang="it">
-  <head>
-    <?php
-      require_once('./inc/header.inc.php')
-    ?>
-    <link type="text/css" rel="stylesheet" media="screen" href="css/index.css" />
-    <script type="text/javascript" src="js/registrazione.js"></script>
-  </head>
-  <body>
-    <div id="header">
-      <a href="/login.php" class="button" id="bottoneFlottante">Accesso</a>
-      <div>
-        <p><?php echo NOME_SITO; ?><p>
-      </div>
-      <img src="images/logo.png" alt="Logo" />
-    </div>
-    <div id="registrazione">
-      <h2>Registrazione</h2>
-      <?php
-        if($dizionario -> getValue('bloccoIscrizioni') !== 'true') {
-      ?>
-      <form id="formRegistrazione">
-        <input type="text" id="nome" autocomplete="off" placeholder="Nome" />
-        <input type="text" id="cognome" autocomplete="off" placeholder="Cognome" />
-        <input type="text" id="email" autocomplete="off" placeholder="E-Mail" />
-        <input type="password" id="pwd" autocomplete="off" placeholder="Password" />
-        <input type="hidden" id="tipoAccount" value="0" />
-        <input type="submit" id="invioForm" value="Registrati" />
-        <p style="color: #aaa; margin-top: 15px;">Registrandoti accetti la Privacy Policy ed i Termini di utilizzo.</p>
-      </form>
-      <?php
-        } else {
-      ?>
-      <h3 style="margin-top: 20px;">Le registrazioni sono temporaneamente bloccate.</h3>
-      <?php
-        }
-      ?>
-    </div>
-    <?php
-      require_once('inc/footer.inc.php');
-    ?>
-  </body>
+<html>
+    <head>
+        <?php
+        require_once('./inc/header.inc.php');
+        ?>
+        <script type="text/javascript">
+            $(document).ready(function () {
+
+                var priv16 = false
+                var priv = false
+
+                $('#privacy16').change(function () {
+                    priv16 = !priv16
+                    privacy()
+                })
+
+                $('#privacy_policy').change(function () {
+                    priv = !priv
+                    privacy()
+                })
+
+                function privacy () {
+                    if (priv && priv16)
+                        $('#btnReg').removeAttr('disabled')
+
+                    else
+                        $('#btnReg').attr('disabled', 'yes')
+                }
+            })
+        </script>
+    </head>
+    <body>
+        <?php
+        include_once('./inc/nav.inc.php');
+        ?>
+        <div class="contenuto">
+            <h1 class="title is-1 has-text-centered">Registrazione</h1>
+            <div class="container is-fluid">
+                <div class="columns">
+                    <form action="/ajax/registrazione.php" class="column is-4 is-offset-4 has-text-centered">
+                        <p>Se hai già avuto rapporti con l'associazione (partecipazione ai corsi, ecc) potresti essere
+                            già stato registrato nel gestionale dal nostro personale.</p>
+                        <p style="margin: 10px 0;">Contattaci per effettuare un controllo e renderti disponibile
+                            l'accesso anche alle attività svolte in passato.</p>
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-primary" name="nome" type="text" placeholder="Nome"/>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-primary" name="cognome" type="text" placeholder="Cognome"/>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-primary" name="email" type="email" placeholder="E-Mail"/>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-primary" type="password" name="password" placeholder="Password"/>
+                            </div>
+                            <p style="margin-top: 10px" class="is-size-7 has-text-grey">La password deve contenere
+                                almeno un carattere minuscolo, uno maiuscolo, un numero e un carattere speciale. La
+                                lunghezza minima consentita è di sei caratteri.</p>
+                        </div>
+                        <div class="notification">
+                            <h3 class="is-3">Verifica di sicurezza</h3>
+                            <img class="captcha-img" src="/ajax/captcha.php" alt/>
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input is-primary" type="text" name="captcha"
+                                           placeholder="Codice di verifica"/>
+                                </div>
+                            </div>
+                        </div>
+                        <input class="styled ajax-exclude" type="checkbox" id="privacy16">
+                        <label for="privacy16">
+                            Dichiaro di avere almeno 16 anni.
+                        </label>
+                        <p style="margin: 10px 0" class="is-size-7 has-text-grey">Se non hai raggiunto l'età ti
+                            chiediamo di richiedere un modulo cartaceo da far firmare ad un genitore/tutore (ai sensi
+                            del regolamento UE n. 679/2016 «GDPR»).</p>
+                        <input class="styled ajax-exclude" type="checkbox" id="privacy_policy">
+                        <label for="privacy_policy">
+                            Dichiaro di accettare la <a href="<?php echo PRIVACY_POLICY_URL; ?>" target="_blank">Privacy
+                                Policy</a>.
+                        </label>
+                        <p style="margin-top: 10px" class="is-size-7 has-text-grey">L'accettazione della Privacy Policy
+                            è obbligatoria per poter erogare i servizi connessi.</p>
+
+                        <button class="button is-primary" disabled id="btnReg" style="margin-top: 15px">Registrati
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php
+        include_once('inc/footer.inc.php');
+        ?>
+    </body>
 </html>
