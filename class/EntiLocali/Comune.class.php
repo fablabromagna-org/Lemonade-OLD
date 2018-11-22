@@ -1,6 +1,10 @@
 <?php
 
-namespace FabLabRomagna {
+namespace FabLabRomagna\EntiLocali {
+
+    use FabLabRomagna\Ricerca;
+    use FabLabRomagna\Ricercabile;
+    use FabLabRomagna\RisultatoRicerca;
 
 
     /**
@@ -12,8 +16,14 @@ namespace FabLabRomagna {
      * @property-read string $codice_belfiore
      * @property-read bool   $is_stato_estero
      */
-    class Comune
+    class Comune implements Ricercabile
     {
+        private const PROP_COMUNE = [
+            'nome' => 's',
+            'belfiore' => 's',
+            'stato_estero' => 'i'
+        ];
+
         /**
          * @var string $nome Nome del comune o dello stato estero
          */
@@ -72,6 +82,8 @@ namespace FabLabRomagna {
          * @return Comune[]
          *
          * @throws \Exception
+         *
+         * @deprecated Utilizzare ricerca
          */
         public static function trova_comune_by($campo, $valore, $simile = false)
         {
@@ -104,6 +116,8 @@ namespace FabLabRomagna {
          * @throws \Exception
          *
          * @return \FabLabRomagna\Comune[]
+         *
+         * @deprecated Utilizzare ricerca
          */
         protected static function trova_comune_by_nome($nome)
         {
@@ -148,6 +162,8 @@ namespace FabLabRomagna {
          * @return \FabLabRomagna\Comune[]
          *
          * @throws \Exception
+         *
+         * @deprecated Utilizzare ricerca
          */
         protected static function trova_comune_by_belfiore($codice_belfiore)
         {
@@ -190,6 +206,46 @@ namespace FabLabRomagna {
         public function __toString()
         {
             return $this->nome;
+        }
+
+        /**
+         * Metodo per cercare uno o più comuni
+         *
+         * @param \FabLabRomagna\SQLOperator\SQLOperator[] $dati   Campi di ricerca
+         * @param int|null                                 $limit  Lunghezza della ricerca
+         * @param int|null                                 $offset Offset di ricerca
+         * @param array|null                               $order  Ordinamento: [campo, ascendente] (default: ['id_utente', true] )
+         *
+         * @throws \Exception
+         *
+         * @return \FabLabRomagna\RisultatoRicerca
+         */
+        public static function ricerca(
+            $dati,
+            $limit = null,
+            $offset = null,
+            $order = [['belfiore', true]]
+        ) {
+
+            global $mysqli;
+
+            $risultati = new Ricerca($mysqli,
+                $dati,
+                $limit,
+                $offset,
+                $order,
+                self::PROP_COMUNE,
+                'comuni');
+
+            $res = [];
+
+            foreach ($risultati->res as $row) {
+                $res[] = new Comune($row['nome'], $row['belfiore'], (bool)$row['stato_estero']);
+            }
+
+            $res = new RisultatoRicerca($res, $limit, $offset, $risultati->totale, $order);
+
+            return $res;
         }
     }
 }
