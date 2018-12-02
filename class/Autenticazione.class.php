@@ -361,6 +361,83 @@ namespace FabLabRomagna {
         {
             return gettype($token) === 'string' && preg_match('/^[a-f0-9.]{23}$/i', $token);
         }
+
+        /**
+         * Metodo per generare una password casuale
+         *
+         * @return string
+         */
+        public static function generatePassword()
+        {
+            return self::pwd_phase('23456789') . self::pwd_phase('abcdefghjkmnpqrstuvwxyz') . self::pwd_phase('ABCDEFGHJKLMNPQRSTUVWXYZ') . self::pwd_phase('.@!#?');
+        }
+
+        /**
+         * @return string
+         */
+        private static function pwd_phase($characters)
+        {
+            $charactersLength = strlen($characters);
+            $randomString = '';
+            for ($i = 0; $i < 5; $i++) {
+                $randomString .= $characters[rand(0, $charactersLength - 1)];
+            }
+            return $randomString;
+        }
+
+        /**
+         * Metodo per ottenere tutte le sessioni dell'utente
+         *
+         * @param Utente $utente Utente per cui cercare le sessioni
+         *
+         * @return Sessione[]
+         *
+         * @throws \Exception
+         */
+        public static function get_user_sessions($utente)
+        {
+            global $mysqli;
+
+            if (!is_a($mysqli, 'mysqli')) {
+                throw new \Exception('Expected mysqli instance as global variable');
+            }
+
+            if (!is_a($utente, 'FabLabRomagna\Utente')) {
+                throw new \Exception('Expected user instance in $utente');
+            }
+
+            $sql = "SELECT * FROM sessioni WHERE id_utente = ?";
+            $stmt = $mysqli->prepare($sql);
+
+            if ($stmt === false) {
+                throw new \Exception('Unable to prepare the statment!');
+            }
+
+            if (!$stmt->bind_param('i', $utente->id_utente)) {
+                throw new \Exception('Unable to bind param!');
+            }
+
+            if (!$stmt->execute()) {
+                throw new \Exception('Unable to execute the statement!');
+            }
+
+            $res = $stmt->get_result();
+            $stmt->close();
+
+            if ($res->num_rows !== 1) {
+                return [];
+            }
+
+            $tmp = [];
+
+            while ($row = $res->fetch_assoc()) {
+                $tmp[] = new Sessione($row['id_sessione'], $row['id_utente'], $row['token'], $row['tipo_dispositivo'],
+                    $row['user_agent'], $row['ts_creazione'], $row['ts_scadenza'], $row['ts_ultima_attivita']);
+
+            }
+
+            return $tmp;
+        }
     }
 
 
