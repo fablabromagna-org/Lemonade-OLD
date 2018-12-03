@@ -151,11 +151,36 @@ try {
         }
 
         switch ($key) {
+            case 'codice_fiscale':
+                $value = $value !== null ? mb_strtoupper($value) : null;
+
+                if ($utenteModifica->{$key} !== $value) {
+                    $dato = $utenteModifica->{$key};
+
+                    if ($value !== null) {
+                        $ricerca = Utente::ricerca(array(
+                            new Equals('codice_fiscale', $value)
+                        ));
+
+                        if (count($ricerca) !== 0) {
+                            reply(400, 'Bad Request', array(
+                                'alert' => 'Codice fiscale già in uso!',
+                                'field' => $key
+                            ), true);
+                        }
+                    }
+
+                    $utenteModifica->set_campo($key, $value);
+                    Log::crea($utente, 1, 'ajax/utente/aggiorna.php', 'aggiornamento_anagrafiche',
+                        'Aggiornata anagrafica (utente: ' . $utenteModifica->id_utente . ') ' . $key . ' da ' . $dato . ' a ' . $value);
+                }
+
+                break;
+
             case 'nome':
             case 'cognome':
             case 'sospeso':
             case 'sesso':
-            case 'codice_fiscale':
             case 'data_nascita':
             case 'luogo_nascita':
                 if ($utenteModifica->{$key} !== $value) {
@@ -163,7 +188,7 @@ try {
 
                     $utenteModifica->set_campo($key, $value);
 
-                    Log::crea($utente, 1, '/ajax/anagrafiche/aggiorna.php', 'aggiornamento_anagrafiche',
+                    Log::crea($utente, 1, 'ajax/utente/aggiorna.php', 'aggiornamento_anagrafiche',
                         'Aggiornata anagrafica (utente: ' . $utenteModifica->id_utente . ') ' . $key . ' da ' . $dato . ' a ' . $value);
                 }
                 break;
@@ -240,7 +265,7 @@ try {
                     ]);
 
 
-                    Log::crea($utente, 1, '/ajax/anagrafiche/aggiorna.php', 'aggiornamento_anagrafiche',
+                    Log::crea($utente, 1, 'ajax/utente/aggiorna.php', 'aggiornamento_anagrafiche',
                         'Aggiornata email (utente: ' . $utenteModifica->id_utente . ') da ' . $dato . ' a ' . $dati);
                 }
                 break;
@@ -285,7 +310,7 @@ try {
                         ]
                     ]);
 
-                    Log::crea($utente, 1, '/ajax/anagrafiche/aggiorna.php', 'verifica_email',
+                    Log::crea($utente, 1, 'ajax/utente/aggiorna.php', 'verifica_email',
                         'Richiesta verifica email (utente: ' . $utenteModifica->id_utente . ')');
                 }
                 break;
@@ -298,14 +323,14 @@ try {
 
 } catch (Exception $e) {
     reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.' . $e
+        'alert' => 'Impossibile completare la richiesta.'
     ), true);
 
     if ($utente instanceof Utente) {
-        Log::crea($utente, 3, 'ajax/anagrafiche/aggiorna.php', 'update',
+        Log::crea($utente, 3, 'ajax/utente/aggiorna.php', 'update',
             'Impossibile completare la richiesta.', (string)$e);
     } else {
-        Log::crea(null, 3, 'ajax/anagrafiche/aggiorna.php', 'update',
+        Log::crea(null, 3, 'ajax/utente/aggiorna.php', 'update',
             'Impossibile completare la richiesta.', (string)$e);
     }
 

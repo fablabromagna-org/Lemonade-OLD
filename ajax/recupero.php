@@ -1,106 +1,137 @@
 <?php
-  require_once('../inc/carica.inc.php');
-  require_once('../vendor/autoload.php');
+require_once(__DIR__ . '/../class/autoload.inc.php');
+require_once(__DIR__ . '/../vendor/autoload.php');
 
-  // Configuro AWS SES
-  use Aws\Ses\SesClient;
-  $client = SesClient::factory(array(
-      'key' => $dizionario -> getValue('AWS_KEY'),
-      'secret' => $dizionario -> getValue('AWS_SECRET'),
-      'region'  => $dizionario -> getValue('AWS_REGION')
-  ));
+use FabLabRomagna\Utente;
+use FabLabRomagna\Autenticazione;
+use FabLabRomagna\SQLOperator\Equals;
+use FabLabRomagna\SQLOperator\NotEquals;
+use FabLabRomagna\Log;
+use FabLabRomagna\Firewall;
+use Aws\Ses\SesClient;
 
-  header('Content-Type: application/json');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    reply(405, 'Method Not Allowed');
+}
 
-  $email = $mysqli -> real_escape_string(isset($_POST['email']) ? trim($_POST['email']) : '');
+json();
 
-  function stampaErrore($errore = 'Errore sconosciuto!') {
-    echo '{"errore":true,"msg":"'.$errore.'"}';
-    exit();
-  }
+try {
+    $ip = Firewall::get_valid_ip();
 
-  function randomString($length = 10) {
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.@!#[]{}+-_,;.*?';
-    $charactersLength = strlen($characters);
-    $randomString = '';
-    for ($i = 0; $i < $length; $i++) {
-        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    if (!Firewall::controllo()) {
+        reply(429, 'Too Many Requests');
     }
-    return $randomString;
-  }
 
-  // Controllo i dati
-  if($email == '')
-    stampaErrore('Devi inserire il tuo indirizzo email!');
+    $sessione = Autenticazione::get_sessione_attiva();
 
-  else if(!filter_var($email, FILTER_VALIDATE_EMAIL))
-    stampaErrore('Devi inserire un indirizzo un indirizzo email valido!');
+    if ($sessione !== null) {
+        reply(401, 'Unauthorized', null, true);
+    }
 
-  // I dati sono validi
-  else {
+    $dati = json_decode(file_get_contents('php://input'), true);
 
-    // Li confronto col database
-    $sql = "SELECT * FROM utenti WHERE email = '$email'";
+    if ($dati === null) {
+        reply(400, 'Bad Request', null, true);
+    }
 
-    if($query = $mysqli -> query($sql)) {
+    if (!is_array($dati)) {
+        reply(400, 'Bad Request', null, true);
+    }
 
-      // L'account esiste
-      if($query -> num_rows == 1) {
+    $campi_modificabili = [
+        'email',
+        'captcha'
+    ];
 
-        $dati = $query -> fetch_assoc();
+    // Controllo che tutti i campi inviati siano tra quelli modificabili
+    foreach ($dati as $key => $value) {
+        if (!in_array($key, $campi_modificabili)) {
+            reply(400, 'Bad Request', null, true);
+        }
+    }
 
-        $password = randomString();
-        $hashPassword = md5($password);
-        $nome = $dati['nome'];
-        $cognome = $dati['cognome'];
+    if (count($dati) !== 2) {
+        reply(400, 'Bad Request', null, true);
+    }
 
-        $sql = "UPDATE utenti SET password = '$hashPassword' WHERE id = '".$dati['id']."'";
+    if (!Utente::valida_campo('email', $dati['email'])) {
+        reply(400, 'Bad Request', array(
+            'field' => 'email'
+        ), true);
+    }
 
-        if($query = $mysqli -> query($sql)) {
+    $utenteModifica = Utente::ricerca([
+        new Equals('email', $dati['email'])
+    ]);
 
-          // Invio la mail
-          try {
-            $replyTo = ($dizionario -> getValue('EMAIL_REPLY_TO') == false || $dizionario -> getValue('EMAIL_REPLY_TO') == null) ? $dizionario -> getValue('EMAIL_SOURCE') : $dizionario -> getValue('EMAIL_REPLY_TO');
-            $html = $templateManager -> getTemplate('recuperoPassword', array(
-              'nome' => $nome,
-              'cognome' => $cognome,
-              'password' => $password,
-              'nomeSito' => $dizionario -> getValue('nomeSito')
-            ));
+    if (count($utenteModifica) !== 1) {
+        reply(204, 'No Content');
+    }
 
-            $client -> sendEmail(array(
-              'Source' => $dizionario -> getValue('EMAIL_SOURCE'),
-              'ReplyToAddresses' => array($replyTo),
-              'Destination' => array(
-                'ToAddresses' => array($email)
-              ),
-              'Message' => array(
-                'Subject' => array(
-                  'Data' => 'Nuova password',
-                  'Charset' => 'UTF-8'
-                ),
-                'Body' => array(
-                  'Html' => array(
-                    'Data' => $html,
-                    'Charset' => 'UTF-8'
-                  )
-                )
-              )
-            ));
+    $utenteModifica = $utenteModifica->risultato[0];
 
-            echo '{}';
+    /**
+     * @var Utente $utenteModifica
+     */
 
-          } catch(Exception $e) {
-            stampaErrore('Impossibile inviare l\'email!');
-          }
+    $password = Autenticazione::generatePassword();
 
-        } else
-          stampaErrore('Impossibile aggiornare la password!');
+    $client = new SesClient(array(
+        'version' => '2010-12-01',
+        'region' => AWS_REGION,
+        'credentials' => [
+            'key' => AWS_MAIL_KEY,
+            'secret' => AWS_MAIL_SECRET,
+        ]
+    ));
 
-      } else
-        stampaErrore('Account inesistente!');
+    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+        new \FabLabRomagna\SQLOperator\Equals('nome', 'recupero_password')
+    ));
 
-    } else
-      stampaErrore('Impossibile controllare l\'esistenza dell\'account!');
-  }
+    foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
+        $email->replace('utente.' . $campo, $valore);
+    }
+
+    $email->replace('password', $password);
+
+    $client->sendEmail([
+        'Destination' => [
+            'ToAddresses' => [$utenteModifica->email],
+        ],
+        'ReplyToAddresses' => [EMAIL_REPLY_TO],
+        'Source' => EMAIL_FROM,
+        'Message' => [
+            'Body' => [
+                'Html' => [
+                    'Charset' => 'UTF-8',
+                    'Data' => $email->file,
+                ]
+            ],
+            'Subject' => [
+                'Charset' => 'UTF-8',
+                'Data' => 'Nuova password',
+            ]
+        ]
+    ]);
+
+    Autenticazione::set_user_password($utenteModifica, $password);
+
+    reply(204, 'No Content');
+
+} catch (Exception $e) {
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.'
+    ), true);
+
+    if ($utente instanceof Utente) {
+        Log::crea($utente, 3, 'ajax/recupero.php', 'update_password',
+            'Impossibile completare la richiesta.', (string)$e);
+    } else {
+        Log::crea(null, 3, 'ajax/recupero.php', 'update_password',
+            'Impossibile completare la richiesta.', (string)$e);
+    }
+
+}
 ?>
