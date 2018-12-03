@@ -4,8 +4,8 @@ require_once(__DIR__ . '/../vendor/autoload.php');
 
 use FabLabRomagna\Utente;
 use FabLabRomagna\Autenticazione;
+use FabLabRomagna\Gruppo;
 use FabLabRomagna\SQLOperator\Equals;
-use FabLabRomagna\SQLOperator\NotEquals;
 use FabLabRomagna\Log;
 use Aws\Ses\SesClient;
 
@@ -186,6 +186,27 @@ try {
             ]
         ]
     ]);
+
+    // Rimuovo l'utente da tutti i gruppi
+    $gruppi = Gruppo::get_gruppi_utente($utente);
+
+    foreach ($gruppi as $gruppo) {
+
+        /**
+         * @var Gruppo $gruppo
+         */
+
+        $gruppo->rimuovi_utente($utente);
+    }
+
+    // Aggiungo l'utente ai gruppi di default
+    $gruppi = Gruppo::ricerca(array(
+        new Equals('default', true)
+    ));
+
+    foreach ($gruppi->risultato as $gruppo) {
+        $gruppo->inserisci_utente($utente);
+    }
 
     reply(200, 'Ok', array(
         'redirect' => '/completaRegistrazione.php'

@@ -17,7 +17,7 @@ namespace FabLabRomagna {
         /**
          * Indirizzo della pagina per la quale va effettuata la redirect
          */
-        protected const REDIRECT = '/firewall.html';
+        protected const REDIRECT = '/firewall.php';
 
         /**
          * Metodo per aggiungere una regola al firewall

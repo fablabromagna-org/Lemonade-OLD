@@ -1,4 +1,6 @@
 <?php
+set_time_limit(0);
+
 require_once(__DIR__ . '/../class/autoload.inc.php');
 require_once(__DIR__ . '/../vendor/autoload.php');
 

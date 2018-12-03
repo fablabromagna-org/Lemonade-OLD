@@ -187,7 +187,7 @@ namespace FabLabRomagna {
 
                 $tmp = array_merge(array($tipi), $dati_sql);
 
-                if (!$obj->invokeArgs($stmt, Utente::refValues($tmp))) {
+                if (!$obj->invokeArgs($stmt, Ricerca::refValues($tmp))) {
                     throw new \Exception('Impossibile inserire i valori nella query!');
                 }
             }

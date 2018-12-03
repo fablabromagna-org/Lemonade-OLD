@@ -9,7 +9,7 @@ use FabLabRomagna\SQLOperator\Like;
 use FabLabRomagna\SQLOperator\SQLOr;
 use FabLabRomagna\Log;
 use FabLabRomagna\Firewall;
-use FabLabRomagna\EntiLocali\Comune;
+use FabLabRomagna\Scuola;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     reply(405, 'Method Not Allowed');
@@ -47,7 +47,6 @@ try {
         reply(401, 'Unauthorized', null, true);
     }
 
-
     $dati = json_decode(file_get_contents('php://input'), true);
 
     if ($dati === null) {
@@ -69,18 +68,23 @@ try {
         }
     }
 
-    $ricerca = Comune::ricerca([
-        new Like('belfiore', $dati['ricerca'] . '%'),
+    $ricerca = Scuola::ricerca([
+        new Like('codice', '%' . $dati['ricerca'] . '%'),
         new SQLOr(),
-        new Like('nome', $dati['ricerca'] . '%')
+        new Like('denominazione', '%' . $dati['ricerca'] . '%')
     ]);
 
     $res = [];
 
-    foreach ($ricerca->risultato as $comune) {
+    foreach ($ricerca->risultato as $scuola) {
+
+        /**
+         * @var Scuola $scuola
+         */
+
         $res[] = [
-            'text' => $comune->nome,
-            'value' => $comune->codice_belfiore
+            'text' => $scuola . ' - ' . $scuola->comune->nome,
+            'value' => $scuola->codice
         ];
     }
 

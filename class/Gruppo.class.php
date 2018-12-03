@@ -13,8 +13,19 @@ namespace FabLabRomagna {
      * @property-read $eliminato
      * @property-read $default
      */
-    class Gruppo
+    class Gruppo implements Ricercabile
     {
+        /**
+         * Elenco delle proprietà dell'utente
+         */
+        protected const PROP_GRUPPO = [
+            'id_gruppo' => 'i',
+            'nome' => 's',
+            'descrizione' => 's',
+            'eliminato' => 'i',
+            'default' => 'i'
+        ];
+
         /**
          * @var int $id_gruppo ID del gruppo
          */
@@ -392,6 +403,8 @@ namespace FabLabRomagna {
          * @return Gruppo|null
          *
          * @throws \Exception
+         *
+         * @deprecated
          */
         public static function get_gruppo_by_id($id)
         {
@@ -518,6 +531,8 @@ namespace FabLabRomagna {
          * @return Gruppo[]
          *
          * @throws \Exception
+         *
+         * @deprecated
          */
         public static function get_groups($eliminati = false)
         {
@@ -560,6 +575,47 @@ namespace FabLabRomagna {
             }
 
             return $tmp;
+        }
+
+        /**
+         * Metodo per cercare uno o più gruppi
+         *
+         * @param \FabLabRomagna\SQLOperator\SQLOperator[] $dati   Campi di ricerca
+         * @param int|null                                 $limit  Lunghezza della ricerca
+         * @param int|null                                 $offset Offset di ricerca
+         * @param array|null                               $order  Ordinamento: [campo, ascendente] (default: ['id_gruppo', true] )
+         *
+         * @throws \Exception
+         *
+         * @return \FabLabRomagna\RisultatoRicerca
+         */
+        public static function ricerca(
+            $dati,
+            $limit = null,
+            $offset = null,
+            $order = [['id_gruppo', true]]
+        ) {
+
+            global $mysqli;
+
+            $risultati = new Ricerca($mysqli,
+                $dati,
+                $limit,
+                $offset,
+                $order,
+                self::PROP_GRUPPO,
+                'gruppi');
+
+            $res = [];
+
+            foreach ($risultati->res as $row) {
+                $res[] = new Gruppo($row['id_gruppo'], $row['nome'], $row['descrizione'], (bool)$row['eliminato'],
+                    (bool)$row['default']);
+            }
+
+            $res = new RisultatoRicerca($res, $limit, $offset, $risultati->totale, $order);
+
+            return $res;
         }
     }
 }

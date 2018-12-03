@@ -307,11 +307,20 @@ Log::crea($utente, 0, '/gestione/utenti/ricerca.php', 'view',
                     'Impossibile completare la richiesta.', (string)$e);
             }
 
+
             if ($ricerca !== false):
                 try {
                     $dataset = new HTMLDataGrid($ricerca);
                     $dataset->remove_field('secretato');
                     $dataset->remove_field('id_foto');
+
+                    if (!$permessi['gestione.utenti.visualizzare_anagrafiche']['reale']) {
+                        $dataset->remove_field('data_nascita');
+                        $dataset->remove_field('codice_fiscale');
+                        $dataset->remove_field('luogo_nascita');
+                        $dataset->remove_field('sesso');
+                    }
+
                     echo $dataset->render([
                         'pagina_attuale' => $pagina,
                         'qs_pagina' => 'p',

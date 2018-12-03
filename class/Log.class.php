@@ -210,14 +210,16 @@ namespace FabLabRomagna {
         }
 
         /**
-         * @param SQLOperator[] $dati
-         * @param null          $limit
-         * @param null          $offset
-         * @param array         $order
+         * Metodo per cercare uno o più log
          *
-         * @return RisultatoRicerca
+         * @param \FabLabRomagna\SQLOperator\SQLOperator[] $dati   Campi di ricerca
+         * @param int|null                                 $limit  Lunghezza della ricerca
+         * @param int|null                                 $offset Offset di ricerca
+         * @param array|null                               $order  Ordinamento: [campo, ascendente] (default: ['id_utente', true] )
          *
          * @throws \Exception
+         *
+         * @return \FabLabRomagna\RisultatoRicerca
          */
         public static function ricerca(
             $dati,
@@ -228,122 +230,17 @@ namespace FabLabRomagna {
 
             global $mysqli;
 
-            if (!is_a($mysqli, 'mysqli')) {
-                throw new \Exception('MySQLi as global variable expected!');
-            }
-
-            if (gettype($dati) !== 'array') {
-                throw new \Exception('$dati deve essere un array!');
-            }
-
-            if ($offset !== null && gettype($offset) !== 'integer') {
-                throw new \Exception('Invalid offset!');
-            }
-
-            if ($limit !== null && gettype($limit) !== 'integer') {
-                throw new \Exception('Invalid limit');
-            }
-
-            if ($limit === null && $offset !== null) {
-                throw new \Exception('Offset requires limit!');
-            }
-
-            if ((gettype($order) !== 'array') && $order !== null) {
-                throw new \Exception('Invalid order!');
-            }
-
-            $tipi = '';
-            $dati_sql = [];
-            $where_query = [];
-
-            foreach ($dati as $campo_ricerca) {
-                if (is_subclass_of($campo_ricerca, 'FabLabRomagna\SQLOperator\SQLOperator')) {
-                    if (isset(self::PROP_LOG[$campo_ricerca->colonna])) {
-                        $tipi .= $campo_ricerca->get_type();
-                        $where_query[] = $campo_ricerca->get_sql();
-                        $dati_sql[] = $campo_ricerca->valore;
-                    }
-                }
-            }
-
-            $where_query = implode(' AND ', $where_query);
-            $calc = '';
-
-            if ($limit !== null) {
-                $calc = ' SQL_CALC_FOUND_ROWS';
-            }
-
-            $query = "SELECT" . $calc . " * FROM log";
-
-            if ($where_query !== '') {
-                $query .= ' WHERE ' . $where_query;
-            }
-
-            if ($order !== null) {
-
-                $is_first = true;
-                foreach ($order as $value) {
-                    if (isset(self::PROP_LOG[$value[0]])) {
-                        $t = $value[1] ? 'ASC' : 'DESC';
-
-                        if ($is_first) {
-                            $is_first = false;
-                            $query .= ' ORDER BY';
-                        } else {
-                            $query .= ',';
-                        }
-
-                        $query .= ' ' . $value[0] . ' ' . $t;
-                    }
-                }
-            }
-
-            if ($limit !== null) {
-                $query .= ' LIMIT ' . $limit;
-            }
-
-            if ($offset !== null) {
-                $query .= ' OFFSET ' . $offset;
-            }
-
-            $stmt = $mysqli->prepare($query);
-
-            if ($stmt === false) {
-                throw new \Exception('Unable to prepare the query!' . $query);
-            }
-
-            if ($tipi !== '') {
-                $ref = new \ReflectionClass('mysqli_stmt');
-                $obj = $ref->getMethod('bind_param');
-
-                $tmp = array_merge(array($tipi), $dati_sql);
-
-                if (!$obj->invokeArgs($stmt, Utente::refValues($tmp))) {
-                    throw new \Exception('Impossibile inserire i valori nella query!');
-                }
-            }
-
-            if (!$stmt->execute()) {
-                throw new \Exception('Impossibile eseguire la query!');
-            }
-
-            $risultati = $stmt->get_result();
-
-            if ($limit !== null) {
-                $stmt->close();
-                $sql = "SELECT FOUND_ROWS() AS 'totale'";
-                $stmt = $mysqli->query($sql);
-
-                $row = $stmt->fetch_assoc();
-
-                $totale = (int)$row['totale'];
-            } else {
-                $totale = $risultati->num_rows;
-            }
+            $risultati = new Ricerca($mysqli,
+                $dati,
+                $limit,
+                $offset,
+                $order,
+                self::PROP_LOG,
+                'log');
 
             $res = [];
 
-            while ($row = $risultati->fetch_assoc()) {
+            foreach ($risultati->res as $row) {
                 $res[] = new Log(
                     $row['id_log'],
                     $row['livello'],
@@ -357,9 +254,7 @@ namespace FabLabRomagna {
                 );
             }
 
-            $res = new RisultatoRicerca($res, $limit, $offset, $totale, $order);
-
-            $stmt->close();
+            $res = new RisultatoRicerca($res, $limit, $offset, $risultati->totale, $order);
 
             return $res;
         }
@@ -382,7 +277,7 @@ namespace FabLabRomagna {
         {
             switch ($field) {
                 case 'id_log':
-                    return '<a href="/gestione/log.php?id=' . $this->id_log . '">' . $this->id_log . '</a>';
+                    return '<a href="/gestione/log/log.php?id=' . $this->id_log . '">' . $this->id_log . '</a>';
 
                 case 'id_utente':
 
@@ -403,7 +298,7 @@ namespace FabLabRomagna {
                     return '<a href="/gestione/utenti/utente.php?id=' . $utente->id_utente . '">' . $utente->nome . ' ' . $utente->cognome . '</a>';
 
                 case 'ts':
-                    return $this->{$field} === null ? '' : date('d/m/Y H:m:i',
+                    return $this->{$field} === null ? '' : date('d/m/Y H:i:s',
                         $this->{$field});
 
                 case 'livello':

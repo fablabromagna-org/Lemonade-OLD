@@ -86,9 +86,10 @@ namespace FabLabRomagna {
                             $tipi .= $campo_ricerca->get_type();
                             $where_query[] = $campo_ricerca->get_sql();
                             $dati_sql[] = $campo_ricerca->valore;
+
+                            $last = false;
                         }
 
-                        $last = false;
                     } else {
                         $where_query[] = $campo_ricerca->get_sql();
                         $last = true;

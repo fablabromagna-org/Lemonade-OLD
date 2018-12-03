@@ -25,7 +25,6 @@ $(document).ready(function () {
     }
 
     var qs = new Url()
-    console.log(qs)
 
     function ricaricaTabella () {
         var url = new Url()
