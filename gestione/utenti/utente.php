@@ -414,19 +414,19 @@ try {
                                                            value="<?php echo $ricerca->email; ?>"/>
                                                 </div>
                                             </div>
+                                            <p style="margin: 10px 0 0 0" class="is-size-7 has-text-grey">Se modifichi
+                                                l'indirizzo
+                                                email, <b>l'utente riceverà un
+                                                    messaggio di avviso al vecchio indirizzo e dovrà confermare il
+                                                    nuovo</b> cliccando sul
+                                                link inviato alla nuova casella.</p>
                                         </div>
                                     </div>
                                     <input type="hidden" name="id_utente" data-type="integer"
                                            value="<?php echo $ricerca->id_utente; ?>"/>
                                     <button class="button is-primary">Salva</button>
+
                                 </form>
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
-                                    <p style="margin-bottom: 7px;">Se modifichi l'indirizzo email, l'utente riceverà un
-                                        messaggio di
-                                        avviso al vecchio indirizzo e dovrà confermare il nuovo cliccando sul link
-                                        inviato alla
-                                        nuova casella.</p>
-                                </div>
                                 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
                                     <ul>
                                         <li>ID utente: <b><?php echo $ricerca->id_utente; ?> </b></li>
@@ -582,15 +582,12 @@ try {
 
                                                 $ruolo = $relazione->ruolo === 1 ? 'Insegnante' : 'Personale';
                                                 ?>
-
-
                                                 <p><?php echo $ruolo ?> presso <b><?php echo $relazione->scuola; ?></b>.
                                                     <a
                                                             onclick="elimina_scuola(<?php echo $ricerca->id_utente ?>, <?php echo $relazione->id_relazione ?>)">Elimina</a>
                                                     -
                                                     <a href="/gestione/scuole/scuola.php?cod_mec=<?php echo $relazione->scuola->codice ?>">Visualizza
                                                         scuola</a></p>
-
                                             <?php
                                             endif;
                                         }
@@ -617,13 +614,12 @@ try {
                                                value="<?php echo $ricerca->id_utente; ?>"/>
                                         <button id="cambiaPwd" class="button is-warning">Invia password</button>
                                     </form>
-                                    <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">Puoi
-                                        inviare
-                                        una nuova
-                                        password all'utente cliccando il bottone sopra. L'invio di una nuova password
-                                        comporta la
-                                        revoca
-                                        della precedente.</p>
+                                    <div class="columns column is-half">
+                                        <p style="margin: 10px 0 0 0" class="is-size-7 has-text-grey">Puoi
+                                            inviare una nuova password all'utente cliccando il bottone sopra.
+                                            <b>L'invio di una nuova password comporta la revoca della precedente e
+                                                l'impossibilità di riutilizzarla nei successivi 12 mesi.</b></p>
+                                    </div>
                                 </div>
                             </div>
                         <?php

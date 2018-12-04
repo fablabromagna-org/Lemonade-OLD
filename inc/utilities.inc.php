@@ -49,5 +49,4 @@ function genera_testo_captcha($length = 6)
 
     return $randomString;
 }
-
 ?>

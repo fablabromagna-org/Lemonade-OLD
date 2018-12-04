@@ -3,6 +3,7 @@
 <link type="text/css" rel="stylesheet" media="screen" href="/css/spinner.css"/>
 <link type="text/css" rel="stylesheet" href="/bulma/css/bulma.min.css"/>
 <link type="text/css" rel="stylesheet" href="/bulma-extensions/bulma-switch/dist/css/bulma-switch.min.css"/>
+<link type="text/css" rel="stylesheet" href="/bulma-extensions/bulma-calendar/dist/css/bulma-calendar.min.css"/>
 
 <link type="text/css" rel="stylesheet" href="/font-awesome/css/fontawesome.min.css"/>
 <link type="text/css" rel="stylesheet" href="/font-awesome/css/all.min.css"/>
@@ -33,6 +34,10 @@
 
 <script type="text/javascript" src="/js/jquery.min.js"></script>
 <script type="text/javascript" src="/query-string/index.js"></script>
+<script type="text/javascript" src="/bulma-extensions/bulma-calendar/dist/js/bulma-calendar.min.js"></script>
 
 <script type="text/javascript" src="/js/generale.js"></script>
 <script type="text/javascript" src="/js/HTMLDataGrid.js"></script>
+<script type="text/javascript" src="/js/form.js"></script>
+<script type="text/javascript" src="/js/modal.js"></script>
+<script type="text/javascript" src="/js/autocomplete.js"></script>
