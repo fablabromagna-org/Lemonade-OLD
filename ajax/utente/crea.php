@@ -178,6 +178,9 @@ try {
         $gruppo->inserisci_utente($utente_registrazione);
     }
 
+    Log::crea($utente, 1, 'ajax/utente/crea.php', 'crea',
+        'Creato utente ID: ' . $utente_registrazione->id_utente);
+
     reply(200, 'Ok', array(
         'redirect' => '/gestione/utenti/utente.php?id=' . $utente_registrazione->id_utente
     ), true);
