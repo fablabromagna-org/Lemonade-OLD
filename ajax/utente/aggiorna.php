@@ -99,6 +99,9 @@ try {
         } elseif ($key === 'luogo_nascita' && $value === '') {
             $dati[$key] = null;
             $value = null;
+        } elseif ($key === 'email' && $value === '') {
+            $dati[$key] = null;
+            $value = null;
         } elseif ($key === 'data_nascita') {
 
             if ($value === '') {
@@ -201,69 +204,73 @@ try {
                     // Aggiorno l'indirizzo
                     $utenteModifica->set_campo($key, $value);
 
-                    $codice = uniqid();
-                    $utenteModifica->set_campo('codice_attivazione', $codice);
+                    if ($value !== null) {
 
-                    $link = URL_SITO . 'confermaMail.php?id=' . $utenteModifica->id_utente . '&c=' . $codice;
+                        $codice = uniqid();
+                        $utenteModifica->set_campo('codice_attivazione', $codice);
 
-                    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-                        new \FabLabRomagna\SQLOperator\Equals('nome', 'nuova_email')
-                    ));
+                        $link = URL_SITO . 'confermaMail.php?id=' . $utenteModifica->id_utente . '&c=' . $codice;
 
-                    foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
-                        $email->replace('utente.' . $campo, $valore);
+                        $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+                            new \FabLabRomagna\SQLOperator\Equals('nome', 'nuova_email')
+                        ));
+
+                        foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
+                            $email->replace('utente.' . $campo, $valore);
+                        }
+
+                        $email->replace('link', $link);
+
+                        $client->sendEmail([
+                            'Destination' => [
+                                'ToAddresses' => [$utenteModifica->email],
+                            ],
+                            'ReplyToAddresses' => [EMAIL_REPLY_TO],
+                            'Source' => EMAIL_FROM,
+                            'Message' => [
+                                'Body' => [
+                                    'Html' => [
+                                        'Charset' => 'UTF-8',
+                                        'Data' => $email->file,
+                                    ]
+                                ],
+                                'Subject' => [
+                                    'Charset' => 'UTF-8',
+                                    'Data' => 'Verifica dell\'indirizzo email',
+                                ]
+                            ]
+                        ]);
                     }
 
-                    $email->replace('link', $link);
+                    if ($vecchio_indirizzo !== null) {
+                        $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+                            new \FabLabRomagna\SQLOperator\Equals('nome', 'vecchia_email')
+                        ));
 
-                    $client->sendEmail([
-                        'Destination' => [
-                            'ToAddresses' => [$utenteModifica->email],
-                        ],
-                        'ReplyToAddresses' => [EMAIL_REPLY_TO],
-                        'Source' => EMAIL_FROM,
-                        'Message' => [
-                            'Body' => [
-                                'Html' => [
-                                    'Charset' => 'UTF-8',
-                                    'Data' => $email->file,
-                                ]
+                        foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
+                            $email->replace('utente.' . $campo, $valore);
+                        }
+
+                        $client->sendEmail([
+                            'Destination' => [
+                                'ToAddresses' => [$vecchio_indirizzo],
                             ],
-                            'Subject' => [
-                                'Charset' => 'UTF-8',
-                                'Data' => 'Verifica dell\'indirizzo email',
+                            'ReplyToAddresses' => [EMAIL_REPLY_TO],
+                            'Source' => EMAIL_FROM,
+                            'Message' => [
+                                'Body' => [
+                                    'Html' => [
+                                        'Charset' => 'UTF-8',
+                                        'Data' => $email->file,
+                                    ]
+                                ],
+                                'Subject' => [
+                                    'Charset' => 'UTF-8',
+                                    'Data' => 'Indirizzo email modificato',
+                                ]
                             ]
-                        ]
-                    ]);
-
-                    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-                        new \FabLabRomagna\SQLOperator\Equals('nome', 'vecchia_email')
-                    ));
-
-                    foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
-                        $email->replace('utente.' . $campo, $valore);
+                        ]);
                     }
-
-                    $client->sendEmail([
-                        'Destination' => [
-                            'ToAddresses' => [$vecchio_indirizzo],
-                        ],
-                        'ReplyToAddresses' => [EMAIL_REPLY_TO],
-                        'Source' => EMAIL_FROM,
-                        'Message' => [
-                            'Body' => [
-                                'Html' => [
-                                    'Charset' => 'UTF-8',
-                                    'Data' => $email->file,
-                                ]
-                            ],
-                            'Subject' => [
-                                'Charset' => 'UTF-8',
-                                'Data' => 'Indirizzo email modificato',
-                            ]
-                        ]
-                    ]);
-
 
                     Log::crea($utente, 1, 'ajax/utente/aggiorna.php', 'aggiornamento_anagrafiche',
                         'Aggiornata email (utente: ' . $utenteModifica->id_utente . ') da ' . $dato . ' a ' . $dati);
@@ -271,6 +278,11 @@ try {
                 break;
 
             case 'codice_attivazione':
+
+                if ($utenteModifica->email === null) {
+                    continue;
+                }
+
                 if ($value === true && $utenteModifica->codice_attivazione !== null) {
                     $utenteModifica->set_campo('codice_attivazione', null);
 
@@ -322,9 +334,6 @@ try {
     ));
 
 } catch (Exception $e) {
-    reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.'
-    ), true);
 
     if ($utente instanceof Utente) {
         Log::crea($utente, 3, 'ajax/utente/aggiorna.php', 'update',
@@ -334,5 +343,8 @@ try {
             'Impossibile completare la richiesta.', (string)$e);
     }
 
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.'
+    ), true);
 }
 ?>

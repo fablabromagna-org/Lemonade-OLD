@@ -138,9 +138,6 @@ try {
     ));
 
 } catch (Exception $e) {
-    reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.'
-    ), true);
 
     if ($utente instanceof Utente) {
         Log::crea($utente, 3, 'ajax/utente/reset_password.php', 'update_password',
@@ -150,5 +147,8 @@ try {
             'Impossibile completare la richiesta.', (string)$e);
     }
 
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.'
+    ), true);
 }
 ?>

@@ -91,9 +91,6 @@ try {
     reply(200, 'Ok', $res, true);
 
 } catch (Exception $e) {
-    reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.'
-    ), true);
 
     if ($utente instanceof Utente) {
         Log::crea($utente, 3, 'ajax/utente/.php', 'update',
@@ -103,5 +100,8 @@ try {
             'Impossibile completare la richiesta.', (string)$e);
     }
 
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.'
+    ), true);
 }
 ?>

@@ -1,6 +1,8 @@
 <?php
 require_once(__DIR__ . '/../../class/autoload.inc.php');
+require_once(__DIR__ . '/../../vendor/autoload.php');
 
+use Aws\Ses\SesClient;
 use FabLabRomagna\Utente;
 use FabLabRomagna\Autenticazione;
 use FabLabRomagna\SQLOperator\Equals;
@@ -64,7 +66,7 @@ try {
         'nome',
         'cognome',
         'email',
-        ''
+        'invio_mail'
     ];
 
     // Controllo che tutti i campi inviati siano tra quelli modificabili
@@ -74,71 +76,124 @@ try {
         }
     }
 
-    if (!Utente::valida_campo('id_utente', $dati['id_utente'])) {
-        reply(400, 'Bad Request', array(), true);
-    }
+    foreach ($dati as $key => $value) {
 
-    foreach ($dati['gruppi'] as $key => $value) {
-        $res = FabLabRomagna\Gruppo::ricerca(array(
-            new FabLabRomagna\SQLOperator\Equals('id_gruppo', $value),
-            new FabLabRomagna\SQLOperator\Equals('eliminato', false)
-        ));
+        if ($key === 'email' && $value === '') {
+            $value = null;
+            $dati[$key] = null;
+        }
 
-        if (count($res) !== 1) {
-            reply(400, 'Bad Request', array(), true);
+        if ($key === 'invio_mail') {
+            if (!is_bool($value)) {
+                reply(400, 'Bad Request', null, true);
+            }
+
+        } elseif (!Utente::valida_campo($key, $value)) {
+            reply(400, 'Bad Request', array(
+                'field' => $key
+            ), true);
         }
     }
 
-    $utenteModifica = Utente::ricerca([
-        new Equals('id_utente', $dati['id_utente'])
-    ]);
+    if ($dati['email'] !== null) {
+        $utente_registrazione = Utente::ricerca(array(
+            new Equals('email', $dati['email'])
+        ));
 
-    if (count($utenteModifica) !== 1) {
-        reply(400, 'Bad Request', null, true);
+        if (count($utente_registrazione) !== 0) {
+            reply(409, 'Conflict', array(
+                'field' => 'email',
+                'alert' => 'Indirizzo email già in uso. Eventualmente, controlla l\'esistenza di un precedente profilo.'
+            ), true);
+        }
     }
 
-    $utenteModifica = $utenteModifica->risultato[0];
+    $codice_attivazione = !$dati['invio_mail'] || $dati['email'] === null ? null : uniqid();
 
-    /**
-     * @var Utente $utenteModifica
-     */
+    $utente_registrazione = Utente::crea_utente(array(
+        'nome' => $dati['nome'],
+        'cognome' => $dati['cognome'],
+        'email' => $dati['email'],
+        'sospeso' => false,
+        'secretato' => false,
+        'codice_attivazione' => $codice_attivazione,
+        'data_registrazione' => time(),
+        'ip_registrazione' => \FabLabRomagna\Firewall::get_valid_ip()
+    ));
 
-    $tutti = Gruppo::ricerca(array());
+    if ($codice_attivazione !== null) {
+        $link = URL_SITO . 'confermaMail.php?id=' . $utente_registrazione->id_utente . '&c=' . $codice_attivazione;
 
-    foreach ($tutti->risultato as $gruppo) {
+        $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+            new \FabLabRomagna\SQLOperator\Equals('nome', 'registrazione')
+        ));
+
+        foreach ($utente_registrazione->getDataGridFields() as $campo => $valore) {
+            $email->replace('utente.' . $campo, $valore);
+        }
+
+        $email->replace('link', $link);
+
+        $client = new SesClient(array(
+            'version' => '2010-12-01',
+            'region' => AWS_REGION,
+            'credentials' => [
+                'key' => AWS_MAIL_KEY,
+                'secret' => AWS_MAIL_SECRET,
+            ]
+        ));
+
+        $client->sendEmail([
+            'Destination' => [
+                'ToAddresses' => [$utente_registrazione->email],
+            ],
+            'ReplyToAddresses' => [EMAIL_REPLY_TO],
+            'Source' => EMAIL_FROM,
+            'Message' => [
+                'Body' => [
+                    'Html' => [
+                        'Charset' => 'UTF-8',
+                        'Data' => $email->file,
+                    ]
+                ],
+                'Subject' => [
+                    'Charset' => 'UTF-8',
+                    'Data' => 'Completa la registrazione',
+                ]
+            ]
+        ]);
+    }
+
+    // Aggiungo l'utente ai gruppi di default
+    $gruppi = Gruppo::ricerca(array(
+        new Equals('default', true)
+    ));
+
+    foreach ($gruppi->risultato as $gruppo) {
 
         /**
          * @var Gruppo $gruppo
          */
 
-        if (in_array($gruppo->id_gruppo, $dati['gruppi']) && !$gruppo->fa_parte($utenteModifica)) {
-            $gruppo->inserisci_utente($utenteModifica);
-            Log::crea($utente, 1, 'ajax/anagrafiche/aggiorna.php', 'update',
-                'Utente ' . $utenteModifica->nome . ' . ' . $utenteModifica->cognome . ' (ID: ' . $utenteModifica->id_utente . ') aggiunto al gruppo ' . $gruppo->nome . ' (ID: ' . $gruppo->id_gruppo . ').');
-
-        } elseif (!in_array($gruppo->id_gruppo, $dati['gruppi']) && $gruppo->fa_parte($utenteModifica)) {
-            $gruppo->rimuovi_utente($utenteModifica);
-            Log::crea($utente, 1, 'ajax/anagrafiche/aggiorna.php', 'update',
-                'Utente ' . $utenteModifica->nome . ' . ' . $utenteModifica->cognome . ' (ID: ' . $utenteModifica->id_utente . ') rimosso dal gruppo ' . $gruppo->nome . ' (ID: ' . $gruppo->id_gruppo . ').');
-        }
+        $gruppo->inserisci_utente($utente_registrazione);
     }
 
     reply(200, 'Ok', array(
-        'redirect' => '/gestione/utenti/utente.php?id=' . $utenteModifica->id_utente
-    ));
-
-} catch (Exception $e) {
-    reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.'
+        'redirect' => '/gestione/utenti/utente.php?id=' . $utente_registrazione->id_utente
     ), true);
 
+} catch (Exception $e) {
+
     if ($utente instanceof Utente) {
-        Log::crea($utente, 3, 'ajax/utente/imposta_gruppi.php', 'update',
+        Log::crea($utente, 3, 'ajax/utente/crea.php', 'crea',
             'Impossibile completare la richiesta.', (string)$e);
     } else {
-        Log::crea(null, 3, 'ajax/utente/imposta_gruppi.php', 'update',
+        Log::crea(null, 3, 'ajax/utente/crea.php', 'crea',
             'Impossibile completare la richiesta.', (string)$e);
     }
 
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.'
+    ), true);
 }
 ?>

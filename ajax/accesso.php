@@ -205,13 +205,13 @@ try {
     ));
 
 } catch (Exception $e) {
-    reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.',
-        'refreshCaptcha' => false
-    ), false);
 
     FabLabRomagna\Log::crea(null, 3, 'ajax/accesso.php', 'login',
         'Impossibile completare l\'accesso.', (string)$e);
 
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.',
+        'refreshCaptcha' => false
+    ), false);
 }
 ?>

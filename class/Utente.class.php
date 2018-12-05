@@ -270,10 +270,14 @@ namespace FabLabRomagna {
          *
          * @param array    $dati   Dizionario con i dati dell'utente da creare
          *
+         * @return Utente $utente
+         *
          * @throws \Exception
          */
         public static function crea_utente($dati)
         {
+
+            $dati_utente = $dati;
 
             global $mysqli;
 
@@ -331,6 +335,10 @@ namespace FabLabRomagna {
             if (!$stmt->execute()) {
                 throw new \Exception('Impossibile eseguire la query!');
             }
+
+            $dati_utente['id_utente'] = $stmt->insert_id;
+
+            return new Utente($dati_utente);
         }
 
         /**
@@ -423,15 +431,19 @@ namespace FabLabRomagna {
 
                 case 'email':
 
-                    if (gettype($valore) != 'string') {
+                    if ($valore === null) {
+                        return true;
+                    }
+
+                    if (gettype($valore) !== 'string') {
                         return false;
                     }
 
                     if (filter_var($valore, FILTER_VALIDATE_EMAIL) === false) {
                         return false;
-                    } else {
-                        return true;
                     }
+
+                    return true;
 
                 case 'data_registrazione':
                     if (gettype($valore) !== 'integer') {
@@ -552,7 +564,14 @@ namespace FabLabRomagna {
                 case 'id_utente':
                 case 'nome':
                 case 'cognome':
+                    return '<a href="/gestione/utenti/utente.php?id=' . $this->id_utente . '">' . $this->{$field} . '</a>';
+
                 case 'email':
+
+                    if ($this->email === null) {
+                        return '';
+                    }
+
                     return '<a href="/gestione/utenti/utente.php?id=' . $this->id_utente . '">' . $this->{$field} . '</a>';
 
                 case 'data_registrazione':

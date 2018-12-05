@@ -84,45 +84,16 @@ try {
     // Sono presenti alcuni record nel db
     if (count($utente) !== 0) {
 
-        // L'utente è confermato, annullo la richiesta
-        if ($utente->risultato[0]->codice_attivazione === null) {
-            reply(400, 'Bad Request', array(
+        reply(409, 'Conflict', array(
                 'field' => 'email',
                 'alert' => 'E-Mail già in uso!'
             ), true);
 
-            // L'account non è verificato, sovrascrivo le anagrafiche
-        } else {
-
-            $utente = $utente->risultato[0];
-
-            /**
-             * @var Utente $utente
-             */
-
-            $codice_attivazione = uniqid();
-
-            $utente->set_campo('nome', $nome);
-            $utente->set_campo('cognome', $cognome);
-            $utente->set_campo('ip_registrazione', \FabLabRomagna\Firewall::get_valid_ip());
-            $utente->set_campo('data_registrazione', time());
-            $utente->set_campo('codice_fiscale', null);
-            $utente->set_campo('sospeso', false);
-            $utente->set_campo('secretato', false);
-            $utente->set_campo('sesso', null);
-            $utente->set_campo('id_foto', null);
-            $utente->set_campo('codice_attivazione', $codice_attivazione);
-            $utente->set_campo('data_nascita', null);
-            $utente->set_campo('luogo_nascita', null);
-
-        }
-
-        // Non è presente nessun record relativo all'indirizzo nel db
     } else {
 
         $codice_attivazione = uniqid();
 
-        Utente::crea_utente(array(
+        $utente = Utente::crea_utente(array(
             'nome' => $nome,
             'cognome' => $cognome,
             'email' => $email,
@@ -132,12 +103,6 @@ try {
             'data_registrazione' => time(),
             'ip_registrazione' => \FabLabRomagna\Firewall::get_valid_ip()
         ));
-
-        $utente = Utente::ricerca(array(
-            new Equals('email', $email)
-        ));
-
-        $utente = $utente->risultato[0];
     }
 
     /**
@@ -187,18 +152,6 @@ try {
         ]
     ]);
 
-    // Rimuovo l'utente da tutti i gruppi
-    $gruppi = Gruppo::get_gruppi_utente($utente);
-
-    foreach ($gruppi as $gruppo) {
-
-        /**
-         * @var Gruppo $gruppo
-         */
-
-        $gruppo->rimuovi_utente($utente);
-    }
-
     // Aggiungo l'utente ai gruppi di default
     $gruppi = Gruppo::ricerca(array(
         new Equals('default', true)
@@ -213,9 +166,6 @@ try {
     ), true);
 
 } catch (Exception $e) {
-    reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.' . $e
-    ), true);
 
     if ($utente instanceof Utente) {
         Log::crea($utente, 3, 'ajax/registrazione.php', 'registrazione',
@@ -225,4 +175,7 @@ try {
             'Impossibile completare la richiesta.', (string)$e);
     }
 
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.' . $e
+    ), true);
 }

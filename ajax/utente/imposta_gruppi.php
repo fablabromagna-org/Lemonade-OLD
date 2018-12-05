@@ -126,9 +126,6 @@ try {
     ));
 
 } catch (Exception $e) {
-    reply(500, 'Internal Server Error', array(
-        'alert' => 'Impossibile completare la richiesta.'
-    ), true);
 
     if ($utente instanceof Utente) {
         Log::crea($utente, 3, 'ajax/utente/imposta_gruppi.php', 'update',
@@ -138,5 +135,8 @@ try {
             'Impossibile completare la richiesta.', (string)$e);
     }
 
+    reply(500, 'Internal Server Error', array(
+        'alert' => 'Impossibile completare la richiesta.'
+    ), true);
 }
 ?>

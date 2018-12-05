@@ -52,7 +52,7 @@ namespace FabLabRomagna\SQLOperator {
                 $cs = 'COLLATE utf8mb4_unicode_ci ';
             }
 
-            return 'NOT(' . $this->colonna . ' ' . $cs . ' <=> ?)';
+            return 'NOT(`' . $this->colonna . '` ' . $cs . ' <=> ?)';
         }
     }
 }
