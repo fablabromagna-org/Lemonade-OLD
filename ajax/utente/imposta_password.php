@@ -112,42 +112,45 @@ try {
         ), true);
     }
 
-    $client = new SesClient(array(
-        'version' => '2010-12-01',
-        'region' => AWS_REGION,
-        'credentials' => [
-            'key' => AWS_MAIL_KEY,
-            'secret' => AWS_MAIL_SECRET,
-        ]
-    ));
+    if ($utenteModifica->email !== null) {
 
-    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-        new \FabLabRomagna\SQLOperator\Equals('nome', 'cambio_password')
-    ));
-
-    foreach ($utente->getDataGridFields() as $campo => $valore) {
-        $email->replace('utente.' . $campo, $valore);
-    }
-
-    $client->sendEmail([
-        'Destination' => [
-            'ToAddresses' => [$utente->email],
-        ],
-        'ReplyToAddresses' => [EMAIL_REPLY_TO],
-        'Source' => EMAIL_FROM,
-        'Message' => [
-            'Body' => [
-                'Html' => [
-                    'Charset' => 'UTF-8',
-                    'Data' => $email->file,
-                ]
-            ],
-            'Subject' => [
-                'Charset' => 'UTF-8',
-                'Data' => 'Cambio password',
+        $client = new SesClient(array(
+            'version' => '2010-12-01',
+            'region' => AWS_REGION,
+            'credentials' => [
+                'key' => AWS_MAIL_KEY,
+                'secret' => AWS_MAIL_SECRET,
             ]
-        ]
-    ]);
+        ));
+
+        $email = \FabLabRomagna\TemplateEmail::ricerca(array(
+            new \FabLabRomagna\SQLOperator\Equals('nome', 'cambio_password')
+        ));
+
+        foreach ($utente->getDataGridFields() as $campo => $valore) {
+            $email->replace('utente.' . $campo, $valore);
+        }
+
+        $client->sendEmail([
+            'Destination' => [
+                'ToAddresses' => [$utente->email],
+            ],
+            'ReplyToAddresses' => [EMAIL_REPLY_TO],
+            'Source' => EMAIL_FROM,
+            'Message' => [
+                'Body' => [
+                    'Html' => [
+                        'Charset' => 'UTF-8',
+                        'Data' => $email->file,
+                    ]
+                ],
+                'Subject' => [
+                    'Charset' => 'UTF-8',
+                    'Data' => 'Cambio password',
+                ]
+            ]
+        ]);
+    }
 
     Autenticazione::set_user_password($utente, $dati['nuova_password']);
 
