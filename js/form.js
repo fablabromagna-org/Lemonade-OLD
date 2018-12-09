@@ -37,6 +37,17 @@ $$$$F ?$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$P",z'                3$$h   ?$F
  */
 
 $(document).ready(function () {
+    var input = $('input[type=\'file\']')
+
+    input.each(function() {
+        $(this).change(function() {
+            console.log(this.files)
+        })
+
+    })
+})
+
+$(document).ready(function () {
 
     var form = $('form:not(.no-traditional-sender)')
 

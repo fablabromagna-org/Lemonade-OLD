@@ -2,6 +2,9 @@
 
 namespace FabLabRomagna {
 
+    use FabLabRomagna\Data\DataGridFields;
+    use FabLabRomagna\Data\TableHeader;
+
     /**
      * Class Gruppo
      *
@@ -13,7 +16,7 @@ namespace FabLabRomagna {
      * @property-read $eliminato
      * @property-read $default
      */
-    class Gruppo implements Ricercabile
+    class Gruppo implements Ricercabile, DataGridFields
     {
         /**
          * Elenco delle proprietà dell'utente
@@ -616,6 +619,51 @@ namespace FabLabRomagna {
             $res = new RisultatoRicerca($res, $limit, $offset, $risultati->totale, $order);
 
             return $res;
+        }
+
+
+        /**
+         * Metodo utilizzato dai figli di DataSet per ricavare tutte le proprietà
+         *
+         * @return array
+         */
+        public function getDataGridFields(): array
+        {
+            return get_object_vars($this);
+        }
+
+        /**
+         * @param mixed $field
+         *
+         * @return mixed
+         */
+        public function HTMLDataGridFormatter($field)
+        {
+            switch ($field) {
+
+                case 'eliminato':
+                case 'default':
+                    return $this->{$field} ? 'Sì' : 'No';
+
+                default:
+                    return $this->{$field};
+            }
+        }
+
+        /**
+         * Metodo che restituisce tutte le intestazioni di tabella
+         *
+         * @return array
+         */
+        public static function getDataGridTableHeaders()
+        {
+            return [
+                'id_gruppo' => new TableHeader('#', 'ID gruppo'),
+                'nome' => new TableHeader('Nome'),
+                'descrizione' => new TableHeader('Descrizione'),
+                'eliminato' => new TableHeader('Eliminato'),
+                'default' => new TableHeader('Default')
+            ];
         }
     }
 }

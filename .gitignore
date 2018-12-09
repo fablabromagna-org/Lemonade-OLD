@@ -2,3 +2,5 @@
 .DS_Store
 /inc/config.inc.php
 .idea/
+*.crt
+/tests

@@ -41,5 +41,11 @@ define('ELENCO_PERMESSI', [
         'richiede_pannello_gestione' => true,
         'nome' => 'Visualizzare i dettagli di una scuola',
         'descrizione' => 'Indica se l\'utente può accedere alla pagina con tutti i dettagli di una scuola.'
+    ],
+    'gestione.gruppi.visualizzare' => [
+        'default' => true,
+        'richiede_pannello_gestione' => true,
+        'nome' => 'Visualizzare gruppi',
+        'descrizione' => 'Indica se l\'utente può visualizzare l\'elenco di tutti i gruppi e la relativa descrizione.'
     ]
 ]);

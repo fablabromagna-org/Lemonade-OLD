@@ -46,7 +46,7 @@
                                     <a class="navbar-item" href="/gestione/utenti/crea.php">
                                         Crea utente
                                     </a>
-                                    <a class="navbar-item">
+                                    <a class="navbar-item" href="/gestione/gruppi/">
                                         Gestione gruppi
                                     </a>
                                 </div>

@@ -1,4 +1,14 @@
-RewriteEngine On
+RewriteEngine Off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteCond %{HTTPS} off
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+Header unset ETag
+Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+Header set Pragma "no-cache"
+Header set Expires "Wed, 11 Jan 1984 05:00:00 GMT"
+Header always set Referrer-Policy "no-referrer"
+
+Options -Indexes
+
+ErrorDocument 404 /404.php
