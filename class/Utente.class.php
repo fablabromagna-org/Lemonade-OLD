@@ -598,6 +598,37 @@ namespace FabLabRomagna {
         }
 
         /**
+         * @param mixed $field
+         *
+         * @return mixed
+         */
+        public function CSVDataGridFormatter($field)
+        {
+            switch ($field) {
+                case 'data_registrazione':
+                    return $this->{$field} === null ? '' : date('d/m/Y H:i:s',
+                        $this->{$field});
+
+                case 'data_nascita':
+                    return $this->{$field} === null ? '' : date('d/m/Y',
+                        $this->{$field});
+
+                case 'sospeso':
+                case 'secretato':
+                    return $this->sospeso ? 'Sì' : 'No';
+
+                case 'codice_attivazione':
+                    return $this->codice_attivazione === null ? 'Verificato' : 'Non verificato';
+
+                case 'sesso':
+                    return $this->sesso === null ? '' : ($this->sesso ? 'Femminile' : 'Maschile');
+
+                default:
+                    return $this->{$field};
+            }
+        }
+
+        /**
          * Metodo che restituisce tutte le intestazioni di tabella
          *
          * @return array
@@ -612,7 +643,7 @@ namespace FabLabRomagna {
                 'data_registrazione' => new TableHeader('Data reg.', 'Data di registrazione'),
                 'ip_registrazione' => new TableHeader('IP reg.', 'IP registrazione'),
                 'sospeso' => new TableHeader('Sospeso'),
-                'codice_attivazione' => new TableHeader('Verifica account'),
+                'codice_attivazione' => new TableHeader('Verifica me'),
                 'data_nascita' => new TableHeader('Data di nascita'),
                 'codice_fiscale' => new TableHeader('Codice fiscale'),
                 'luogo_nascita' => new TableHeader('Luogo di nascita'),

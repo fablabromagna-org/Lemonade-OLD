@@ -1,4 +1,5 @@
-<title><?php echo NOME_SITO; ?></title>
+<title><?php echo NOME_SITO;
+    echo isset($titolo_pagina) ? ' - ' . $titolo_pagina : ''; ?></title>
 
 <link type="text/css" rel="stylesheet" media="screen" href="/css/spinner.css"/>
 <link type="text/css" rel="stylesheet" href="/bulma/css/bulma.min.css"/>

@@ -39,153 +39,190 @@ $$$$F ?$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$P",z'                3$$h   ?$F
 $(document).ready(function () {
     var input = $('input[type=\'file\']')
 
-    input.each(function() {
-        $(this).change(function() {
-            console.log(this.files)
-        })
-
-    })
-})
-
-$(document).ready(function () {
+    input.each(file_change)
 
     var form = $('form:not(.no-traditional-sender)')
 
-    form.each(function () {
-        var invioInCorso = false
+    form.each(form_sender)
+})
 
-        this.addEventListener('submit', function (e) {
-            e.preventDefault()
+function file_change () {
+    $(this).change(function () {
 
-            if (invioInCorso)
-                return
+        if (this._fileChangeEvent === true)
+            return
 
-            invioInCorso = true
+        var files = []
+        for (var i = 0; i < this.files.length; i++) {
+            files.push(this.files[i].name)
+        }
 
-            var dati = {}
-            var elementi = $(this).find('input:not([type=\'submit\']):not(.ajax-exclude), select:not(.ajax-exclude)')
+        files = files.join('; ')
 
-            elementi.each(function () {
-                valorizzatore(this)
-                this.disabled = true
-            })
+        var txt = $(this).parent().children('.file-name')
+        txt.each(function () {
+            this.innerText = files
+            this.setAttribute('title', files)
+        })
 
-            $(this).find('input[type=\'submit\'], button').each(function () {
-                $(this).disabled = true
-            })
+        this._fileChangeEvent = true
+    })
+}
 
-            $(this).find('button').each(function () {
-                $(this).addClass('is-loading')
-            })
+function form_sender () {
+    this._invioInCorso = false
 
-            var _self = this
+    if (this._formSubmitEvent === true)
+        return
 
-            $.ajax({
-                method: 'post'
-                , url: this.action
-                , dataType: 'json'
-                , cache: false
-                , contentType: 'application/json; charset=utf-8'
-                , data: JSON.stringify(dati)
-                , complete: function (res) {
-                    if (res.responseJSON !== undefined) {
-                        if (res.responseJSON.alert !== undefined)
-                            alert(res.responseJSON.alert)
+    this._formSubmitEvent = true
 
-                        if (res.responseJSON.redirect !== undefined)
-                            location.href = res.responseJSON.redirect
+    var _self = this
 
-                        if (res.responseJSON.refreshCaptcha !== undefined) {
-                            $(_self).find('.captcha-img').each(function () {
-                                this.src = '/ajax/captcha.php'
-                            })
+    this.addEventListener('submit', function (e) {
+        e.preventDefault()
 
-                            $(_self).find('input[name=\'captcha\']').each(function () {
-                                $(this).val('')
-                            })
-                        }
+        if (this._invioInCorso)
+            return
 
-                        if (res.responseJSON.field !== undefined) {
-                            $(_self).find('input[name=\'' + res.responseJSON.field + '\']').each(function () {
-                                $(this).val('')
-                                $(this).effect('shake')
-                            })
-                        }
-                    } else if (res.status !== 200 && res.status !== 204)
-                        alert('Impossibile completare la richiesta.')
+        this._invioInCorso = true
 
-                    if ((res.status === 200 || res.status === 204) && $(_self).hasClass('is-modal')) {
-                        $(_self).children('div.modal.is-active').each(function () {
-                            $(this).removeClass('is-active')
+        var dati = {}
+        var elementi = $(this).find('input:not([type=\'submit\']):not(.ajax-exclude), select:not(.ajax-exclude), textarea')
+
+        elementi.each(function () {
+            valorizzatore(this)
+            this.disabled = true
+        })
+
+        $(this).find('input[type=\'submit\'], button').each(function () {
+            $(this).disabled = true
+        })
+
+        $(this).find('button').each(function () {
+            $(this).addClass('is-loading')
+        })
+
+        function abilitaForm () {
+            _self._invioInCorso = false
+        }
+
+        var config = {
+            method: _self.getAttribute('method')
+            , url: this.action
+            , dataType: 'json'
+            , cache: false
+            , complete: function (res) {
+                if (res.responseJSON !== undefined) {
+                    if (res.responseJSON.alert !== undefined)
+                        alert(res.responseJSON.alert)
+
+                    if (res.responseJSON.redirect !== undefined)
+                        location.href = res.responseJSON.redirect
+
+                    if (res.responseJSON.refreshCaptcha !== undefined) {
+                        $(_self).find('.captcha-img').each(function () {
+                            this.src = '/ajax/captcha.php'
+                        })
+
+                        $(_self).find('input[name=\'captcha\']').each(function () {
+                            $(this).val('')
                         })
                     }
 
-                    invioInCorso = false
+                    if (res.responseJSON.field !== undefined) {
+                        $(_self).find('input[name=\'' + res.responseJSON.field + '\']').each(function () {
+                            $(this).val('')
+                            $(this).effect('shake')
+                        })
+                    }
+                } else if (res.status !== 200 && res.status !== 204)
+                    alert('Impossibile completare la richiesta.')
 
-                    elementi.each(function () {
-                        this.disabled = false
-                    })
-
-                    $(_self).find('input[type=\'submit\'], button').each(function () {
-                        $(this).disabled = false
-                    })
-
-                    $(_self).find('button').each(function () {
-                        $(this).removeClass('is-loading')
+                if ((res.status === 200 || res.status === 204) && $(_self).hasClass('is-modal')) {
+                    $(_self).children('div.modal.is-active').each(function () {
+                        $(this).removeClass('is-active')
                     })
                 }
-            })
 
-            function caster (input, data = null) {
+                abilitaForm()
 
-                if (data === null)
-                    data = input.value
+                elementi.each(function () {
+                    this.disabled = false
+                })
 
-                if (data === 'null')
-                    return null
+                $(_self).find('input[type=\'submit\'], button').each(function () {
+                    $(this).disabled = false
+                })
 
-                if (input.dataset.type === undefined || input.dataset.type === 'string')
-                    return data
+                $(_self).find('button').each(function () {
+                    $(this).removeClass('is-loading')
+                })
+            }
+        }
 
-                if (input.dataset.type === 'integer')
-                    return parseInt(data)
+        if (_self.getAttribute('method') === 'get')
+            config.data = dati
 
-                if (input.dataset.type === 'float')
-                    return parseFloat(data)
+        else {
+            config.contentType = 'application/json; charset=utf-8'
+            config.data = JSON.stringify(dati)
+        }
 
-                if (input.dataset.type === 'boolean')
-                    return data === 'true' || data === '1' || data === true
+        $.ajax(config)
 
+        function caster (input, data = null) {
+
+            if (data === null)
+                data = input.value
+
+            if (data === 'null')
+                return null
+
+            if (input.dataset.type === undefined || input.dataset.type === 'string')
                 return data
-            }
 
-            function valorizzatore (input) {
+            if (input.dataset.type === 'integer')
+                return parseInt(data)
 
-                if (input.nodeName === 'SELECT' && input.getAttribute('multiple') !== null) {
+            if (input.dataset.type === 'float')
+                return parseFloat(data)
 
+            if (input.dataset.type === 'boolean' && data === '')
+                return null
+
+            if (input.dataset.type === 'boolean')
+                return data === 'true' || data === '1' || data === true
+
+            return data
+        }
+
+        function valorizzatore (input) {
+
+            if (input.nodeName === 'SELECT' && input.getAttribute('multiple') !== null) {
+
+                dati[input.name] = []
+
+                $.each($(input).val(), function () {
+                    dati[input.name].push(caster(input, this))
+                })
+
+            } else if (input.type === 'checkbox' && input.checked && input.name.endsWith('[]')) {
+                if (dati[input.name] === undefined) {
                     dati[input.name] = []
-
-                    $.each($(input).val(), function () {
-                        dati[input.name].push(caster(input, this))
-                    })
-
-                } else if (input.type === 'checkbox' && input.checked && input.name.endsWith('[]')) {
-                    if (dati[input.name] === undefined) {
-                        dati[input.name] = []
-                        dati[input.name].push(caster(input))
-                    } else
-                        dati[input.name].push(caster(input))
-
-                } else if (input.type === 'checkbox') {
-                    dati[input.name] = caster(input, input.checked)
-
-                } else if (input.type === 'radio' && input.checked) {
-                    dati[input.name] = caster(input)
-
+                    dati[input.name].push(caster(input))
                 } else
-                    dati[input.name] = caster(input)
+                    dati[input.name].push(caster(input))
 
-            }
-        })
+            } else if (input.type === 'checkbox') {
+                dati[input.name] = caster(input, input.checked)
+
+            } else if (input.type === 'radio' && input.checked) {
+                dati[input.name] = caster(input)
+
+            } else
+                dati[input.name] = caster(input)
+
+        }
     })
-})
+}

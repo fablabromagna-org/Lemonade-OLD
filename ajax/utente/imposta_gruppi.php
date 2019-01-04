@@ -45,7 +45,7 @@ try {
 
     $permessi = \FabLabRomagna\Permesso::what_can_i_do($utente);
 
-    if (!$permessi['gestione.utenti.modificare_gruppi_utente']['reale']) {
+    if (!$permessi['gestione.utenti.modificare_gruppi_utenti']['reale']) {
 
         reply(401, 'Unauthorized', null, true);
     }

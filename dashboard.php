@@ -49,6 +49,7 @@ try {
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Dashboard';
         require_once('inc/header.inc.php');
         ?>
     </head>

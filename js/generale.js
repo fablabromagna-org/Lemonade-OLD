@@ -1,7 +1,7 @@
 console.log('%cATTENZIONE!', 'color: red; font-weight: bold; font-size: 45px; font-family: sans-serif;')
 console.log('%cQuesta è una funzione pensata per gli sviluppatori.\n' +
     'Se qualcuno ti dice di incollare qualcosa in questa finestra %cNON FARLO%c!\nStanno tentando di sottrarti dei dati ' +
-    'sensibili o di accedere al tuo account!\nPer ulteriori informazioni: https://en.wikipedia.org/wiki/Self-XSS',
+    'sensibili o di accedere al tuo me!\nPer ulteriori informazioni: https://en.wikipedia.org/wiki/Self-XSS',
     'font-size: 25px; font-family: sans-serif;', 'font-weight: bold; font-size: 30px; font-family: sans-serif;', 'font-weight: regular; font-size: 25px; font-family: sans-serif;')
 
 $(document).ready(function () {

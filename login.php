@@ -20,6 +20,7 @@ try {
 <html>
     <head>
         <?php
+        $titolo_pagina = 'Accesso';
         require_once('./inc/header.inc.php');
         ?>
     </head>
@@ -31,7 +32,7 @@ try {
             <h1 class="title is-1 has-text-centered">Accesso</h1>
             <div class="container is-fluid">
                 <div class="columns">
-                    <form action="/ajax/accesso.php" class="column is-4 is-offset-4 has-text-centered">
+                    <form action="/ajax/accesso.php" method="post" class="column is-4 is-offset-4 has-text-centered">
                         <div class="field">
                             <div class="control">
                                 <input class="input is-primary" type="text" name="email" placeholder="E-Mail"/>
@@ -42,18 +43,12 @@ try {
                                 <input class="input is-primary" type="password" name="password" placeholder="Password"/>
                             </div>
                         </div>
-                        <div class="notification">
-                            <h3 class="is-3">Verifica di sicurezza</h3>
-                            <img class="captcha-img" src="/ajax/captcha.php" alt/>
-                            <div class="field">
-                                <div class="control">
-                                    <input class="input is-primary" type="text" name="captcha"
-                                           placeholder="Codice di verifica"/>
-                                </div>
-                            </div>
-                        </div>
+                        <a class="is-block" href="/me/recupero.php" style="margin-bottom: 10px;">Ho dimenticato la
+                            password</a>
+                        <?php
+                        include('./inc/captcha.php');
+                        ?>
                         <button class="button is-primary">Accedi</button>
-                        <a class="is-block" href="/account/recupero.php">Ho dimenticato la password</a>
                     </form>
                 </div>
             </div>

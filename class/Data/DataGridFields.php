@@ -19,12 +19,21 @@ namespace FabLabRomagna\Data {
         public function getDataGridFields(): array;
 
         /**
-         * Metodo per richiedere la formattazione del campo
+         * Metodo per richiedere la formattazione del campo (HTML)
          *
          * @param mixed $field Campo da formattare
          *
          * @return mixed
          */
         public function HTMLDataGridFormatter($field);
+
+        /**
+         * Metodo per richiedere la formattazione del campo (solo testo)
+         *
+         * @param mixed $field Campo da formattare
+         *
+         * @return mixed
+         */
+        public function CSVDataGridFormatter($field);
     }
 }

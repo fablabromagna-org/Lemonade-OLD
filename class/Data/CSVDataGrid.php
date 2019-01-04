@@ -33,11 +33,12 @@ namespace FabLabRomagna\Data {
             }
 
             foreach ($this->data->risultato as $risultato) {
+
                 $arr = [];
 
                 foreach ($risultato->getDataGridFields() as $key => $value) {
                     if (!in_array($key, $this->campi_rimossi)) {
-                        $arr[] = $value;
+                        $arr[] = $risultato->CSVDataGridFormatter($key);
                     }
                 }
 

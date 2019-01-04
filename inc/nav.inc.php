@@ -1,7 +1,7 @@
 <nav class="navbar" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
         <div class="navbar-item">
-            <img src="/images/logo.png" alt="<?php echo NOME_SITO ?>" style="margin-right: 10px"/>
+            <img src="/images/logo.png" alt="<?php echo NOME_SITO ?>" style="margin-right: 10px;"/>
             <b><?php echo NOME_SITO ?> <span class="tag is-warning">ALPHA</span></b>
         </div>
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
@@ -16,9 +16,11 @@
             ?>
             <div class="navbar-start">
                 <a href="/dashboard.php" class="navbar-item">Dashboard</a>
-                <a href="/dashboard.php" class="navbar-item">Attestati</a>
+                <a href="/me/attestati/" class="navbar-item">Attestati&nbsp;&nbsp;<b><span
+                                class="tag is-primary">NEW!</span></b></a>
                 <a href="/dashboard.php" class="navbar-item">Corsi</a>
-                <a href="/account/supporto/" class="navbar-item">Supporto</a>
+                <a href="/me/supporto/" class="navbar-item">Supporto&nbsp;&nbsp;<b><span
+                                class="tag is-primary">NEW!</span></b></a>
                 <?php
                 $gestione = false;
                 foreach ($permessi as $permesso) {
@@ -154,8 +156,8 @@
                         <?php echo $utente->nome . ' ' . $utente->cognome ?>
                     </a>
                     <div class="navbar-dropdown">
-                        <a href="/account/impostazioni.php" class="navbar-item">Impostazioni</a>
-                        <a href="/account/notifiche.php" class="navbar-item">Notifiche</a>
+                        <a href="/me/impostazioni.php" class="navbar-item">Impostazioni</a>
+                        <a href="/me/notifiche.php" class="navbar-item">Notifiche</a>
                         <a href="/logout.php" class="navbar-item">Disconnettiti</a>
                     </div>
                 </div>

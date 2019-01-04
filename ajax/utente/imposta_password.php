@@ -170,6 +170,6 @@ try {
 
     reply(500, 'Internal Server Error', array(
         'alert' => 'Impossibile completare la richiesta.',
-        'redirect' => '/account/impostazioni.php'
+        'redirect' => '/me/impostazioni.php'
     ), true);
 }

@@ -323,6 +323,40 @@ namespace FabLabRomagna {
         }
 
         /**
+         * @param mixed $field
+         *
+         * @return false|mixed|string
+         * @throws \Exception
+         */
+        public function CSVDataGridFormatter($field)
+        {
+            switch ($field) {
+                case 'ts':
+                    return $this->{$field} === null ? '' : date('d/m/Y H:i:s',
+                        $this->{$field});
+
+                case 'livello':
+
+                    if ($this->livello == 1) {
+                        return 'INFO';
+                    }
+
+                    if ($this->livello == 2) {
+                        return 'WARN';
+                    }
+
+                    if ($this->livello == 3) {
+                        return 'ERROR';
+                    }
+
+                    return 'TRACE';
+
+                default:
+                    return $this->{$field};
+            }
+        }
+
+        /**
          * Metodo che restituisce tutte le intestazioni di tabella
          *
          * @return array

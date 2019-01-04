@@ -53,6 +53,7 @@ Log::crea($utente, 0, '/gestione/logs.php', 'view',
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Ricerca Log';
         require_once('../../inc/header.inc.php');
         ?>
         <script type="text/javascript">

@@ -521,11 +521,71 @@ namespace FabLabRomagna {
                 throw new \Exception('Expected \mysqli instance in $mysqli!');
             }
 
-            /*
-             * ToDo: Completare eliminazione del gruppo
-             *          - Aggiungere flag eliminato
-             *          - Rimuovere eventuali utenti rimasti
-             */
+            $this->modifica('eliminato', true);
+        }
+
+        /**
+         * Metodo per modificare i dati di un gruppo
+         *
+         * @param string $campo  Campo da modificare (escluso ID)
+         * @param mixed  $valore Valore da inserire
+         *
+         * @throws \Exception
+         */
+        public function modifica($campo, $valore)
+        {
+            global $mysqli;
+
+            if (!is_a($mysqli, 'mysqli')) {
+                throw new \Exception('Expected \mysqli instance in $mysqli!');
+            }
+
+            switch ($campo) {
+                case 'nome':
+
+                    if (!is_string($valore)) {
+                        throw new \Exception('Invalid data type!');
+                    }
+
+                    break;
+
+                case 'descrizione':
+
+                    if (!is_string($valore) && $valore !== null) {
+                        throw new \Exception('Invalid data type!');
+                    }
+
+                    break;
+
+                case 'default':
+                case 'eliminato':
+
+                    if (!is_bool($valore)) {
+                        throw new \Exception('Invalid data type!');
+                    }
+
+                    break;
+
+                default:
+                    throw new \Exception('Invalid field!');
+            }
+
+            $sql = "UPDATE gruppi SET `$campo` = ? WHERE id_gruppo = ?";
+            $stmt = $mysqli->prepare($sql);
+
+            if ($stmt === false) {
+                throw new \Exception('Unable to prepare the statement!');
+            }
+
+            if (!$stmt->bind_param(self::PROP_GRUPPO[$campo] . 'i', $valore, $this->id_gruppo)) {
+                throw new \Exception('Unable to bind params!');
+            }
+
+            if (!$stmt->execute()) {
+                throw new \Exception('Unable to execute the statement!');
+            }
+
+            $this->{$campo} = $valore;
         }
 
         /**
@@ -638,6 +698,24 @@ namespace FabLabRomagna {
          * @return mixed
          */
         public function HTMLDataGridFormatter($field)
+        {
+            switch ($field) {
+
+                case 'eliminato':
+                case 'default':
+                    return $this->{$field} ? 'Sì' : 'No';
+
+                default:
+                    return $this->{$field};
+            }
+        }
+
+        /**
+         * @param mixed $field
+         *
+         * @return mixed
+         */
+        public function CSVDataGridFormatter($field)
         {
             switch ($field) {
 

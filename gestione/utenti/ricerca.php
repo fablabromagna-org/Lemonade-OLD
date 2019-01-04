@@ -60,6 +60,7 @@ Log::crea($utente, 0, '/gestione/utenti/ricerca.php', 'view',
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Ricerca utenti';
         require_once('../../inc/header.inc.php');
         ?>
         <script type="text/javascript">

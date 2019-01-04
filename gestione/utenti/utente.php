@@ -51,6 +51,7 @@ try {
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Profilo utente';
         require_once('../../inc/header.inc.php');
         ?>
         <script type="text/javascript">
@@ -128,7 +129,7 @@ try {
                 Log::crea($utente, 0, '/gestione/utenti/utente.php', 'visualizzazione_profilo',
                     'L\'utente ha visualizzato il profilo con ID ' . $ricerca->id_utente, (string)$e);
                 ?>
-                <form action="/ajax/utente/aggiorna.php" class="is-modal">
+                <form action="/ajax/utente/aggiorna.php" method="post" class="is-modal">
                     <div id="modal-sesso" class="modal">
                         <div class="modal-background"></div>
                         <div class="modal-card">
@@ -165,7 +166,7 @@ try {
                         </div>
                     </div>
                 </form>
-                <form action="/ajax/utente/aggiorna.php" class="is-modal">
+                <form action="/ajax/utente/aggiorna.php" method="post" class="is-modal">
                     <div id="modal-cf" class="modal">
                         <div class="modal-background"></div>
                         <div class="modal-card">
@@ -196,7 +197,7 @@ try {
                         </div>
                     </div>
                 </form>
-                <form action="/ajax/utente/aggiorna.php" class="is-modal">
+                <form action="/ajax/utente/aggiorna.php" method="post" class="is-modal">
                     <div id="modal-data" class="modal">
                         <div class="modal-background"></div>
                         <div class="modal-card">
@@ -229,7 +230,7 @@ try {
                         </div>
                     </div>
                 </form>
-                <form action="/ajax/utente/aggiorna.php" class="is-modal">
+                <form action="/ajax/utente/aggiorna.php" method="post" class="is-modal">
                     <div id="modal-luogo-nascita" class="modal">
                         <div class="modal-background"></div>
                         <div class="modal-card">
@@ -266,7 +267,7 @@ try {
                         </div>
                     </div>
                 </form>
-                <form action="/ajax/utente/scuola.php" class="is-modal">
+                <form action="/ajax/utente/scuola.php" method="post" class="is-modal">
                     <div id="modal-scuola" class="modal">
                         <div class="modal-background"></div>
                         <div class="modal-card">
@@ -390,7 +391,7 @@ try {
                             <h3 class="title is-3">Profilo</h3>
                             <div>
                                 <!-- <img src="/images/utente.png" id="imgUtente" alt/> -->
-                                <form id="form-profilo" action="/ajax/utente/aggiorna.php">
+                                <form id="form-profilo" action="/ajax/utente/aggiorna.php" method="post">
                                     <div class="columns">
                                         <div class="column is-half">
                                             <div class="field">
@@ -438,7 +439,7 @@ try {
                                     </ul>
                                 </div>
                                 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #aaa;">
-                                    <form action="/ajax/utente/aggiorna.php">
+                                    <form action="/ajax/utente/aggiorna.php" method="post">
                                         <div>
                                             <div class="field">
                                                 <input id="sospensione" type="checkbox" name="sospeso"
@@ -465,10 +466,12 @@ try {
                             ?>
                             <div class="box">
                                 <h3 class="title is-3">Gruppi</h3>
-                                <form action="/ajax/utente/imposta_gruppi.php">
+                                <form action="/ajax/utente/imposta_gruppi.php" method="post">
                                     <?php
                                     try {
-                                        $gruppi = \FabLabRomagna\Gruppo::Ricerca(array());
+                                        $gruppi = \FabLabRomagna\Gruppo::Ricerca(array(
+                                            new Equals('eliminato', false)
+                                        ));
 
                                         echo '<div class="select is-multiple">';
                                         echo '<select name="gruppi" multiple data-type="integer">';
@@ -609,7 +612,7 @@ try {
                             <div class="box">
                                 <h3 class="title is-3">Password</h3>
                                 <div>
-                                    <form action="/ajax/utente/reset_password.php">
+                                    <form action="/ajax/utente/reset_password.php" method="post">
                                         <input type="hidden" name="id_utente" data-type="integer"
                                                value="<?php echo $ricerca->id_utente; ?>"/>
                                         <button id="cambiaPwd" class="button is-warning">Invia password</button>

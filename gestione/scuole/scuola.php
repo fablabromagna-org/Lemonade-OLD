@@ -53,6 +53,7 @@ try {
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Scuola';
         require_once('../../inc/header.inc.php');
         ?>
     </head>

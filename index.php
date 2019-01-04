@@ -56,7 +56,8 @@ try {
             <h1 class="title is-1 has-text-centered">Registrazione</h1>
             <div class="container is-fluid">
                 <div class="columns">
-                    <form action="/ajax/registrazione.php" class="column is-4 is-offset-4 has-text-centered">
+                    <form action="/ajax/registrazione.php" method="post"
+                          class="column is-4 is-offset-4 has-text-centered">
                         <p>Se hai già avuto rapporti con l'associazione (partecipazione ai corsi, ecc) potresti essere
                             già stato registrato nel gestionale dal nostro personale.</p>
                         <p style="margin: 10px 0;">Contattaci per effettuare un controllo e renderti disponibile
@@ -84,16 +85,9 @@ try {
                                 almeno un carattere minuscolo, uno maiuscolo, un numero e un carattere speciale. La
                                 lunghezza minima consentita è di sei caratteri.</p>
                         </div>
-                        <div class="notification">
-                            <h3 class="is-3">Verifica di sicurezza</h3>
-                            <img class="captcha-img" src="/ajax/captcha.php" alt/>
-                            <div class="field">
-                                <div class="control">
-                                    <input class="input is-primary" type="text" name="captcha"
-                                           placeholder="Codice di verifica"/>
-                                </div>
-                            </div>
-                        </div>
+                        <?php
+                        include('./inc/captcha.php');
+                        ?>
                         <input class="styled ajax-exclude" type="checkbox" id="privacy16">
                         <label for="privacy16">
                             Dichiaro di avere almeno 16 anni.

@@ -270,7 +270,7 @@ namespace FabLabRomagna\Data {
             $tmp = array();
             $i = 0;
             foreach ($qs as $key => $value) {
-                $tmp[$i] = urlencode($key) . '=' . urlencode((string)$value);
+                $tmp[$i] = $key . '=' . (string)$value;
                 $i++;
             }
 

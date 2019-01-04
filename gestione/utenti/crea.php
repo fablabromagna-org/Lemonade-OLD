@@ -51,6 +51,7 @@ try {
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Crea utente';
         require_once('../../inc/header.inc.php');
         ?>
     </head>
@@ -65,7 +66,7 @@ try {
                 <div class="box">
                     <h3 class="title is-3">Dati del nuovo utente</h3>
                     <div>
-                        <form action="/ajax/utente/crea.php">
+                        <form action="/ajax/utente/crea.php" method="post">
                             <div class="columns">
                                 <div class="column is-half">
                                     <div class="field">
@@ -93,10 +94,12 @@ try {
                                     </label>
                                     <div style="margin-top: 20px;">
                                         <span class="tag is-warning"><b>IMPORTANTE</b></span>
-                                        <p style="margin: 10px 0 0 0" class="is-size-7 has-text-grey">Se l'utente ha
-                                            meno di 16 anni ricordati di caricare dopo la creazione, nel suo fascicolo
-                                            personale, la liberatoria firmata da un genitore e di inserire i suoi dati
-                                            anagrafici completi (es. data di nascita, scuola, ecc).</p>
+                                        <p style="margin: 10px 0 0 0" class="is-size-7 has-text-grey">Ricordati di
+                                            caricare dopo la creazione,
+                                            nel fascicolo personale, la liberatoria firmata da un genitore e di inserire
+                                            i suoi dati
+                                            anagrafici completi (se minore di anni 16, es. data di nascita, scuola,
+                                            ecc).</p>
                                     </div>
                                     <div style="margin-top: 20px;">
                                         <span class="tag is-info"><b>NOTA BENE</b></span>

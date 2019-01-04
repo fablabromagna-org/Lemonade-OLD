@@ -50,6 +50,7 @@ try {
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Log';
         require_once('../../inc/header.inc.php');
         ?>
     </head>

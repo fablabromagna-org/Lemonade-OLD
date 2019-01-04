@@ -36,11 +36,11 @@ try {
     $utente = $utente->risultato[0];
     $permessi = \FabLabRomagna\Permesso::what_can_i_do($utente);
 
-    Log::crea($utente, 3, '/account/impostazioni.php', 'page_request',
-        'Impossibile completare la richiesta.', (string)$e);
+    Log::crea($utente, 0, '/me/impostazioni.php', 'page_request',
+        'L\'utente ha visualizzato le proprie impostazioni.', (string)$e);
 
 } catch (Exception $e) {
-    Log::crea(null, 3, '/account/impostazioni.php', 'page_request',
+    Log::crea(null, 3, '/me/impostazioni.php', 'page_request',
         'Impossibile completare la richiesta.', (string)$e);
     reply(500, 'Internal Server Error');
 }
@@ -49,6 +49,7 @@ try {
 <html lang="it">
     <head>
         <?php
+        $titolo_pagina = 'Impostazioni';
         require_once('../inc/header.inc.php');
         ?>
     </head>
@@ -123,7 +124,7 @@ try {
                             ));
 
                         } catch (Exception $e) {
-                            Log::crea($utente, 3, '/account/impostazioni.php', 'estrazione_relazioni_scuola',
+                            Log::crea($utente, 3, '/me/impostazioni.php', 'estrazione_relazioni_scuola',
                                 'Impossibile completare la richiesta.', (string)$e);
                             echo '<p>Impossibile completare la richiesta.';
                         }
@@ -161,7 +162,7 @@ try {
                 <div class="box">
                     <h3 class="title is-3">Password</h3>
                     <div class="columns">
-                        <form action="/ajax/utente/imposta_password.php" class="column is-half">
+                        <form action="/ajax/utente/imposta_password.php" class="column is-half" method="post">
                             <div class="field">
                                 <div class="control">
                                     <input class="input is-primary" type="password" name="password_attuale"
