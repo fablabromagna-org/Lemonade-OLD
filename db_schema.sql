@@ -16,8 +16,8 @@ create table if not exists files
   mime           varchar(255) null,
   file           longblob     not null,
   ts_inserimento int(11)      not null,
-  sha256         varchar(64) as (sha2(`file`, 256)) stored,
-  md5            varchar(32) as (md5(`file`)) stored
+  sha256         char(64) generated always as (sha2(`file`, 256)) stored,
+  md5            char(32) generated always as (md5(`file`)) stored
 );
 
 create table if not exists email_templates
