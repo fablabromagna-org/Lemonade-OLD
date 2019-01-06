@@ -369,17 +369,34 @@ namespace FabLabRomagna {
          */
         public static function generatePassword()
         {
-            return self::pwd_phase('23456789') . self::pwd_phase('abcdefghjkmnpqrstuvwxyz') . self::pwd_phase('ABCDEFGHJKLMNPQRSTUVWXYZ') . self::pwd_phase('.@!#?');
+            $tmp = self::pwd_phase('23456789') . self::pwd_phase('abcdefghjkmnpqrstuvwxyz') .
+                self::pwd_phase('ABCDEFGHJKLMNPQRSTUVWXYZ') . self::pwd_phase('.@!#?');
+
+            $randomString = '';
+            $characters = str_split($tmp);
+
+            for ($i = 0; $i < strlen($tmp); $i++) {
+                $j = rand(0, count($characters) - 1);
+                $randomString .= $characters[$j];
+                array_splice($characters, $j, 1);
+            }
+
+            return $randomString;
         }
 
         /**
+         * Metodo per generare una stringa casuale
+         *
+         * @param string $characters Caratterri di partenza
+         * @param int    $length     Lunghezza
+         *
          * @return string
          */
-        private static function pwd_phase($characters)
+        private static function pwd_phase($characters, $length = 5)
         {
             $charactersLength = strlen($characters);
             $randomString = '';
-            for ($i = 0; $i < 5; $i++) {
+            for ($i = 0; $i < $length; $i++) {
                 $randomString .= $characters[rand(0, $charactersLength - 1)];
             }
             return $randomString;

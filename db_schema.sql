@@ -208,3 +208,56 @@ create table if not exists utenti_gruppi
     on delete cascade
     on update cascade
 );
+
+create table if not exists tag
+(
+  id_tag int(11) unsigned auto_increment
+    primary key,
+  nome   varchar(30) not null unique
+);
+
+create table if not exists fascicoli_personali
+(
+  id_elemento      int(11) unsigned auto_increment
+    primary key,
+  id_utente        int(11) unsigned not null,
+  oggetto          varchar(75)      null,
+  descrizione      text             null,
+  autore           int(11) unsigned null,
+  data_inserimento int(11)          not null,
+  data_modifica    int(11)          null,
+  foreign key (id_utente) references utenti (id_utente)
+    on delete cascade
+    on update cascade,
+  foreign key (autore) references utenti (id_utente)
+    on delete set null
+    on update cascade
+);
+
+create table if not exists tag_fascicoli_personali
+(
+  id_elemento int(11) unsigned not null,
+  tag         int(11) unsigned not null,
+  constraint associazione_unica
+    unique (id_elemento, tag),
+  foreign key (id_elemento) references fascicoli_personali (id_elemento)
+    on delete cascade
+    on update cascade,
+  foreign key (tag) references tag (id_tag)
+    on delete cascade
+    on update cascade
+);
+
+create table if not exists allegati_fascicoli_personali
+(
+  id_elemento int(11) unsigned not null,
+  id_file     int(11) unsigned not null,
+  constraint associazione_unica
+    unique (id_elemento, id_file),
+  foreign key (id_elemento) references fascicoli_personali (id_elemento)
+    on delete cascade
+    on update cascade,
+  foreign key (id_file) references files (id_file)
+    on delete cascade
+    on update cascade
+);

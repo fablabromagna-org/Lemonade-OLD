@@ -45,5 +45,6 @@ require_once(__DIR__ . '/Permesso.class.php');
 require_once(__DIR__ . '/TemplateEmail.php');
 require_once(__DIR__ . '/Scuola.php');
 require_once(__DIR__ . '/RelazioneScolastica.php');
+require_once(__DIR__ . '/Tag.php');
 
 session_start();
