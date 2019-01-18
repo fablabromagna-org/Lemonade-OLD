@@ -120,6 +120,10 @@ function apri_permessi (id_gruppo) {
                 var html = ''
 
                 for (var permesso in res.responseJSON) {
+
+                    if (!res.responseJSON.hasOwnProperty(permesso))
+                        continue
+
                     var dati_permesso = res.responseJSON[permesso]
 
                     html += '<div class="field"><div class="columns"><div class="column"><p><b>' + dati_permesso.nome +

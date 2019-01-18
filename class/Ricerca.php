@@ -160,6 +160,8 @@ namespace FabLabRomagna {
 
             $risultati = $stmt->get_result();
 
+            $res = [];
+
             while ($row = $risultati->fetch_assoc()) {
                 $res[] = $row;
             }

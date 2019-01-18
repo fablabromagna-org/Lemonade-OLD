@@ -8,11 +8,15 @@ use FabLabRomagna\SQLOperator\Equals;
 use FabLabRomagna\SQLOperator\NotEquals;
 use FabLabRomagna\Log;
 use FabLabRomagna\Firewall;
-use Aws\Ses\SesClient;
+use FabLabRomagna\Email\TemplateEmail;
+use FabLabRomagna\Email\Configuration;
+use FabLabRomagna\Email\Sender;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     reply(405, 'Method Not Allowed');
 }
+
+$config = new Configuration(SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PWD);
 
 json();
 
@@ -22,15 +26,6 @@ try {
     if (!Firewall::controllo()) {
         reply(429, 'Too Many Requests');
     }
-
-    $client = new SesClient(array(
-        'version' => '2010-12-01',
-        'region' => AWS_REGION,
-        'credentials' => [
-            'key' => AWS_MAIL_KEY,
-            'secret' => AWS_MAIL_SECRET,
-        ]
-    ));
 
     $sessione = Autenticazione::get_sessione_attiva();
 
@@ -211,8 +206,8 @@ try {
 
                         $link = URL_SITO . 'confermaMail.php?id=' . $utenteModifica->id_utente . '&c=' . $codice;
 
-                        $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-                            new \FabLabRomagna\SQLOperator\Equals('nome', 'nuova_email')
+                        $email = TemplateEmail::ricerca(array(
+                            new Equals('nome', 'nuova_email')
                         ));
 
                         foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
@@ -221,55 +216,21 @@ try {
 
                         $email->replace('link', $link);
 
-                        $client->sendEmail([
-                            'Destination' => [
-                                'ToAddresses' => [$utenteModifica->email],
-                            ],
-                            'ReplyToAddresses' => [EMAIL_REPLY_TO],
-                            'Source' => EMAIL_FROM,
-                            'Message' => [
-                                'Body' => [
-                                    'Html' => [
-                                        'Charset' => 'UTF-8',
-                                        'Data' => $email->file,
-                                    ]
-                                ],
-                                'Subject' => [
-                                    'Charset' => 'UTF-8',
-                                    'Data' => 'Verifica dell\'indirizzo email',
-                                ]
-                            ]
-                        ]);
+                        $sender = new Sender($config, $email);
+                        $sender->send([$utenteModifica->email]);
                     }
 
                     if ($vecchio_indirizzo !== null) {
-                        $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-                            new \FabLabRomagna\SQLOperator\Equals('nome', 'vecchia_email')
+                        $email = TemplateEmail::ricerca(array(
+                            new Equals('nome', 'vecchia_email')
                         ));
 
                         foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
                             $email->replace('utente.' . $campo, $valore);
                         }
 
-                        $client->sendEmail([
-                            'Destination' => [
-                                'ToAddresses' => [$vecchio_indirizzo],
-                            ],
-                            'ReplyToAddresses' => [EMAIL_REPLY_TO],
-                            'Source' => EMAIL_FROM,
-                            'Message' => [
-                                'Body' => [
-                                    'Html' => [
-                                        'Charset' => 'UTF-8',
-                                        'Data' => $email->file,
-                                    ]
-                                ],
-                                'Subject' => [
-                                    'Charset' => 'UTF-8',
-                                    'Data' => 'Indirizzo email modificato',
-                                ]
-                            ]
-                        ]);
+                        $sender = new Sender($config, $email);
+                        $sender->send([$vecchio_indirizzo]);
                     }
 
                     Log::crea($utente, 1, 'ajax/utente/aggiorna.php', 'aggiornamento_anagrafiche',
@@ -292,8 +253,8 @@ try {
 
                     $link = URL_SITO . 'confermaMail.php?id=' . $utenteModifica->id_utente . '&c=' . $codice;
 
-                    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-                        new \FabLabRomagna\SQLOperator\Equals('nome', 'ripeti_verifica_email')
+                    $email = TemplateEmail::ricerca(array(
+                        new Equals('nome', 'ripeti_verifica_email')
                     ));
 
                     foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
@@ -302,25 +263,8 @@ try {
 
                     $email->replace('link', $link);
 
-                    $client->sendEmail([
-                        'Destination' => [
-                            'ToAddresses' => [$utenteModifica->email],
-                        ],
-                        'ReplyToAddresses' => [EMAIL_REPLY_TO],
-                        'Source' => EMAIL_FROM,
-                        'Message' => [
-                            'Body' => [
-                                'Html' => [
-                                    'Charset' => 'UTF-8',
-                                    'Data' => $email->file,
-                                ]
-                            ],
-                            'Subject' => [
-                                'Charset' => 'UTF-8',
-                                'Data' => 'Verifica dell\'indirizzo email',
-                            ]
-                        ]
-                    ]);
+                    $sender = new Sender($config, $email);
+                    $sender->send([$utenteModifica->email]);
 
                     Log::crea($utente, 1, 'ajax/utente/aggiorna.php', 'verifica_email',
                         'Richiesta verifica email (utente: ' . $utenteModifica->id_utente . ')');

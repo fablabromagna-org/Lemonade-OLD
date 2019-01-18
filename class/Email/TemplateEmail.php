@@ -8,7 +8,7 @@ namespace FabLabRomagna\Email {
     /**
      * Class TemplateEmail
      *
-     * @package FabLabRomagna
+     * @package FabLabRomagna\Email
      *
      * @property-read string $nome
      * @property-read int    $id_file
@@ -81,11 +81,11 @@ namespace FabLabRomagna\Email {
         /**
          * Metodo per aggiornare il template
          *
-         * @param int $id_file ID del file del nuovo template
+         * @param File $file File del nuovo template
          *
          * @throws \Exception
          */
-        public function update_template(int $id_file)
+        public function update_template(File $file)
         {
             global $mysqli;
 
@@ -96,7 +96,7 @@ namespace FabLabRomagna\Email {
                 throw new \Exception('Unable to prepare the query!');
             }
 
-            if (!$stmt->bind_param('is', $id_file, $this->nome)) {
+            if (!$stmt->bind_param('is', $file->id_file, $this->nome)) {
                 throw new \Exception('Unable to bind params!');
             }
 
@@ -104,11 +104,11 @@ namespace FabLabRomagna\Email {
                 throw new \Exception('Unable to execute the query!');
             }
 
-            $this->id_file = $id_file;
-            $file = File::get_by_id($id_file);
+            $this->id_file = $file->id_file;
+            $file = File::get_by_id($file->id_file);
 
             if ($file === null) {
-                throw new \Exception('File not found (id: ' . $id_file . ')!');
+                throw new \Exception('File not found (id: ' . $file . ')!');
             }
 
             $file->richiedi_file();
@@ -123,7 +123,7 @@ namespace FabLabRomagna\Email {
          *
          * @throws \Exception
          */
-        public function update_object(string $oggetto)
+        public function update_subject(string $oggetto)
         {
             global $mysqli;
 
@@ -206,7 +206,7 @@ namespace FabLabRomagna\Email {
 
                 $tmp = array_merge(array($tipi), $dati_sql);
 
-                if (!$obj->invokeArgs($stmt, Ricerca::refValues($tmp))) {
+                if (!$obj->invokeArgs($stmt, \FabLabRomagna\Ricerca::refValues($tmp))) {
                     throw new \Exception('Impossibile inserire i valori nella query!');
                 }
             }
@@ -224,7 +224,7 @@ namespace FabLabRomagna\Email {
             $stmt->close();
             $row = $risultati->fetch_assoc();
 
-            return new TemplateEmail($row['nome'], $row['oggetto'], $row['id_file']);
+            return new TemplateEmail($row['nome'], (string)$row['oggetto'], $row['id_file']);
         }
 
         /**
@@ -311,7 +311,7 @@ namespace FabLabRomagna\Email {
                 throw new \Exception('MySQLi as global variable expected!');
             }
 
-            $sql = "DELETE FROM allegati_template_email WHERE nome = ?";
+            $sql = "SELECT * FROM allegati_template_email WHERE nome = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {

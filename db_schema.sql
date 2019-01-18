@@ -25,6 +25,7 @@ create table if not exists email_templates
   nome    varchar(255)     not null
     primary key,
   id_file int(11) unsigned not null,
+  oggetto varchar(255)     not null,
   foreign key (id_file) references files (id_file)
     on delete restrict
     on update cascade
@@ -255,6 +256,21 @@ create table if not exists allegati_fascicoli_personali
   constraint associazione_unica
     unique (id_elemento, id_file),
   foreign key (id_elemento) references fascicoli_personali (id_elemento)
+    on delete cascade
+    on update cascade,
+  foreign key (id_file) references files (id_file)
+    on delete cascade
+    on update cascade
+);
+
+create table if not exists allegati_template_email
+(
+  nome     varchar(255)     not null,
+  id_file  int(11) unsigned not null,
+  embedded tinyint(1)       not null default false,
+  constraint associazione_unica
+    unique (nome, id_file),
+  foreign key (nome) references email_templates (nome)
     on delete cascade
     on update cascade,
   foreign key (id_file) references files (id_file)

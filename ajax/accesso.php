@@ -9,11 +9,16 @@ use FabLabRomagna\Autenticazione;
 use FabLabRomagna\OggettoRegistro;
 use FabLabRomagna\Firewall;
 use FabLabRomagna\SQLOperator\Equals;
-use Aws\Ses\SesClient;
+use FabLabRomagna\Email\TemplateEmail;
+use FabLabRomagna\Email\Configuration;
+use FabLabRomagna\Email\Sender;
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     reply(405, 'Method Not Allowed');
 }
+
+$config = new Configuration(SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PWD);
 
 json();
 
@@ -23,15 +28,6 @@ try {
     if (!Firewall::controllo()) {
         reply(429, 'Too Many Requests');
     }
-
-    $client = new SesClient(array(
-        'version' => '2010-12-01',
-        'region' => AWS_REGION,
-        'credentials' => [
-            'key' => AWS_MAIL_KEY,
-            'secret' => AWS_MAIL_SECRET,
-        ]
-    ));
 
     $dati = json_decode(file_get_contents('php://input'), true);
 
@@ -129,33 +125,16 @@ try {
         if (count(OggettoRegistro::ricerca_da_ip('FabLabRomagna\Autenticazione',
                 'login', $ip, 300)) > 3) {
 
-            $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-                new \FabLabRomagna\SQLOperator\Equals('nome', 'accessi_bloccati')
+            $email = TemplateEmail::ricerca(array(
+                new Equals('nome', 'accessi_bloccati')
             ));
 
             foreach ($utente->getDataGridFields() as $campo => $valore) {
                 $email->replace('utente.' . $campo, $valore);
             }
 
-            $client->sendEmail([
-                'Destination' => [
-                    'ToAddresses' => [$utente->email],
-                ],
-                'ReplyToAddresses' => [EMAIL_REPLY_TO],
-                'Source' => EMAIL_FROM,
-                'Message' => [
-                    'Body' => [
-                        'Html' => [
-                            'Charset' => 'UTF-8',
-                            'Data' => $email->file,
-                        ]
-                    ],
-                    'Subject' => [
-                        'Charset' => 'UTF-8',
-                        'Data' => 'Accessi falliti',
-                    ]
-                ]
-            ]);
+            $sender = new Sender($config, $email);
+            $sender->send([$utente->email]);
 
             Firewall::aggiungi_regola($ip, 32, 'reject', 900);
         }
@@ -172,33 +151,16 @@ try {
     FabLabRomagna\Log::crea($utente, 1, 'ajax/accesso.php', 'login',
         'Effettuato un nuovo accesso.');
 
-    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-        new \FabLabRomagna\SQLOperator\Equals('nome', 'nuovo_accesso')
+    $email = TemplateEmail::ricerca(array(
+        new Equals('nome', 'nuovo_accesso')
     ));
 
     foreach ($utente->getDataGridFields() as $campo => $valore) {
         $email->replace('utente.' . $campo, $valore);
     }
 
-    $client->sendEmail([
-        'Destination' => [
-            'ToAddresses' => [$utente->email],
-        ],
-        'ReplyToAddresses' => [EMAIL_REPLY_TO],
-        'Source' => EMAIL_FROM,
-        'Message' => [
-            'Body' => [
-                'Html' => [
-                    'Charset' => 'UTF-8',
-                    'Data' => $email->file,
-                ]
-            ],
-            'Subject' => [
-                'Charset' => 'UTF-8',
-                'Data' => 'Nuovo accesso',
-            ]
-        ]
-    ]);
+    $sender = new Sender($config, $email);
+    $sender->send([$utente->email]);
 
     reply(200, 'Ok', array(
         'redirect' => '/dashboard.php'

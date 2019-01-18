@@ -8,11 +8,15 @@ use FabLabRomagna\SQLOperator\Equals;
 use FabLabRomagna\SQLOperator\NotEquals;
 use FabLabRomagna\Log;
 use FabLabRomagna\Firewall;
-use Aws\Ses\SesClient;
+use FabLabRomagna\Email\TemplateEmail;
+use FabLabRomagna\Email\Configuration;
+use FabLabRomagna\Email\Sender;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     reply(405, 'Method Not Allowed');
 }
+
+$config = new Configuration(SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PWD);
 
 json();
 
@@ -76,68 +80,42 @@ try {
         reply(400, 'Bad Request', array(), true);
     }
 
-    $utenteModifica = Utente::ricerca([
+    $utente_modifica = Utente::ricerca([
         new Equals('id_utente', $dati['id_utente'])
     ]);
 
-    if (count($utenteModifica) !== 1) {
+    if (count($utente_modifica) !== 1) {
         reply(400, 'Bad Request', null, true);
     }
 
-    $utenteModifica = $utenteModifica->risultato[0];
+    $utente_modifica = $utente_modifica->risultato[0];
 
     /**
-     * @var Utente $utenteModifica
+     * @var Utente $utente_modifica
      */
 
     $password = Autenticazione::generatePassword();
 
-    if ($utenteModifica->email !== null) {
+    if ($utente_modifica->email !== null) {
 
-        $client = new SesClient(array(
-            'version' => '2010-12-01',
-            'region' => AWS_REGION,
-            'credentials' => [
-                'key' => AWS_MAIL_KEY,
-                'secret' => AWS_MAIL_SECRET,
-            ]
+        $email = TemplateEmail::ricerca(array(
+            new Equals('nome', 'reset_password')
         ));
 
-        $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-            new \FabLabRomagna\SQLOperator\Equals('nome', 'reset_password')
-        ));
-
-        foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
+        foreach ($utente_modifica->getDataGridFields() as $campo => $valore) {
             $email->replace('utente.' . $campo, $valore);
         }
 
         $email->replace('password', $password);
 
-        $client->sendEmail([
-            'Destination' => [
-                'ToAddresses' => [$utenteModifica->email],
-            ],
-            'ReplyToAddresses' => [EMAIL_REPLY_TO],
-            'Source' => EMAIL_FROM,
-            'Message' => [
-                'Body' => [
-                    'Html' => [
-                        'Charset' => 'UTF-8',
-                        'Data' => $email->file,
-                    ]
-                ],
-                'Subject' => [
-                    'Charset' => 'UTF-8',
-                    'Data' => 'Nuova password',
-                ]
-            ]
-        ]);
+        $sender = new Sender($config, $email);
+        $sender->send([$utente_modifica->email]);
     }
 
-    Autenticazione::set_user_password($utenteModifica, $password);
+    Autenticazione::set_user_password($utente_modifica, $password);
 
     reply(200, 'Ok', array(
-        'redirect' => '/gestione/utenti/utente.php?id=' . $utenteModifica->id_utente
+        'redirect' => '/gestione/utenti/utente.php?id=' . $utente_modifica->id_utente
     ));
 
 } catch (Exception $e) {

@@ -112,7 +112,7 @@ try {
         ), true);
     }
 
-    if ($utenteModifica->email !== null) {
+    if ($utente_modifica->email !== null) {
 
         $client = new SesClient(array(
             'version' => '2010-12-01',

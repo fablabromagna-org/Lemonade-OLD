@@ -2,7 +2,6 @@
 require_once(__DIR__ . '/../../class/autoload.inc.php');
 
 use FabLabRomagna\Utente;
-use FabLabRomagna\Gruppo;
 use FabLabRomagna\Permesso;
 use FabLabRomagna\Autenticazione;
 use FabLabRomagna\SQLOperator\Equals;
@@ -59,7 +58,7 @@ try {
         }
 
         $campi_modificabili = [
-            'id_gruppo',
+            'id_utente',
             '_'
         ];
 
@@ -67,22 +66,22 @@ try {
             reply(400, 'Bad Request', null, true);
         }
 
-        if (!preg_match('/^[0-9]{1,11}$/', $dati['id_gruppo'])) {
+        if (!preg_match('/^[0-9]{1,11}$/', $dati['id_utente'])) {
             reply(400, 'Bad Request', null, true);
         }
 
-        $gruppo = Gruppo::ricerca(array(
-            new Equals('id_gruppo', $dati['id_gruppo'])
+        $utente_ricerca = Utente::ricerca(array(
+            new Equals('id_utente', $dati['id_utente'])
         ));
 
-        if (count($gruppo) !== 1) {
+        if (count($utente_ricerca) !== 1) {
             reply(404, 'Not Found', null, true);
         }
 
-        $gruppo = $gruppo->risultato[0];
+        $utente_ricerca = $utente_ricerca->risultato[0];
 
         /**
-         * @var Gruppo $gruppo
+         * @var Utente $utente_ricerca
          */
 
         $sql = "SELECT * FROM permessi WHERE utente = ? AND id_utente_gruppo = ?";
@@ -97,7 +96,7 @@ try {
 
         $permessi_gruppo = ELENCO_PERMESSI;
 
-        if (!$stmt->bind_param('ii', $false, $gruppo->id_gruppo)) {
+        if (!$stmt->bind_param('ii', $true, $utente_ricerca->id_utente)) {
             throw new \Exception('Unable to bind params!');
         }
 
@@ -117,7 +116,7 @@ try {
 
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-        if (!$permessi['gestione.permessi.modificare_gruppi']['reale']) {
+        if (!$permessi['gestione.permessi.modificare_utenti']['reale']) {
             reply(401, 'Unauthorized', null, true);
         }
 
@@ -132,7 +131,7 @@ try {
         }
 
         $campi_modificabili = array_keys(ELENCO_PERMESSI);
-        $campi_modificabili[] = 'id_gruppo';
+        $campi_modificabili[] = 'id_utente';
 
         // Controllo che tutti i campi inviati siano tra quelli modificabili
         foreach ($dati as $key => $value) {
@@ -142,7 +141,7 @@ try {
         }
 
         foreach ($dati as $key => $value) {
-            if ($key === 'id_gruppo') {
+            if ($key === 'id_utente') {
                 continue;
             }
 
@@ -156,36 +155,36 @@ try {
         }
 
 
-        $gruppo = Gruppo::ricerca(array(
-            new Equals('id_gruppo', $dati['id_gruppo'])
+        $utente_ricerca = Utente::ricerca(array(
+            new Equals('id_utente', $dati['id_utente'])
         ));
 
-        if (count($gruppo) !== 1) {
+        if (count($utente_ricerca) !== 1) {
             reply(404, 'Not Found', array(
-                'alert' => 'Gruppo inesistente!'
+                'alert' => 'Utente inesistente!'
             ));
         }
 
-        $gruppo = $gruppo->risultato[0];
+        $utente_ricerca = $utente_ricerca->risultato[0];
 
         /**
-         * @var Gruppo $gruppo
+         * @var Utente $utente_ricerca
          */
 
         foreach ($dati as $key => $value) {
-            if ($key === 'id_gruppo') {
+            if ($key === 'id_utente') {
                 continue;
             }
 
             if ($value !== null) {
-                Permesso::aggiungi_permesso($gruppo, $key, $value);
-            } elseif (($permesso = Permesso::get_permission($gruppo, $key)) !== null) {
+                Permesso::aggiungi_permesso($utente_ricerca, $key, $value);
+            } elseif (($permesso = Permesso::get_permission($utente_ricerca, $key)) !== null) {
                 $permesso->rimuovi();
             }
         }
 
-        Log::crea($utente, 1, 'ajax/gruppo/permessi.php', 'crea',
-            'Modificati permessi al gruppo ID: ' . $gruppo->id_gruppo . ' Nome: ' . $gruppo->nome);
+        Log::crea($utente, 1, 'ajax/utente/permessi.php', 'crea',
+            'Modificati permessi all\'utente ID: ' . $utente_ricerca->id_utente . ' Nome: ' . $utente_ricerca->cognome . ' Nome: ' . $utente_ricerca->cognome);
 
         reply(204, 'No Content', null, true);
 
@@ -196,10 +195,10 @@ try {
 } catch (Exception $e) {
 
     if ($utente instanceof Utente) {
-        Log::crea($utente, 3, 'ajax/gruppo/permessi.php', 'update',
+        Log::crea($utente, 3, 'ajax/utente/permessi.php', 'update',
             'Impossibile completare la richiesta.', (string)$e);
     } else {
-        Log::crea(null, 3, 'ajax/gruppo/permessi.php', 'update',
+        Log::crea(null, 3, 'ajax/utente/permessi.php', 'update',
             'Impossibile completare la richiesta.', (string)$e);
     }
 

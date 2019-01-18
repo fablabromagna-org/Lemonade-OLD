@@ -12,7 +12,7 @@
         </div>
     </div>
     <div>
-        <p>Lemonade è un progetto realizzato da Edoardo Savini per <a href="https://fablabromagna.org">FabLab
+        <p>Lemonade 🍋 è un progetto realizzato da Edoardo Savini per <a href="https://fablabromagna.org">FabLab
                 Romagna</a>.<br/>Codice sorgente
             rilasciato con licenza LGPL-3.0 su <a
                     href="https://github.com/fablabromagna-org/Lemonade/">GitHub</a>.</p>

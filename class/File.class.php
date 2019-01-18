@@ -78,7 +78,6 @@ namespace FabLabRomagna {
             $ts_inserimento,
             $mime = null,
             $nome = null,
-            $file = null,
             $md5 = null,
             $sha256 = null
         ) {
@@ -397,7 +396,7 @@ namespace FabLabRomagna {
                 throw new \Exception('Invalid file timestamp!');
             }
 
-            $sql = "SELECT nome, mime, ts_inserimento, id_file, `sha256`, `md5` FROM files WHERE id_file = ?";
+            $sql = "SELECT nome, mime, ts_inserimento, id_file, `sha256`, `md5`  FROM files WHERE id_file = ?";
             $stmt = $mysqli->prepare($sql);
 
             if ($stmt === false) {
@@ -420,7 +419,7 @@ namespace FabLabRomagna {
 
             $row = $stmt->fetch_assoc();
 
-            return new File($id, $row['ts_inserimento'], $row['mime'], $row['nome']);
+            return new File($id, $row['ts_inserimento'], $row['mime'], $row['nome'], $row['md5'], $row['sha256']);
         }
     }
 }

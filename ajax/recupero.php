@@ -5,14 +5,17 @@ require_once(__DIR__ . '/../vendor/autoload.php');
 use FabLabRomagna\Utente;
 use FabLabRomagna\Autenticazione;
 use FabLabRomagna\SQLOperator\Equals;
-use FabLabRomagna\SQLOperator\NotEquals;
 use FabLabRomagna\Log;
 use FabLabRomagna\Firewall;
-use Aws\Ses\SesClient;
+use FabLabRomagna\Email\TemplateEmail;
+use FabLabRomagna\Email\Configuration;
+use FabLabRomagna\Email\Sender;
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     reply(405, 'Method Not Allowed');
 }
+
+$config = new Configuration(SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PWD);
 
 json();
 
@@ -77,17 +80,8 @@ try {
 
     $password = Autenticazione::generatePassword();
 
-    $client = new SesClient(array(
-        'version' => '2010-12-01',
-        'region' => AWS_REGION,
-        'credentials' => [
-            'key' => AWS_MAIL_KEY,
-            'secret' => AWS_MAIL_SECRET,
-        ]
-    ));
-
-    $email = \FabLabRomagna\TemplateEmail::ricerca(array(
-        new \FabLabRomagna\SQLOperator\Equals('nome', 'recupero_password')
+    $email = TemplateEmail::ricerca(array(
+        new Equals('nome', 'recupero_password')
     ));
 
     foreach ($utenteModifica->getDataGridFields() as $campo => $valore) {
@@ -96,25 +90,8 @@ try {
 
     $email->replace('password', $password);
 
-    $client->sendEmail([
-        'Destination' => [
-            'ToAddresses' => [$utenteModifica->email],
-        ],
-        'ReplyToAddresses' => [EMAIL_REPLY_TO],
-        'Source' => EMAIL_FROM,
-        'Message' => [
-            'Body' => [
-                'Html' => [
-                    'Charset' => 'UTF-8',
-                    'Data' => $email->file,
-                ]
-            ],
-            'Subject' => [
-                'Charset' => 'UTF-8',
-                'Data' => 'Nuova password',
-            ]
-        ]
-    ]);
+    $sender = new Sender($config, $email);
+    $sender->send([$utenteModifica->email]);
 
     Autenticazione::set_user_password($utenteModifica, $password);
 

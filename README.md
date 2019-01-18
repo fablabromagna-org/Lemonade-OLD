@@ -1,4 +1,4 @@
-# Lemonade (formerly FabLab-Romagna-Auth)
+# Lemonade 🍋 (formerly FabLab-Romagna-Auth)
 Lemonade (formerly FabLab-Romagna-Auth) is FabLab Romagna's information system. Currently we are rewriting almost everything.
 
 ## Download and installation

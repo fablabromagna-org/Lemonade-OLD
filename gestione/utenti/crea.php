@@ -36,7 +36,7 @@ try {
     $utente = $utente->risultato[0];
     $permessi = \FabLabRomagna\Permesso::what_can_i_do($utente);
 
-    if (!$permessi['gestione.utenti.visualizzare_utenti']['reale']) {
+    if (!$permessi['gestione.utenti.creare']['reale']) {
         header('Location: /dashboard.php');
         exit();
     }
