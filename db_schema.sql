@@ -277,3 +277,83 @@ create table if not exists allegati_template_email
     on delete cascade
     on update cascade
 );
+
+create table if not exists makerspace
+(
+  id_makerspace int(11) unsigned auto_increment primary key,
+  nome          varchar(255),
+  eliminato     tinyint(1) not null default false
+);
+
+create table if not exists badge
+(
+  id_assegnazione     int(11) unsigned auto_increment
+    primary key,
+  rfid                char(10)         not null,
+  data_assegnazione   int(11),
+  utente_assegnazione int(11) unsigned not null,
+  revocato            tinyint(1)       not null default false,
+  foreign key (utente_assegnazione) references utenti (id_utente)
+    on delete cascade
+    on update cascade
+);
+
+create table if not exists totem
+(
+  id_totem      int(11) unsigned auto_increment
+    primary key,
+  id_makerspace int(11) unsigned not null,
+  nome          varchar(255)     not null,
+  test          tinyint(1)       not null default false,
+  token         char(36)         not null,
+  foreign key (id_makerspace) references makerspace (id_makerspace)
+    on delete cascade
+    on update cascade
+);
+
+create table if not exists presenze
+(
+  id_presenza     int(11) unsigned auto_increment
+    primary key,
+  id_utente       int(11) unsigned not null,
+  id_totem_inizio int(11) unsigned,
+  id_totem_fine   int(11) unsigned,
+  orario_inizio   int(11)          not null,
+  orario_fine     int(11)          not null,
+  badge_inizio    int(11) unsigned,
+  badge_fine      int(11) unsigned,
+  annullato       tinyint(1)       not null default false,
+  foreign key (id_utente) references utenti (id_utente)
+    on delete cascade
+    on update cascade,
+  foreign key (id_totem_inizio) references totem (id_totem)
+    on delete cascade
+    on update cascade,
+  foreign key (id_totem_fine) references totem (id_totem)
+    on delete cascade
+    on update cascade,
+  foreign key (badge_inizio) references badge (id_assegnazione)
+    on delete cascade
+    on update cascade,
+  foreign key (badge_fine) references badge (id_assegnazione)
+    on delete cascade
+    on update cascade
+);
+
+create table if not exists attivita
+(
+  id_attivita   int(11) unsigned auto_increment
+    primary key,
+  id_utente     int(11) unsigned not null,
+  oggetto       varchar(125)     not null,
+  descrizione   text,
+  link_presenza int(11) unsigned,
+  inizio        int(11), # NULL se link_presenza contiene qualcosa
+  fine          int(11), # NULL se link_presenza contiene qualcosa
+  foreign key (id_utente) references utenti (id_utente)
+    on delete cascade
+    on update cascade,
+  foreign key (link_presenza) references presenze (id_presenza)
+    on delete cascade
+    on update cascade
+);
